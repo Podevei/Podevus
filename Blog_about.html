@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于 - Podevus</title>
+    <style>
+        :root {
+            --primary-bg: #faf8f3;
+            --secondary-bg: #f5f1e8;
+            --accent-color: #c89b6d;
+            --accent-hover: #a67c52;
+            --text-primary: #2d2520;
+            --text-secondary: #5a504a;
+            --text-muted: #8b7f76;
+            --border-light: #e8dfd2;
+            --border-dark: #d4c4b0;
+            --shadow-color: rgba(45, 37, 32, 0.08);
+            --card-bg: #ffffff;
+            --font-serif: "Noto Serif JP", "Source Han Serif CN", Georgia, serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-bg: #1a1816;
+                --secondary-bg: #242220;
+                --accent-color: #d4a574;
+                --accent-hover: #e6b786;
+                --text-primary: #e8e6e3;
+                --text-secondary: #c4bfb8;
+                --text-muted: #8b8580;
+                --border-light: #3a3633;
+                --border-dark: #4a4440;
+                --shadow-color: rgba(0, 0, 0, 0.3);
+                --card-bg: #242220;
+            }
+        }
+
+
+        .ripple {
+            position: fixed;
+            border: 2px solid var(--cursor-color);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            animation: ripple-animation 0.6s ease-out;
+        }
+
+        @keyframes ripple-animation {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.8;
+            }
+            100% {
+                width: 80px;
+                height: 80px;
+                opacity: 0;
+            }
+        }
+
+        body {
+            font-family: var(--font-sans);
+            line-height: 1.8;
+            color: var(--text-primary);
+            background: var(--primary-bg);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--shadow-color) 2px, var(--shadow-color) 4px);
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        header {
+            border-bottom: 2px solid var(--border-dark);
+            padding-bottom: 30px;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 120px;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.5s ease;
+        }
+
+        header:hover::after {
+            width: 200px;
+        }
+
+        h1 {
+            font-family: var(--font-serif);
+            font-size: 2.5em;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            letter-spacing: 0.02em;
+        }
+
+        h1 a {
+            color: inherit;
+            text-decoration: none;
+            position: relative;
+        }
+
+        h1 a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        h1 a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .subtitle {
+            font-family: var(--font-serif);
+            font-size: 1.15em;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            margin-left: 0.15em;
+        }
+
+        nav {
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 30px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95em;
+            position: relative;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+            font-weight: 400;
+        }
+
+        nav a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        nav a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        nav a.active {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        nav a.active::before {
+            transform: scaleX(1);
+        }
+
+        .about-content {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 2px 8px var(--shadow-color);
+            margin-bottom: 40px;
+        }
+
+        .about-content h2 {
+            font-family: var(--font-serif);
+            font-size: 1.8em;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: 10px;
+        }
+
+        .about-content p {
+            font-size: 1.05em;
+            line-height: 1.9;
+            color: var(--text-secondary);
+            margin-bottom: 1.5em;
+        }
+
+        .about-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding-top: 30px;
+            border-top: 2px solid var(--border-dark);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9em;
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: var(--accent-color);
+        }
+
+        footer p:first-child {
+            font-family: var(--font-serif);
+            margin-bottom: 12px;
+            font-size: 1.05em;
+        }
+
+        footer p:last-child {
+            font-size: 0.85em;
+            font-style: italic;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 18px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .about-content {
+                padding: 25px;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        ::selection {
+            background: var(--accent-color);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <header>
+        <h1><a href="index.html">Podevus</a></h1>
+        <p class="subtitle">記 · 思 · 道</p>
+        <nav>
+            <a href="index.html">首页</a>
+            <a href="category/Blog_category_tech.html">技术</a>
+            <a href="category/Blog_category_reading.html">读书</a>
+            <a href="category/Blog_category_anime.html">幻想</a>
+            <a href="category/Blog_category_thinking.html">思考</a>
+            <a href="Blog_about.html" class="active">关于</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="about-content">
+            <h2>关于本站</h2>
+            <p>欢迎来到 Podevus，这是一个记录思考、分享观点的个人空间。</p>
+            <p>在这里，我会分享关于技术、阅读、动画作品以及日常思考的文章。希望这些文字能够引发一些共鸣，或者至少给你带来片刻的思考。</p>
+            <p>本站采用极简设计理念，融合大正浪漫时代的优雅美学，旨在让内容本身成为焦点。褪去繁复的装饰，让文字在宁静中绽放。</p>
+        </div>
+
+        <div class="about-content">
+            <h2>关于作者</h2>
+            <p>一个热爱思考、喜欢记录的普通人。</p>
+            <p>相信文字的力量，相信美好的事物值得被记录和分享。</p>
+        </div>
+
+        <div class="about-content">
+            <h2>设计理念</h2>
+            <p><strong>择美而留，存质而弃暗</strong> —— 这是本站的设计哲学。</p>
+            <p>选择美好的事物保留下来，保存事物的本质而摒弃阴暗面。正如 Prima Doll 中那个理想化的世界，我们保留那个时代所有迷人的视觉元素，却巧妙地剥离了真实历史中的压迫、创伤和社会黑暗面。</p>
+            <p>这不是逃避现实，而是一种审美选择 —— 在保持真诚的同时，我们有权利创造一个更加温暖、美好的表达空间。</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Podevus</p>
+        <p>择美而留,存质而弃暗</p>
+    </footer>
+</body>
+</html>

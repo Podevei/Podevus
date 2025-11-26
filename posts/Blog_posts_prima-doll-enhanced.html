@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プリマドール:蒸汽朋克与大正浪漫的完美融合 - Podevus</title>
+    <style>
+
+:root {
+    /* 大正浪漫配色 - 温暖复古 */
+    --primary-bg: #faf8f3;
+    --secondary-bg: #f5f1e8;
+    --accent-color: #c89b6d;
+    --accent-hover: #a67c52;
+    --text-primary: #2d2520;
+    --text-secondary: #5a504a;
+    --text-muted: #8b7f76;
+    --border-light: #e8dfd2;
+    --border-dark: #d4c4b0;
+    --shadow-color: rgba(45, 37, 32, 0.08);
+    --card-bg: #ffffff;
+    
+    /* 字体 */
+    --font-serif: "Noto Serif JP", "Source Han Serif CN", Georgia, serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-bg: #1a1816;
+        --secondary-bg: #242220;
+        --accent-color: #d4a574;
+        --accent-hover: #e6b786;
+        --text-primary: #e8e6e3;
+        --text-secondary: #c4bfb8;
+        --text-muted: #8b8580;
+        --border-light: #3a3633;
+        --border-dark: #4a4440;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --card-bg: #242220;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ============ 光标效果 ============ */
+body {
+    cursor: none;
+}
+
+/* 隐藏默认光标 */
+a, button, .post, nav a {
+    cursor: none !important;
+}
+
+/* 自定义光标 - 小圆点 */
+.cursor-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 10000;
+    transition: transform 0.15s ease, opacity 0.3s ease;
+    mix-blend-mode: difference;
+}
+
+/* 自定义光标 - 外圈 */
+.cursor-outline {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.2s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    opacity: 0.6;
+    mix-blend-mode: difference;
+}
+
+/* 悬停在链接上时 */
+body.cursor-hover .cursor-outline {
+    width: 60px;
+    height: 60px;
+    opacity: 0.8;
+}
+
+body.cursor-hover .cursor-dot {
+    transform: scale(1.5);
+}
+
+/* 点击时 */
+body.cursor-active .cursor-dot {
+    transform: scale(0.8);
+}
+
+body.cursor-active .cursor-outline {
+    width: 50px;
+    height: 50px;
+}
+
+/* 涟漪效果 */
+.cursor-ripple {
+    position: fixed;
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    animation: ripple-effect 0.6s ease-out;
+    opacity: 0;
+}
+
+@keyframes ripple-effect {
+    0% {
+        width: 20px;
+        height: 20px;
+        opacity: 1;
+    }
+    100% {
+        width: 100px;
+        height: 100px;
+        opacity: 0;
+    }
+}
+
+/* ============ 页面基础样式 ============ */
+body {
+    font-family: var(--font-sans);
+    line-height: 1.8;
+    color: var(--text-primary);
+    background: var(--primary-bg);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    transition: background 0.3s ease;
+}
+
+/* 页面装饰 - 微妙的纹理 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            var(--shadow-color) 2px,
+            var(--shadow-color) 4px
+        );
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: -1;
+}
+
+header {
+    border-bottom: 2px solid var(--border-dark);
+    padding-bottom: 30px;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+/* 装饰线条 */
+header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 120px;
+    height: 2px;
+    background: var(--accent-color);
+    transition: width 0.5s ease;
+}
+
+header:hover::after {
+    width: 200px;
+}
+
+h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5em;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+
+h1 a {
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+}
+
+h1 a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+h1 a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.subtitle {
+    font-family: var(--font-serif);
+    font-size: 1.15em;
+    color: var(--text-secondary);
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    margin-left: 0.15em;
+}
+
+nav {
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 30px;
+}
+
+nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95em;
+    position: relative;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+    font-weight: 400;
+}
+
+nav a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+nav a:hover {
+    color: var(--accent-color);
+}
+
+nav a:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+nav a.active {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+nav a.active::before {
+    transform: scaleX(1);
+}
+
+/* 文章卡片 */
+.post {
+    background: var(--card-bg);
+    margin-bottom: 40px;
+    padding: 35px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.post::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+}
+
+.post:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--shadow-color);
+    border-color: var(--border-dark);
+}
+
+.post:hover::before {
+    transform: scaleX(1);
+}
+
+.post-title {
+    font-family: var(--font-serif);
+    font-size: 1.65em;
+    font-weight: 500;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.post-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.post-title a:hover {
+    color: var(--accent-color);
+}
+
+.post-meta {
+    font-size: 0.88em;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+}
+
+.post-category {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+.post-category:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 155, 109, 0.3);
+}
+
+.post-excerpt {
+    color: var(--text-secondary);
+    font-size: 1.02em;
+    line-height: 1.85;
+    margin-bottom: 18px;
+}
+
+.read-more {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 0.92em;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.3s ease, color 0.3s ease;
+}
+
+.read-more::after {
+    content: '→';
+    transition: transform 0.3s ease;
+}
+
+.read-more:hover {
+    gap: 10px;
+    color: var(--accent-hover);
+}
+
+.read-more:hover::after {
+    transform: translateX(3px);
+}
+
+/* 分类页标题 */
+.category-header {
+    margin-bottom: 40px;
+}
+
+.category-title {
+    font-family: var(--font-serif);
+    font-size: 1.8em;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.category-description {
+    color: var(--text-secondary);
+    font-size: 1em;
+}
+
+/* 文章详情页 */
+.article-header {
+    margin-bottom: 40px;
+}
+
+.article-title {
+    font-family: var(--font-serif);
+    font-size: 2em;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.article-meta {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.article-meta span {
+    margin-right: 15px;
+}
+
+.article-content {
+    font-size: 1.05em;
+    line-height: 1.9;
+    color: var(--text-secondary);
+}
+
+.article-content p {
+    margin-bottom: 1.5em;
+}
+
+.article-content h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    color: var(--text-primary);
+}
+
+.back-link {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.back-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+    color: var(--accent-hover);
+}
+
+footer {
+    margin-top: 80px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border-dark);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    position: relative;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--accent-color);
+}
+
+footer p:first-child {
+    font-family: var(--font-serif);
+    margin-bottom: 12px;
+    font-size: 1.05em;
+}
+
+footer p:last-child {
+    font-size: 0.85em;
+    font-style: italic;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    body {
+        padding: 18px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .subtitle {
+        font-size: 1em;
+        letter-spacing: 0.2em;
+    }
+
+    .post {
+        padding: 25px;
+    }
+
+    .post-title {
+        font-size: 1.4em;
+    }
+
+    nav {
+        gap: 8px 20px;
+    }
+    
+    .cursor-dot,
+    .cursor-outline {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.7em;
+    }
+
+    .post {
+        padding: 20px;
+    }
+
+    .post-title {
+        font-size: 1.25em;
+    }
+}
+
+/* 平滑滚动 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 选中文本样式 */
+::selection {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="../index.html">Podevus</a></h1>
+        <p class="subtitle">記 · 思 · 道</p>
+        <nav>
+            <a href="../index.html">首页</a>
+            <a href="../category/tech.html">技术</a>
+            <a href="../category/reading.html">读书</a>
+            <a href="../category/anime.html">幻想</a>
+            <a href="../category/thinking.html">思考</a>
+            <a href="../about.html">关于</a>
+        </nav>
+    </header>
+
+    <article>
+        <div class="article-header">
+            <h1 class="article-title">プリマドール:蒸汽朋克与大正浪漫的完美融合</h1>
+            <div class="article-meta">
+                <a href="../category/Blog_category_anime.html" class="post-category">幻想</a>
+                <span>2025年11月10日</span>
+                <span>阅读时间: 约5分钟</span>
+            </div>
+        </div>
+
+        <div class="article-content">
+            <p>プリマドール最吸引人的地方,在于它构建了一个理想化的复古未来主义世界。故事背景设定在战后的架空世界,融合了蒸汽朋克的机械美学与大正浪漫时代的优雅氛围。那些曾作为战争兵器的自律人偶,在和平年代转而经营咖啡馆的设定,本身就充满了诗意与反差感。</p>
+
+            <h2>理想化的世界观构建</h2>
+
+            <p>这部作品最成功的地方,是它保留了那个时代所有迷人的视觉元素——精致的洋装、古典的室内装潢、蒸汽机械的齿轮与铜管——却巧妙地剥离了真实历史中的压迫、战争创伤和社会黑暗面。观众可以纯粹地沉浸在这种美学营造的浪漫中,享受一种"如果历史可以这样就好了"的理想投射。</p>
+
+            <p>蒸汽朋克元素不仅仅停留在表面的装饰层面,而是深度融入了世界观设定。自律人偶本身就是机械与生命的完美结合体,她们的存在本身就体现了这个架空世界的科技水平。齿轮转动的声音、蒸汽升腾的画面、机械关节的精密构造,这些细节都让这个世界显得真实可信。</p>
+
+            <h2>从战争到日常的诗意转变</h2>
+
+            <p>故事最打动人心的设定,莫过于战争人偶到咖啡馆店员的身份转变。这种反差不仅仅是职业的改变,更是从毁灭到创造、从冰冷到温暖、从工具到个体的深层转变。</p>
+
+            <p>人偶们在咖啡馆的日常——冲泡咖啡、招待客人、打扫卫生——这些看似平凡的琐事,对她们而言却是重新寻找存在意义的过程。战争结束后,她们不再需要作为兵器存在,反而要学习如何"像人一样生活"。这种探索本身就充满了哲学意味。</p>
+
+            <h3>治愈系氛围的营造</h3>
+
+            <p>咖啡馆"黑猫亭"本身就是一个温暖的避风港。昏黄的灯光、木质的桌椅、墙上的挂画、窗外的街景,每一个场景都经过精心设计,营造出一种恬静而温馨的氛围。</p>
+
+            <p>动画在色彩运用上也颇具匠心。大量使用暖色调和柔和的光影处理,让整部作品笼罩在一种怀旧而浪漫的滤镜之下。这种视觉呈现方式,配合舒缓的配乐,共同构建了治愈系的观感体验。</p>
+
+            <h2>角色塑造的细腻度</h2>
+
+            <p>每个人偶都有鲜明的个性特征和独特的过往经历。从外向活泼的レーツェル到沉默寡言的ハイゼ,从严肃认真的カギハ到天然呆萌的オトマティカ,角色设定层次丰富,避免了脸谱化。</p>
+
+            <p>更重要的是,作品并没有回避她们作为"兵器"的过去。相反,正是这些战争记忆与和平日常的对比,让角色塑造更加立体。她们如何面对曾经的自己?如何处理战争创伤?如何在新的生活中找到意义?这些问题的探讨赋予了角色深度。</p>
+
+            <h2>大正浪漫的美学追求</h2>
+
+            <p>大正时代(1912-1926)是日本历史上一个独特的时期,西化与传统、新潮与复古并存。プリマドール巧妙地捕捉了这个时代的美学精髓——西式建筑中的东方元素、洋装下的和风配饰、现代生活方式中保留的传统礼仪。</p>
+
+            <p>这种文化混搭不是生硬的拼贴,而是自然的融合。角色的服装设计就是最好的例证:既有维多利亚风格的蓬蓬裙和蕾丝装饰,又融入了和服的配色方案和细节处理。这种混搭恰恰体现了那个时代的文化特质。</p>
+
+            <h2>为什么我们需要这样的作品?</h2>
+
+            <p>在快节奏、高压力的现代社会,像プリマドール这样的作品提供了一个精神避难所。它不要求观众思考沉重的现实问题,不制造紧张的戏剧冲突,而是单纯地提供一个美好的、理想化的世界供人沉浸。</p>
+
+            <p>这种"逃避"并非消极的。相反,通过这样的作品,我们可以暂时抽离现实的焦虑,在美学的享受中获得心灵的休憩。当我们重新回到现实时,或许能带着更平和的心态去面对生活。</p>
+
+            <p>プリマドール的魅力,正在于它为我们构建了一个永恒的黄昏时刻——咖啡馆的灯光刚刚亮起,街道上行人渐少,人偶们开始准备晚间的营业。在那个片刻,时间仿佛停滞,所有的美好都被凝固。而我们,就是那个推门而入的客人,在这片刻的温暖中,找到了短暂的安宁。</p>
+        </div>
+
+        <div class="back-link">
+            <a href="../index.html">返回首页</a>
+            <a href="../category/Blog_category_anime.html">查看更多幻想主题文章</a>
+        </div>
+    </article>
+
+    <footer>
+        <p>© 2025 Podevus</p>
+        <p>择美而留,存质而弃暗</p>
+    </footer>
+    <script>
+
+// ============ 自定义光标效果 ============
+(function() {
+    // 检测是否为移动设备
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        document.body.style.cursor = 'auto';
+        return; // 移动设备不使用自定义光标
+    }
+
+    // 创建光标元素
+    const cursorDot = document.createElement('div');
+    cursorDot.className = 'cursor-dot';
+    document.body.appendChild(cursorDot);
+
+    const cursorOutline = document.createElement('div');
+    cursorOutline.className = 'cursor-outline';
+    document.body.appendChild(cursorOutline);
+
+    // 光标位置
+    let mouseX = 0;
+    let mouseY = 0;
+    let dotX = 0;
+    let dotY = 0;
+    let outlineX = 0;
+    let outlineY = 0;
+
+    // 更新光标位置
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    // 平滑跟随动画
+    function animateCursor() {
+        // 小圆点快速跟随
+        dotX += (mouseX - dotX) * 0.8;
+        dotY += (mouseY - dotY) * 0.8;
+        
+        // 外圈慢速跟随
+        outlineX += (mouseX - outlineX) * 0.15;
+        outlineY += (mouseY - outlineY) * 0.15;
+
+        cursorDot.style.transform = `translate(${dotX - 4}px, ${dotY - 4}px)`;
+        cursorOutline.style.transform = `translate(${outlineX - 20}px, ${outlineY - 20}px)`;
+
+        requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // 悬停效果
+    const hoverElements = document.querySelectorAll('a, button, .post, .post-category');
+    
+    hoverElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            document.body.classList.add('cursor-hover');
+        });
+        
+        el.addEventListener('mouseleave', () => {
+            document.body.classList.remove('cursor-hover');
+        });
+    });
+
+    // 点击效果
+    document.addEventListener('mousedown', () => {
+        document.body.classList.add('cursor-active');
+        createRipple(mouseX, mouseY);
+    });
+
+    document.addEventListener('mouseup', () => {
+        document.body.classList.remove('cursor-active');
+    });
+
+    // 创建涟漪效果
+    function createRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'cursor-ripple';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(ripple);
+
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    }
+
+    // 鼠标离开页面时隐藏光标
+    document.addEventListener('mouseleave', () => {
+        cursorDot.style.opacity = '0';
+        cursorOutline.style.opacity = '0';
+    });
+
+    document.addEventListener('mouseenter', () => {
+        cursorDot.style.opacity = '1';
+        cursorOutline.style.opacity = '0.6';
+    });
+})();
+
+// ============ 平滑滚动 ============
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+
+// ============ 页面加载动画 ============
+window.addEventListener('load', () => {
+    document.body.style.opacity = '0';
+    setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease';
+        document.body.style.opacity = '1';
+    }, 100);
+});
+
+    </script>
+</body>
+</html>
