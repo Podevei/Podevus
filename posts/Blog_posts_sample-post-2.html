@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>读书笔记示例标题 - Podevus</title>
+    <style>
+
+:root {
+    /* 大正浪漫配色 - 温暖复古 */
+    --primary-bg: #faf8f3;
+    --secondary-bg: #f5f1e8;
+    --accent-color: #c89b6d;
+    --accent-hover: #a67c52;
+    --text-primary: #2d2520;
+    --text-secondary: #5a504a;
+    --text-muted: #8b7f76;
+    --border-light: #e8dfd2;
+    --border-dark: #d4c4b0;
+    --shadow-color: rgba(45, 37, 32, 0.08);
+    --card-bg: #ffffff;
+    
+    /* 字体 */
+    --font-serif: "Noto Serif JP", "Source Han Serif CN", Georgia, serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-bg: #1a1816;
+        --secondary-bg: #242220;
+        --accent-color: #d4a574;
+        --accent-hover: #e6b786;
+        --text-primary: #e8e6e3;
+        --text-secondary: #c4bfb8;
+        --text-muted: #8b8580;
+        --border-light: #3a3633;
+        --border-dark: #4a4440;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --card-bg: #242220;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* ============ 页面基础样式 ============ */
+body {
+    font-family: var(--font-sans);
+    line-height: 1.8;
+    color: var(--text-primary);
+    background: var(--primary-bg);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    transition: background 0.3s ease;
+}
+
+/* 页面装饰 - 微妙的纹理 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            var(--shadow-color) 2px,
+            var(--shadow-color) 4px
+        );
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: -1;
+}
+
+header {
+    border-bottom: 2px solid var(--border-dark);
+    padding-bottom: 30px;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+/* 装饰线条 */
+header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 120px;
+    height: 2px;
+    background: var(--accent-color);
+    transition: width 0.5s ease;
+}
+
+header:hover::after {
+    width: 200px;
+}
+
+h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5em;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+
+h1 a {
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+}
+
+h1 a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+h1 a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.subtitle {
+    font-family: var(--font-serif);
+    font-size: 1.15em;
+    color: var(--text-secondary);
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    margin-left: 0.15em;
+}
+
+nav {
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 30px;
+}
+
+nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95em;
+    position: relative;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+    font-weight: 400;
+}
+
+nav a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+nav a:hover {
+    color: var(--accent-color);
+}
+
+nav a:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+nav a.active {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+nav a.active::before {
+    transform: scaleX(1);
+}
+
+/* 文章卡片 */
+.post {
+    background: var(--card-bg);
+    margin-bottom: 40px;
+    padding: 35px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.post::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+}
+
+.post:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--shadow-color);
+    border-color: var(--border-dark);
+}
+
+.post:hover::before {
+    transform: scaleX(1);
+}
+
+.post-title {
+    font-family: var(--font-serif);
+    font-size: 1.65em;
+    font-weight: 500;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.post-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.post-title a:hover {
+    color: var(--accent-color);
+}
+
+.post-meta {
+    font-size: 0.88em;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+}
+
+.post-category {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+.post-category:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 155, 109, 0.3);
+}
+
+.post-excerpt {
+    color: var(--text-secondary);
+    font-size: 1.02em;
+    line-height: 1.85;
+    margin-bottom: 18px;
+}
+
+.read-more {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 0.92em;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.3s ease, color 0.3s ease;
+}
+
+.read-more::after {
+    content: '→';
+    transition: transform 0.3s ease;
+}
+
+.read-more:hover {
+    gap: 10px;
+    color: var(--accent-hover);
+}
+
+.read-more:hover::after {
+    transform: translateX(3px);
+}
+
+/* 分类页标题 */
+.category-header {
+    margin-bottom: 40px;
+}
+
+.category-title {
+    font-family: var(--font-serif);
+    font-size: 1.8em;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.category-description {
+    color: var(--text-secondary);
+    font-size: 1em;
+}
+
+/* 文章详情页 */
+.article-header {
+    margin-bottom: 40px;
+}
+
+.article-title {
+    font-family: var(--font-serif);
+    font-size: 2em;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.article-meta {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.article-meta span {
+    margin-right: 15px;
+}
+
+.article-content {
+    font-size: 1.05em;
+    line-height: 1.9;
+    color: var(--text-secondary);
+}
+
+.article-content p {
+    margin-bottom: 1.5em;
+}
+
+.article-content h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    color: var(--text-primary);
+}
+
+.back-link {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.back-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+    color: var(--accent-hover);
+}
+
+footer {
+    margin-top: 80px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border-dark);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    position: relative;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--accent-color);
+}
+
+footer p:first-child {
+    font-family: var(--font-serif);
+    margin-bottom: 12px;
+    font-size: 1.05em;
+}
+
+footer p:last-child {
+    font-size: 0.85em;
+    font-style: italic;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    body {
+        padding: 18px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .subtitle {
+        font-size: 1em;
+        letter-spacing: 0.2em;
+    }
+
+    .post {
+        padding: 25px;
+    }
+
+    .post-title {
+        font-size: 1.4em;
+    }
+
+    nav {
+        gap: 8px 20px;
+    }
+    
+    .cursor-dot,
+    .cursor-outline {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.7em;
+    }
+
+    .post {
+        padding: 20px;
+    }
+
+    .post-title {
+        font-size: 1.25em;
+    }
+}
+
+/* 平滑滚动 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 选中文本样式 */
+::selection {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="../index.html">Podevus</a></h1>
+        <p class="subtitle">記 · 思 · 道</p>
+        <nav>
+            <a href="../index.html">首页</a>
+            <a href="../category/tech.html">技术</a>
+            <a href="../category/reading.html">读书</a>
+            <a href="../category/anime.html">幻想</a>
+            <a href="../category/thinking.html">思考</a>
+            <a href="../about.html">关于</a>
+        </nav>
+    </header>
+
+    <article>
+        <div class="article-header">
+            <h1 class="article-title">读书笔记示例标题</h1>
+            <div class="article-meta">
+                <a href="../category/Blog_category_reading.html" class="post-category">读书</a>
+                <span>2025年10月28日</span>
+                <span>阅读时间: 约2分钟</span>
+            </div>
+        </div>
+
+        <div class="article-content">
+            <p>这是一篇示例读书笔记。在这里分享读书感悟、书籍评论或知识总结。</p>
+
+            <h2>关于读书笔记</h2>
+
+            <p>好的读书笔记不仅仅是对书籍内容的复述，更重要的是加入自己的思考和感悟。</p>
+
+            <p>书中哪些观点触动了我？为什么会产生共鸣？这些内容如何与生活经验产生联系？通过阅读，获得了什么新的认知或启发？</p>
+
+            <h2>保持个人化的表达</h2>
+
+            <p>不要害怕表达自己独特的观点。即使是同一本书，每个人的阅读体验都是不同的。个人经历、知识背景和思考方式，都会让我的读书笔记具有独特的价值。</p>
+
+            <p>在这个极简风格的博客中，文字本身就是主角。专注于内容的质量，让思考自然地流淌在文字中。</p>
+        </div>
+
+        <div class="back-link">
+            <a href="../index.html">← 返回首页</a> | 
+            <a href="../category/Blog_category_reading.html">查看更多读书笔记</a>
+        </div>
+    </article>
+
+    <footer>
+        <p>© 2025 Podevus</p>
+        <p style="margin-top: 10px; font-size: 0.85em;">存质</p>
+    </footer>
+
+    <!-- 全局音乐播放器 -->
+    <script src="../assets/music-player.js"></script>
+</body>
+</html>

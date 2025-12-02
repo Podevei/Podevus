@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于 - Podevus</title>
+    <link rel="icon" type="image/x-icon" href="logo.ico">
+    <style>
+:root {
+    --primary-bg: #faf8f3;
+    --secondary-bg: #f5f1e8;
+    --accent-color: #c89b6d;
+    --accent-hover: #a67c52;
+    --text-primary: #2d2520;
+    --text-secondary: #5a504a;
+    --text-muted: #8b7f76;
+    --border-light: #e8dfd2;
+    --border-dark: #d4c4b0;
+    --shadow-color: rgba(45, 37, 32, 0.08);
+    --card-bg: #ffffff;
+    --font-serif: "Noto Serif JP", "Source Han Serif CN", Georgia, serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-bg: #1a1816;
+        --secondary-bg: #242220;
+        --accent-color: #d4a574;
+        --accent-hover: #e6b786;
+        --text-primary: #e8e6e3;
+        --text-secondary: #c4bfb8;
+        --text-muted: #8b8580;
+        --border-light: #3a3633;
+        --border-dark: #4a4440;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --card-bg: #242220;
+    }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { cursor: none !important; }
+html *, body * { cursor: none !important; }
+
+.custom-cursor {
+    width: 32px; height: 32px;
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    background-image: url('category/cursor-custom-transparent.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    transition: transform 0.15s ease, opacity 0.3s ease;
+}
+
+body.cursor-hover .custom-cursor { transform: scale(1.2); }
+body.cursor-active .custom-cursor { transform: scale(0.9); }
+
+.cursor-ripple {
+    position: fixed;
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    animation: ripple-effect 0.6s ease-out;
+    opacity: 0;
+}
+
+@keyframes ripple-effect {
+    0% { width: 20px; height: 20px; opacity: 1; }
+    100% { width: 80px; height: 80px; opacity: 0; }
+}
+
+body {
+    font-family: var(--font-sans);
+    line-height: 1.8;
+    color: var(--text-primary);
+    background: var(--primary-bg);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--shadow-color) 2px, var(--shadow-color) 4px);
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: -1;
+}
+
+header {
+    border-bottom: 2px solid var(--border-dark);
+    padding-bottom: 30px;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 120px; height: 2px;
+    background: var(--accent-color);
+    transition: width 0.5s ease;
+}
+
+header:hover::after { width: 200px; }
+
+h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5em;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+h1 a { color: inherit; text-decoration: none; position: relative; }
+
+h1 a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0; right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+h1 a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+.subtitle {
+    font-family: var(--font-serif);
+    font-size: 1.15em;
+    color: var(--text-secondary);
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    margin-left: 0.15em;
+}
+
+nav { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 10px 30px; }
+
+nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95em;
+    position: relative;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+}
+
+nav a::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+nav a:hover { color: var(--accent-color); }
+nav a:hover::before { transform: scaleX(1); transform-origin: left; }
+nav a.active { color: var(--accent-color); font-weight: 500; }
+nav a.active::before { transform: scaleX(1); }
+
+.about-content {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    margin-bottom: 40px;
+}
+
+.about-content h2 {
+    font-family: var(--font-serif);
+    font-size: 1.8em;
+    font-weight: 500;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 10px;
+}
+
+.about-content p {
+    font-size: 1.05em;
+    line-height: 1.9;
+    color: var(--text-secondary);
+    margin-bottom: 1.5em;
+}
+
+.about-content p:last-child { margin-bottom: 0; }
+
+footer {
+    margin-top: 80px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border-dark);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    position: relative;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: 50%;
+    transform: translateX(-50%);
+    width: 60px; height: 2px;
+    background: var(--accent-color);
+}
+
+footer p:first-child { font-family: var(--font-serif); margin-bottom: 12px; font-size: 1.05em; }
+footer p:last-child { font-size: 0.85em; font-style: italic; letter-spacing: 0.05em; }
+
+@media (max-width: 768px) {
+    body { padding: 18px; }
+    h1 { font-size: 2em; }
+    .about-content { padding: 25px; }
+    .custom-cursor { display: none; }
+    html, body, html *, body * { cursor: auto !important; }
+}
+
+html { scroll-behavior: smooth; }
+::selection { background: var(--accent-color); color: #fff; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">Podevus</a></h1>
+        <p class="subtitle">記 · 思 · 道</p>
+        <nav>
+            <a href="index.html">首页</a>
+            <a href="category/Blog_category_tech.html">技术</a>
+            <a href="category/Blog_category_reading.html">读书</a>
+            <a href="category/Blog_category_anime.html">幻想</a>
+            <a href="category/Blog_category_thinking.html">思考</a>
+            <a href="Blog_about.html" class="active">关于</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="about-content">
+            <h2>关于本站</h2>
+            <p><strong>Podevus V2.1</strong></p>
+            <p>欢迎来到 Podevus，这是一个记录思考、分享观点的个人空间。</p>
+            <p>在这里，我会分享关于技术、阅读、动画作品以及日常思考的文章。希望这些文字能够引发一些共鸣，或者至少给你带来片刻的思考。</p>
+            <p>本站采用极简设计理念，融合大正浪漫时代的优雅美学，旨在让内容本身成为焦点。褪去繁复的装饰，让文字在宁静中绽放。</p>
+        </div>
+
+        <div class="about-content">
+            <h2>关于作者</h2>
+            <p>一个思考、记录的普通人。</p>
+            <p>事物值得被记录和分享</p>
+        </div>
+
+        <div class="about-content">
+            <h2>设计理念</h2>
+            <p><strong>存质</strong> —— 这是本站的设计哲学。</p>
+            <p>正如 Prima Doll 中那个理想化的世界，我们保留那个时代所有迷人的视觉元素，却巧妙地剥离了真实历史中的压迫、创伤和社会黑暗面。</p>
+            <p>这不是逃避现实，而是一种审美选择 —— 在保持真诚的同时，我们有权利创造一个更加温暖、美好的表达空间。</p>
+        </div>
+
+        <div class="about-content music-entry-section">
+            <h2>音乐空间</h2>
+            <p>在阅读与思考之间，让音乐陪伴。点击下方按钮打开全局音乐播放器，它将在整个网站的任何页面持续播放。</p>
+            <div style="text-align: center; margin-top: 25px;">
+                <button class="music-player-entry" onclick="openMusicPlayer()">
+                    <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                    <span>打开音乐播放器</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Podevus</p>
+        <p>存质</p>
+    </footer>
+    <script>
+(function() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) { document.body.style.cursor = 'auto'; return; }
+
+    const customCursor = document.createElement('div');
+    customCursor.className = 'custom-cursor';
+    document.body.appendChild(customCursor);
+
+    let mouseX = 0, mouseY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX; mouseY = e.clientY;
+        customCursor.style.left = mouseX + 'px';
+        customCursor.style.top = mouseY + 'px';
+    });
+
+    document.querySelectorAll('a, button, .about-content, .music-player-entry').forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    });
+
+    document.addEventListener('mousedown', () => {
+        document.body.classList.add('cursor-active');
+        const ripple = document.createElement('div');
+        ripple.className = 'cursor-ripple';
+        ripple.style.left = mouseX + 'px';
+        ripple.style.top = mouseY + 'px';
+        ripple.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+    });
+
+    document.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
+    document.addEventListener('mouseleave', () => customCursor.style.opacity = '0');
+    document.addEventListener('mouseenter', () => customCursor.style.opacity = '1');
+})();
+    </script>
+
+    <!-- 全局音乐播放器 -->
+    <script src="assets/music-player.js"></script>
+</body>
+</html>
