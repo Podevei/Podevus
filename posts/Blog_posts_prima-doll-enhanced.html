@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プリマドール:蒸汽朋克与大正浪漫的完美融合 - Podevus</title>
+    <link rel="icon" type="image/x-icon" href="../logo.ico">
+    <style>
+
+:root {
+    /* 大正浪漫配色 - 温暖复古 */
+    --primary-bg: #faf8f3;
+    --secondary-bg: #f5f1e8;
+    --accent-color: #c89b6d;
+    --accent-hover: #a67c52;
+    --text-primary: #2d2520;
+    --text-secondary: #5a504a;
+    --text-muted: #8b7f76;
+    --border-light: #e8dfd2;
+    --border-dark: #d4c4b0;
+    --shadow-color: rgba(45, 37, 32, 0.08);
+    --card-bg: #ffffff;
+    
+    /* 字体 */
+    --font-serif: "Noto Serif JP", "Source Han Serif CN", Georgia, serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-bg: #1a1816;
+        --secondary-bg: #242220;
+        --accent-color: #d4a574;
+        --accent-hover: #e6b786;
+        --text-primary: #e8e6e3;
+        --text-secondary: #c4bfb8;
+        --text-muted: #8b8580;
+        --border-light: #3a3633;
+        --border-dark: #4a4440;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --card-bg: #242220;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: none !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* 允许输入框可选择（如果有的话） */
+input, textarea {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+}
+
+/* ============ 三角形光标效果 ============ */
+body {
+    cursor: none !important;
+}
+
+html {
+    cursor: none !important;
+}
+
+/* 隐藏默认光标 */
+a, button, .post, nav a, input, textarea, select {
+    cursor: none !important;
+}
+
+/* 三角形光标 SVG */
+.cursor-triangle {
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    pointer-events: none;
+    z-index: 10000;
+    transform-origin: center center;
+    transition: opacity 0.3s ease;
+}
+
+/* 悬停效果 */
+.cursor-triangle.cursor-hover {
+    filter: drop-shadow(0 0 6px #847fb7);
+}
+
+/* 点击效果 */
+.cursor-triangle.cursor-active {
+    transform: scale(0.85);
+}
+
+/* 线条尾迹效果 */
+.cursor-trail {
+    position: fixed;
+    height: 2px;
+    background: linear-gradient(90deg, #97cce3, transparent);
+    pointer-events: none;
+    z-index: 9999;
+    transform-origin: left center;
+    animation: trailFade 0.5s ease-out forwards;
+}
+
+@keyframes trailFade {
+    0% {
+        opacity: 0.9;
+        width: 40px;
+    }
+    100% {
+        opacity: 0;
+        width: 10px;
+    }
+}
+
+/* ============ 页面基础样式 ============ */
+body {
+    font-family: var(--font-sans);
+    line-height: 1.8;
+    color: var(--text-primary);
+    background: var(--primary-bg);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    transition: background 0.3s ease;
+}
+
+/* 页面装饰 - 微妙的纹理 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            var(--shadow-color) 2px,
+            var(--shadow-color) 4px
+        );
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: -1;
+}
+
+header {
+    border-bottom: 2px solid var(--border-dark);
+    padding-bottom: 30px;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+/* 装饰线条 */
+header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 120px;
+    height: 2px;
+    background: var(--accent-color);
+    transition: width 0.5s ease;
+}
+
+header:hover::after {
+    width: 200px;
+}
+
+h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5em;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+
+h1 a {
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+}
+
+h1 a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+h1 a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.subtitle {
+    font-family: var(--font-serif);
+    font-size: 1.15em;
+    color: var(--text-secondary);
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    margin-left: 0.15em;
+}
+
+nav {
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 30px;
+}
+
+nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95em;
+    position: relative;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+    font-weight: 400;
+}
+
+nav a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+nav a:hover {
+    color: var(--accent-color);
+}
+
+nav a:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+nav a.active {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+nav a.active::before {
+    transform: scaleX(1);
+}
+
+/* 文章卡片 */
+.post {
+    background: var(--card-bg);
+    margin-bottom: 40px;
+    padding: 35px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.post::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+}
+
+.post:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--shadow-color);
+    border-color: var(--border-dark);
+}
+
+.post:hover::before {
+    transform: scaleX(1);
+}
+
+.post-title {
+    font-family: var(--font-serif);
+    font-size: 1.65em;
+    font-weight: 500;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.post-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.post-title a:hover {
+    color: var(--accent-color);
+}
+
+.post-meta {
+    font-size: 0.88em;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+}
+
+.post-category {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+.post-category:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 155, 109, 0.3);
+}
+
+.post-excerpt {
+    color: var(--text-secondary);
+    font-size: 1.02em;
+    line-height: 1.85;
+    margin-bottom: 18px;
+}
+
+.read-more {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 0.92em;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.3s ease, color 0.3s ease;
+}
+
+.read-more::after {
+    content: '→';
+    transition: transform 0.3s ease;
+}
+
+.read-more:hover {
+    gap: 10px;
+    color: var(--accent-hover);
+}
+
+.read-more:hover::after {
+    transform: translateX(3px);
+}
+
+/* 分类页标题 */
+.category-header {
+    margin-bottom: 40px;
+}
+
+.category-title {
+    font-family: var(--font-serif);
+    font-size: 1.8em;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.category-description {
+    color: var(--text-secondary);
+    font-size: 1em;
+}
+
+/* 文章详情页 */
+.article-header {
+    margin-bottom: 40px;
+}
+
+.article-title {
+    font-family: var(--font-serif);
+    font-size: 2em;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.article-meta {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.article-meta span {
+    margin-right: 15px;
+}
+
+.article-content {
+    font-size: 1.05em;
+    line-height: 1.9;
+    color: var(--text-secondary);
+}
+
+.article-content p {
+    margin-bottom: 1.5em;
+}
+
+.article-content h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    color: var(--text-primary);
+}
+
+.article-content h3 {
+    font-family: var(--font-serif);
+    font-size: 1.3em;
+    font-weight: 500;
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    color: var(--text-primary);
+}
+
+.back-link {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.back-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: color 0.3s ease;
+    margin-right: 20px;
+}
+
+.back-link a:hover {
+    color: var(--accent-hover);
+}
+
+footer {
+    margin-top: 80px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border-dark);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    position: relative;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--accent-color);
+}
+
+footer p:first-child {
+    font-family: var(--font-serif);
+    margin-bottom: 12px;
+    font-size: 1.05em;
+}
+
+footer p:last-child {
+    font-size: 0.85em;
+    font-style: italic;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    body {
+        padding: 18px;
+    }
+    
+    *, body, html {
+        cursor: auto !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
+        user-select: text !important;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .subtitle {
+        font-size: 1em;
+        letter-spacing: 0.2em;
+    }
+
+    .post {
+        padding: 25px;
+    }
+
+    .post-title {
+        font-size: 1.4em;
+    }
+
+    nav {
+        gap: 8px 20px;
+    }
+    
+    .cursor-triangle,
+    .cursor-trail {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.7em;
+    }
+
+    .post {
+        padding: 20px;
+    }
+
+    .post-title {
+        font-size: 1.25em;
+    }
+}
+
+/* 平滑滚动 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 选中文本样式 */
+::selection {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="../index.html">Podevus</a></h1>
+        <p class="subtitle">記 · 思 · 道</p>
+        <nav>
+            <a href="../index.html">首页</a>
+            <a href="../category/Blog_category_tech.html">技术</a>
+            <a href="../category/Blog_category_reading.html">读书</a>
+            <a href="../category/Blog_category_anime.html">幻想</a>
+            <a href="../category/Blog_category_thinking.html">思考</a>
+            <a href="../Blog_about.html">关于</a>
+        </nav>
+    </header>
+
+    <article>
+        <div class="article-header">
+            <h1 class="article-title">プリマドール:蒸汽朋克与大正浪漫的完美融合</h1>
+            <div class="article-meta">
+                <a href="../category/Blog_category_anime.html" class="post-category">幻想</a>
+                <span>2025年11月10日</span>
+                <span>阅读时间: 约5分钟</span>
+            </div>
+        </div>
+
+        <div class="article-content">
+            <p>《プリマドール》最吸引人的地方，不只是"战后人偶开咖啡馆"这么简单的反差设定，而是整个 IP 在不同媒介里共同搭建出的一个<strong>理想化的复古未来主义世界</strong>：电视动画、网页&杂志连载短篇《Encore》《Interlude》、漫画《New Order》《ようこそ黒猫亭へ》，再到后来的前日谭/后日谭キネティックノベル，都围绕同一套世界观不断补完细节，把一个虚构的"帝国与大战之后"打磨得既浪漫又柔和。</p>
+<h2>一、跨媒介共同完成的理想世界观</h2>
+<p>如果只看动画版，《プリマドール》的舞台似乎很小：皇都五区一角的喫茶店"黑猫亭"，几位自律人偶（オートマタ）在这里工作，接待客人、打扫整理，在暖黄色灯光下过着近乎"日常番"的生活。</p>
+<p>但一旦把视野放到整个企划，你会发现：</p>
+<ul>
+  <li>网页连载《Encore》与杂志短篇补完了战争前后、人偶诞生与部署的历史细节；</li>
+  <li>漫画《New Order》描写黑猫亭以外的部队与人偶小队，让这个世界不再只有一间咖啡馆；</li>
+  <li>キネティックノベル作为动画的前日谭/后日谭，则把"战争记忆"与"战后余波"展开成更长的叙事线索。</li>
+</ul>
+<p>这种"跨作品拼图式"的世界构建，让观众在不同媒介之间来回切换时，总是能再多看到一点：前线与后方、皇都与边境、胜利者与被抛弃的兵器。结果就是——这个世界既保留了现实中近代日本的轮廓，又因为被不断修饰、删减、理想化，看起来比真实历史柔软得多。</p>
+<h2>二、被"修正"的战后帝国：背景为何如此有吸引力？</h2>
+<p>《プリマドール》的时间点发生在"数年前大战刚刚结束"的战后帝国。皇都街道上仍保留着军队、贵族、殖民的影子，但作品有意把<strong>军国主义最尖锐、最血腥的部分淡化掉</strong>：</p>
+<ul>
+  <li>战争已经结束，观众看到的是"战后重建"而非"战争进行时"；</li>
+  <li>帝国扩张、殖民、种族冲突等议题，只以"东方国""前线""失落的故乡"之类的模糊名词一笔带过；</li>
+  <li>军服、军徽、阅兵等视觉符号大多退到背景，人偶们真正面对的是"如何在和平年代活下去"。</li>
+</ul>
+<p>这种处理方式很微妙：一方面，<strong>它借用了现实历史中军国主义日本的外壳</strong>——殖民地、前线战区、战败后的疲惫与失落；另一方面，又刻意避免触碰真实历史里的加害与责任，把视角收缩在"被当作兵器的人偶"身上。对观众来说，这样的设定既能感受到时代的重量，又不会被现实中的沉重伦理问题拉出作品。</p>
+<p>换句话说，《プリマドール》提供的是一种<strong>"如果那个时代没有走向彻底的狂热与毁灭，而是适可而止就好了"的平行世界</strong>。我们看到的是略带伤痕、却仍然保有余地的帝国——大战当然残酷，但它已经结束；军队当然冷酷，但也有像ナギ那样把人偶带回咖啡馆的个人选择。现实历史中压迫感极强的军国主义，在这个世界里被"修正"为一种略带感伤、但还能被温柔收尾的过去。</p>
+<h2>三、从军用机器到日常主体：人偶与军国主义的隐性对话</h2>
+<p>作为一个以"兵器少女"为核心的企划，《プリマドール》绕不开军国主义这个主题，但它选择的不是批判式的正面冲撞，而是<strong>以日常与创伤叙事来"慢慢拆弹"</strong>。</p>
+<p>在不同作品里，我们都能看到类似的路径：</p>
+<ul>
+  <li>动画主线中，灰桜、鴉羽、月下、箒星、レーツェル等人偶，几乎都有"战场功能""编号""任务失败/完成"的过去；</li>
+  <li>外传与前日谭则进一步展示她们在前线被如何编组、部署、牺牲——但这些内容往往以回忆、闪回或只言片语出现，很少展示真正血腥的画面。</li>
+</ul>
+<p>这种处理有两个效果：</p>
+<ol>
+  <li><strong>让"军用机器"获得了人格与主体性。</strong>  
+  人偶在战时只是工具，但战后她们开始质疑："我为什么被制造出来？我的使命是不是只有战斗？"从战场回到黑猫亭，冲咖啡、端甜点、擦桌子，对人类来说是琐事，对她们而言却是第一次被允许"作为一个人去生活"。</li>
+  <li><strong>把军国主义"温柔抽离"为个人创伤。</strong>  
+  作品很少追问"国家为什么要发动这场战争""帝国对他国做了什么"，而是问："这场战争给这些人偶留下了什么伤口？"军国主义从宏大的意识形态，变成了一个个女孩无法释怀的任务记忆与失去战友的痛苦。</li>
+</ol>
+<p>于是，观众无需面对复杂的历史责任问题，只需要跟着人偶一起思考：<strong>"如果我一生都被当作武器，现在还有没有资格选择别的活法？"</strong>这是一种很"Key 式"的处理方式——用个人的眼泪代替宏大叙事的清算，用温柔的抚慰代替尖锐的控诉。</p>
+<h2>四、审美层面的魅力：大正浪漫 × 蒸汽机械 × 少女人偶</h2>
+<p>在审美上，《プリマドール》几乎是为"喜欢大正浪漫 + 蒸汽朋克 + 机械少女"的观众量身打造。</p>
+<h3>1. 视觉：从角色设计到空间美术</h3>
+<p>角色设计延续了 Key 一贯的"可爱至上"传统，又加入了大量机械细节：</p>
+<ul>
+  <li>灰桜蓬松的裙摆与发饰在第一眼是典型的洋装萌系，但裙摆与四肢处的金属连接、关节装饰，时时提醒观众她并非人类；</li>
+  <li>鴉羽的服装色系偏暗，搭配黑色羽织和锐利的配饰，视觉上就像"战场残余"的化身；</li>
+  <li>レーツェル则带有异国色彩，用色比其他人偶更强烈，也对应她"来自他国""被帝国军观察"的设定。</li>
+</ul>
+<p>空间层面，黑猫亭内部的木质桌椅、复古吊灯、墙上挂画，与窗外略带雾气的街道构成了一种<strong>"永恒黄昏"</strong>的时间感：天既没有完全黑，也不再明亮，像是战争结束后、真正新时代开始前的那段暧昧时刻——而作品选择把故事一直留在这种"黄昏里"。</p>
+<h3>2. 色彩与光影：被浪漫化的战后世界</h3>
+<p>无论是动画还是后续的キネティックノベル CG，作品都大量使用暖色调和柔和的光影：</p>
+<ul>
+  <li>室内常常是金色与棕色的层叠：木地板、琥珀色灯光、咖啡与红茶的深色液面；</li>
+  <li>即便是战争回忆，画面也很少极端冷色，而是用褪色、偏灰的色调来表达"已经远去的悲伤"。</li>
+</ul>
+<p>这使得《プリマドール》的战后世界看上去不像真实历史那样肮脏、破败，而更像一张略有折痕的老照片——有伤痕，但被柔焦和滤镜覆盖。观众在这样的影像里，很自然就会把注意力从"战争多惨烈"转移到"这些人偶现在过得还好吗"。</p>
+<h3>3. 音乐与声音：机械躯体里的"人类情感"</h3>
+<p>作为 Key 企划，音乐几乎是默认的加分项。从动画的 OP《Tin Toy Melody》到各人偶的角色曲，歌曲里都不断呼应"玩具""机械""记忆""祈愿"等意象，把人偶的存在感从画面延伸到听觉。</p>
+<p>更细腻的是声音演出：齿轮转动的轻响、金属关节微微碰撞、脚步落在木地板上的声线，都在提醒你——这些少女不是血肉之躯。但当她们开口歌唱，声音却又如此柔软、人类化。<strong>这种听觉上的反差，本身就是"机械与生命结合体"的绝佳呈现。</strong></p>
+<h2>五、与现实的差别：一种"经过美化的战后幻想"</h2>
+<p>如果把《プリマドール》的世界拉到现实面前对照，你会发现它在很多关键点上都做了有意的"美化处理"：</p>
+<ul>
+  <li><strong>现实中的军国主义</strong>意味着系统性的暴力、殖民、言论控制与彻底的崩溃，而作品中的帝国更多是"犯过错，但还能回头"的模糊存在；</li>
+  <li><strong>现实中的战争创伤</strong>会长期体现在政治、经济、家庭结构里，而作品把它压缩成个人记忆、噩梦与几场情绪爆发，最后往往能通过"哭一场""唱一首歌""在黑猫亭找到归属"而得到某种程度的和解；</li>
+  <li><strong>现实中的退伍军人</strong>常常面对失业、歧视与心理疾病，而人偶们则拥有一个在审美上极度浪漫化的"第二人生"——咖啡馆、唱歌、穿漂亮衣服、遇见善良的人类伙伴。</li>
+</ul>
+<p>所以，《プリマドール》所提供的并不是对历史的真实还原，而是一种<strong>"经过审美过滤的战后幻想"</strong>。它承认战争带来了伤口，却坚信这些伤口最终可以被温柔包裹；它知道军用机器曾被当作工具使用，却选择把"机器的晚年"安排在灯火温暖的咖啡馆里，而不是冷冰冰的报废场或实验室。</p>
+<h2>六、为什么我们仍然需要这样的作品？</h2>
+<p>在现实世界，我们面对的是更加凌乱的历史与当下：国与国的冲突远没有动画里那样"干净地结束"，意识形态和利益纠葛也不会因为一首歌就烟消云散。正因如此，像《プリマドール》这样的作品才显得格外动人——它为我们提供了一个<strong>"经过修正的历史空间"</strong>，让我们得以想象：</p>
+<ul>
+  <li>如果兵器真的拥有心，它们是否也有机会放下武器，在黄昏的咖啡馆里端起托盘？</li>
+  <li>如果军国主义的狂热没有把一切都推向不可挽回的深渊，我们是否还能在废墟间，搭起一间像黑猫亭那样的小店？</li>
+</ul>
+<p>这种想象当然带有逃避的成分，但它也并非全然幼稚。<strong>当现实让人难以直视时，经由审美过滤的"理想化战后世界"，反而能成为我们重新思考现实的安全起点。</strong>我们在作品中看到的是：</p>
+<ul>
+  <li>战争并非荣耀，而是让连人偶都留下伤疤的暴力；</li>
+  <li>军用机器也有资格被问一句"你想怎样生活"；</li>
+  <li>和平并不意味着一切问题消失，而是一个"重新学习如何活下去"的漫长过程。</li>
+</ul>
+<p>《プリマドール》的魅力，就停留在这样一个被永久拉长的瞬间——黄昏降临，黑猫亭的灯光刚刚亮起，街道上行人渐少，自律人偶们开始准备晚间营业。那是一个被历史与现实共同包围、却又暂时被隔绝出来的小小时间口袋。作为观众的我们，就像推门走进来的那位客人，在这理想化的战后世界里小坐片刻——等到再次走回现实街道时，或许能带着一点点新的温柔，去面对真正复杂而凌乱的人间。</p>
+        </div>
+
+        <div class="back-link">
+            <a href="../index.html">返回首页</a>
+            <a href="../category/Blog_category_anime.html">查看更多幻想主题文章</a>
+        </div>
+    </article>
+
+    <footer>
+        <p>© 2025 Podevus</p>
+        <p>存质</p>
+    </footer>
+    <script>
+
+// ============ 三角形光标效果 ============
+(function() {
+    // 检测是否为移动设备
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        return;
+    }
+    
+    // 创建SVG三角形光标 (标准等边三角形 Medial Triangle Partition)
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'cursor-triangle');
+    svg.setAttribute('viewBox', '0 0 30 30');
+    
+    // 等边三角形的三个顶点（外接圆半径 R = 13）
+    // 中心在 (15, 15)
+    const R = 13;
+    const cx = 15, cy = 15;
+    
+    // 顶点坐标（顶点朝上）
+    const A = { x: cx, y: cy - R };                              // 顶点 (15, 2)
+    const B = { x: cx - R * Math.sqrt(3) / 2, y: cy + R / 2 };  // 左下 (3.74, 21.5)
+    const C = { x: cx + R * Math.sqrt(3) / 2, y: cy + R / 2 };  // 右下 (26.26, 21.5)
+    
+    // Medial Triangle 的顶点（各边中点）
+    const M1 = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };  // AB中点 (9.37, 11.75)
+    const M2 = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };  // BC中点 (15, 21.5)
+    const M3 = { x: (C.x + A.x) / 2, y: (C.y + A.y) / 2 };  // CA中点 (20.63, 11.75)
+    
+    // 外围三个三角形 (#3a2326)
+    const outerTriangles = [
+        `M ${A.x} ${A.y} L ${M1.x} ${M1.y} L ${M3.x} ${M3.y} Z`,      // 上
+        `M ${B.x} ${B.y} L ${M2.x} ${M2.y} L ${M1.x} ${M1.y} Z`,      // 左下
+        `M ${C.x} ${C.y} L ${M3.x} ${M3.y} L ${M2.x} ${M2.y} Z`       // 右下
+    ];
+    
+    outerTriangles.forEach(d => {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('fill', '#3a2326');
+        svg.appendChild(path);
+    });
+    
+    // 中心小三角形 (#847fb7)
+    const centerPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    centerPath.setAttribute('d', `M ${M1.x} ${M1.y} L ${M2.x} ${M2.y} L ${M3.x} ${M3.y} Z`);
+    centerPath.setAttribute('fill', '#847fb7');
+    svg.appendChild(centerPath);
+    
+    document.body.appendChild(svg);
+    
+    // 光标位置和旋转
+    let mouseX = 0;
+    let mouseY = 0;
+    let triangleX = 0;
+    let triangleY = 0;
+    let rotation = 0;
+    let rotationSpeed = 0;
+    
+    // 记录上一帧的位置，用于计算速度
+    let lastX = 0;
+    let lastY = 0;
+    let lastTrailTime = 0;
+    
+    // 更新光标位置
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+    
+    // 平滑跟随动画
+    function animateCursor() {
+        // 计算移动距离
+        const dx = mouseX - triangleX;
+        const dy = mouseY - triangleY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // 三角形跟随鼠标
+        triangleX += dx * 0.25;
+        triangleY += dy * 0.25;
+        
+        // 根据移动距离增加旋转速度
+        if (distance > 0.5) {
+            // 显著增加旋转速度系数，从0.05增加到0.2
+            const speedIncrease = distance * 0.2;
+            rotationSpeed += speedIncrease;
+        }
+        
+        // 应用惯性衰减（从0.92改为0.96，让衰减更慢）
+        rotationSpeed *= 0.96;
+        
+        // 限制最大旋转速度，避免过快
+        const maxSpeed = 15;
+        if (rotationSpeed > maxSpeed) rotationSpeed = maxSpeed;
+        if (rotationSpeed < -maxSpeed) rotationSpeed = -maxSpeed;
+        
+        // 更新旋转角度
+        rotation += rotationSpeed;
+        
+        // 应用变换
+        svg.style.left = triangleX + 'px';
+        svg.style.top = triangleY + 'px';
+        svg.style.transform = `translate(-15px, -15px) rotate(${rotation}deg)`;
+        
+        // 创建尾迹（只有在移动时）
+        const moveDistance = Math.sqrt((triangleX - lastX) ** 2 + (triangleY - lastY) ** 2);
+        const now = Date.now();
+        
+        if (moveDistance > 2 && now - lastTrailTime > 20) {
+            createTrail(triangleX, triangleY, Math.atan2(dy, dx), rotation);
+            lastTrailTime = now;
+        }
+        
+        lastX = triangleX;
+        lastY = triangleY;
+        
+        requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    
+    // 创建线条尾迹效果
+    function createTrail(x, y, moveAngle, rot) {
+        // 等边三角形的三个顶点位置（相对于中心）
+        const rotRad = (rot * Math.PI) / 180;
+        const vertices = [
+            { dx: 0, dy: -R },                           // 顶点
+            { dx: -R * Math.sqrt(3) / 2, dy: R / 2 },   // 左下
+            { dx: R * Math.sqrt(3) / 2, dy: R / 2 }     // 右下
+        ];
+        
+        vertices.forEach(vertex => {
+            // 旋转顶点坐标
+            const rotatedX = vertex.dx * Math.cos(rotRad) - vertex.dy * Math.sin(rotRad);
+            const rotatedY = vertex.dx * Math.sin(rotRad) + vertex.dy * Math.cos(rotRad);
+            
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            
+            // 计算顶点的实际位置
+            const startX = x + rotatedX;
+            const startY = y + rotatedY;
+            
+            trail.style.left = startX + 'px';
+            trail.style.top = startY + 'px';
+            
+            // 尾迹方向与移动方向相反
+            trail.style.transform = `rotate(${moveAngle + Math.PI}rad)`;
+            
+            document.body.appendChild(trail);
+            
+            // 500ms后移除
+            setTimeout(() => {
+                trail.remove();
+            }, 500);
+        });
+    }
+    
+    // 悬停效果
+    const hoverElements = document.querySelectorAll('a, button, .post, .post-category');
+    
+    hoverElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            svg.classList.add('cursor-hover');
+        });
+        
+        el.addEventListener('mouseleave', () => {
+            svg.classList.remove('cursor-hover');
+        });
+    });
+    
+    // 点击效果
+    document.addEventListener('mousedown', () => {
+        svg.classList.add('cursor-active');
+    });
+    
+    document.addEventListener('mouseup', () => {
+        svg.classList.remove('cursor-active');
+    });
+    
+    // 鼠标离开页面时隐藏光标
+    document.addEventListener('mouseleave', () => {
+        svg.style.opacity = '0';
+    });
+    
+    document.addEventListener('mouseenter', () => {
+        svg.style.opacity = '1';
+    });
+})();
+
+// ============ 禁用右键菜单 ============
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// ============ 禁用文本选择 ============
+document.addEventListener('selectstart', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// ============ 禁用复制 ============
+document.addEventListener('copy', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// ============ 禁用常见快捷键 ============
+document.addEventListener('keydown', function(e) {
+    // Ctrl+C, Ctrl+U, Ctrl+S, F12
+    if ((e.ctrlKey && (e.key === 'c' || e.key === 'C' || 
+                       e.key === 'u' || e.key === 'U' || 
+                       e.key === 's' || e.key === 'S')) || 
+        e.key === 'F12') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// ============ 平滑滚动 ============
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+
+// ============ 页面加载动画 ============
+window.addEventListener('load', () => {
+    document.body.style.opacity = '0';
+    setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease';
+        document.body.style.opacity = '1';
+    }, 100);
+});
+
+    </script>
+
+    <!-- 全局音乐播放器 -->
+    <script src="../assets/music-player.js"></script>
+</body>
+</html>
