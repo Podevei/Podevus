@@ -70,6 +70,33 @@
                     { title: '海　その愛', artist: '加山雄三', file: '加山雄三 - 海　その愛.ogg' },
                 ]
             },
+            {
+                name: 'MANYO合辑',
+                artist: 'MANYO',
+                expanded: false,
+                songs: [
+                    { title: 'Thin purple', artist: 'MANYO', file: 'MANYO - Thin purple.ogg' },
+                    { title: 'メインテーマ', artist: 'MANYO', file: 'MANYO - メインテーマ.ogg' },
+                    { title: '久遠', artist: 'MANYO', file: 'MANYO - 久遠….ogg' },
+                    { title: '黄昏', artist: 'MANYO, 麻枝准', file: 'MANYO _ 麻枝准 - 黄昏.ogg' },
+                    { title: 'Lilac', artist: 'MANYO', file: 'MANYO - Lilac.ogg' },
+                    { title: 'キミと過ごす時間', artist: 'MANYO', file: 'MANYO - キミと過ごす時間 (跟你共度的时间).ogg' },
+                    { title: '混ざり合う心', artist: 'MANYO', file: 'MANYO - 混ざり合う心.ogg' },
+                    { title: '祈り', artist: 'MANYO', file: 'MANYO - 祈り (祈祷).ogg' },
+                ]
+            },
+            {
+                name: 'Key合辑',
+                artist: 'VISUAL ARTS/Key',
+                expanded: false,
+                songs: [
+                    { title: 'ニリンソウ', artist: 'VISUAL ARTS, Key Sounds Label', file: 'VISUAL ARTS _ Key Sounds Label - ニリンソウ (鹅掌草).ogg' },
+                    { title: 'ロック风アレンジ', artist: '麻枝准', file: '麻枝准 (まえだ じゅん) - ロック风アレンジ.flac' },
+                    { title: '散花', artist: 'VISUAL ARTS, Key Sounds Label (キー・サウンズ・レーベル)', file: 'VISUAL ARTS_Key Sounds Label (キー・サウンズ・レーベル) - 散花.ogg' },
+                    { title: 'Vitae', artist: 'VISUAL ARTS/Key', file: 'Various Artists _ VISUAL ARTS _ Key - Vitae.ogg' },
+                    { title: 'Reminiscence', artist: 'VISUAL ARTS/Key', file: 'Various Artists _ VISUAL ARTS _ Key - Reminiscence.ogg' },
+                ]
+            },
         ]
     };
 
