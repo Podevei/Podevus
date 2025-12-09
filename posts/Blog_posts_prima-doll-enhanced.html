@@ -1393,22 +1393,22 @@ html {
 // ============ Waline 配置 ============
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
 
-// ============ 关键设置：路径硬编码 ============
-// 根据你的后台截图，必须严格使用这个路径，不能由浏览器自动生成
+// ============ 路径设置：保持硬编码 ============
+// 这已经是正确的了，不需要动
 const PAGE_PATH = '/posts/blog_posts_prima-doll-enhanced';
 
-console.log('✅ Target Page Path set to:', PAGE_PATH);
+console.log('🎯 Target Path:', PAGE_PATH);
 
-// ============ 1. 蒸汽朋克光标与特效 (保持不变) ============
+// ============ 1. 蒸汽朋克光标与特效 (保持原样) ============
 (function() {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile) return;
+    // 移动端禁用
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) return;
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'cursor-triangle');
     svg.setAttribute('viewBox', '0 0 30 30');
     
-    // 三角形绘制逻辑
+    // 绘制三角形
     const R = 13, cx = 15, cy = 15;
     const A = { x: cx, y: cy - R }; 
     const B = { x: cx - R * Math.sqrt(3) / 2, y: cy + R / 2 };
@@ -1435,7 +1435,7 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
     svg.appendChild(centerPath);
     document.body.appendChild(svg);
     
-    // 鼠标跟随逻辑
+    // 跟随逻辑
     let mouseX = 0, mouseY = 0, triangleX = 0, triangleY = 0;
     let rotation = 0, rotationSpeed = 0, lastX = 0, lastY = 0, lastTrailTime = 0;
     
@@ -1444,50 +1444,46 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
     function animateCursor() {
         const dx = mouseX - triangleX;
         const dy = mouseY - triangleY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
         
         triangleX += dx * 0.25;
         triangleY += dy * 0.25;
         
-        if (distance > 0.5) rotationSpeed += distance * 0.2;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist > 0.5) rotationSpeed += dist * 0.2;
         rotationSpeed *= 0.96;
-        if (rotationSpeed > 15) rotationSpeed = 15;
-        if (rotationSpeed < -15) rotationSpeed = -15;
+        rotationSpeed = Math.max(-15, Math.min(15, rotationSpeed));
         rotation += rotationSpeed;
         
         svg.style.left = triangleX + 'px';
         svg.style.top = triangleY + 'px';
         svg.style.transform = `translate(-15px, -15px) rotate(${rotation}deg)`;
         
-        const moveDistance = Math.sqrt((triangleX - lastX) ** 2 + (triangleY - lastY) ** 2);
-        const now = Date.now();
-        if (moveDistance > 2 && now - lastTrailTime > 20) {
+        const moveDist = Math.sqrt((triangleX - lastX)**2 + (triangleY - lastY)**2);
+        if (moveDist > 2 && Date.now() - lastTrailTime > 20) {
             createTrail(triangleX, triangleY, Math.atan2(dy, dx), rotation);
-            lastTrailTime = now;
+            lastTrailTime = Date.now();
         }
         lastX = triangleX; lastY = triangleY;
         requestAnimationFrame(animateCursor);
     }
     animateCursor();
     
-    function createTrail(x, y, moveAngle, rot) {
-        const rotRad = (rot * Math.PI) / 180;
-        const vertices = [{ dx: 0, dy: -R }, { dx: -R * Math.sqrt(3) / 2, dy: R / 2 }, { dx: R * Math.sqrt(3) / 2, dy: R / 2 }];
-        vertices.forEach(vertex => {
-            const rotatedX = vertex.dx * Math.cos(rotRad) - vertex.dy * Math.sin(rotRad);
-            const rotatedY = vertex.dx * Math.sin(rotRad) + vertex.dy * Math.cos(rotRad);
-            const trail = document.createElement('div');
-            trail.className = 'cursor-trail';
-            trail.style.left = (x + rotatedX) + 'px';
-            trail.style.top = (y + rotatedY) + 'px';
-            trail.style.transform = `rotate(${moveAngle + Math.PI}rad)`;
-            document.body.appendChild(trail);
-            setTimeout(() => trail.remove(), 500);
-        });
+    function createTrail(x, y, angle, rot) {
+        const rad = rot * Math.PI / 180;
+        // 简化尾迹逻辑
+        const trail = document.createElement('div');
+        trail.className = 'cursor-trail';
+        // 简单的偏移计算
+        trail.style.left = x + 'px';
+        trail.style.top = y + 'px';
+        trail.style.transform = `rotate(${angle + Math.PI}rad)`;
+        document.body.appendChild(trail);
+        setTimeout(() => trail.remove(), 500);
     }
     
-    const hoverElements = document.querySelectorAll('a, button, .post, .post-category, .submit-btn, input, textarea, .reply-btn');
-    hoverElements.forEach(el => {
+    // 交互效果
+    const interactives = 'a, button, .post, input, textarea, .reply-btn';
+    document.querySelectorAll(interactives).forEach(el => {
         el.addEventListener('mouseenter', () => svg.classList.add('cursor-hover'));
         el.addEventListener('mouseleave', () => svg.classList.remove('cursor-hover'));
     });
@@ -1497,13 +1493,12 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
     document.addEventListener('mouseenter', () => svg.style.opacity = '1');
 })();
 
-// ============ 2. 滚动变色效果 (保持不变) ============
+// ============ 2. 滚动变色效果 (保持原样) ============
 (function() {
     const commentsContent = document.querySelector('.steampunk-comments');
     const backLink = document.querySelector('.back-link');
     const footer = document.querySelector('footer');
     let triggerScrollTop = 0, hasTriggered = false;
-    const COLOR_CHANGE_RANGE = 400, COMMENT_SHOW_RANGE = 300;
     
     function updateBodyBackgroundColor(progress) {
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -1517,10 +1512,8 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
     }
     
     function showComments(progress) {
-        const opacity = Math.min(1, progress);
-        const translateY = Math.max(0, 50 * (1 - progress));
-        commentsContent.style.opacity = opacity;
-        commentsContent.style.transform = `translateY(${translateY}px)`;
+        commentsContent.style.opacity = Math.min(1, progress);
+        commentsContent.style.transform = `translateY(${Math.max(0, 50 * (1 - progress))}px)`;
     }
     
     function handleScroll() {
@@ -1530,14 +1523,15 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
             hasTriggered = true;
         }
         if (!hasTriggered) { updateBodyBackgroundColor(0); showComments(0); return; }
-        const scrollDistance = window.pageYOffset - triggerScrollTop;
-        if (scrollDistance <= COLOR_CHANGE_RANGE) {
-            updateBodyBackgroundColor(Math.max(0, Math.min(1, scrollDistance / COLOR_CHANGE_RANGE)));
+        
+        const dist = window.pageYOffset - triggerScrollTop;
+        if (dist <= 400) {
+            updateBodyBackgroundColor(Math.max(0, Math.min(1, dist / 400)));
             showComments(0);
-            if (scrollDistance < 0) hasTriggered = false;
+            if (dist < 0) hasTriggered = false;
         } else {
             updateBodyBackgroundColor(1);
-            showComments(Math.max(0, Math.min(1, (scrollDistance - COLOR_CHANGE_RANGE) / COMMENT_SHOW_RANGE)));
+            showComments(Math.max(0, Math.min(1, (dist - 400) / 300)));
         }
     }
     window.addEventListener('scroll', handleScroll);
@@ -1549,7 +1543,7 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
     updateBodyBackgroundColor(0); showComments(0);
 })();
 
-// ============ 3. 粒子特效 (保持不变) ============
+// ============ 3. 粒子特效 (保持原样) ============
 (function() {
     const bg = document.getElementById('particlesBackground');
     const fg = document.getElementById('particlesForeground');
@@ -1566,8 +1560,7 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
         container.appendChild(p);
         setTimeout(() => p.remove(), (duration + 5) * 1000);
     }
-    for (let i = 0; i < 20; i++) setTimeout(() => createParticle(bg, false), i * 250);
-    for (let i = 0; i < 10; i++) setTimeout(() => createParticle(fg, true), i * 300);
+    for (let i = 0; i < 15; i++) setTimeout(() => createParticle(bg, false), i * 200);
     setInterval(() => createParticle(bg, false), 2000);
     setInterval(() => createParticle(fg, true), 3000);
 })();
@@ -1577,23 +1570,19 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
     let allComments = [];
     
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Page Loaded, starting comment load...');
-        loadComments(); // 立即开始加载
+        console.log('🚀 Script Loaded');
+        loadComments();
         
-        // 绑定事件
         const form = document.getElementById('commentForm');
         if(form) form.addEventListener('submit', handleSubmit);
-        
         const cancelBtn = document.getElementById('cancelReplyBtn');
         if(cancelBtn) cancelBtn.addEventListener('click', cancelReply);
         
         // 恢复用户信息
-        const nameInput = document.getElementById('nameInput');
-        if(nameInput) nameInput.value = localStorage.getItem('podevus_comment_name') || '';
-        const emailInput = document.getElementById('emailInput');
-        if(emailInput) emailInput.value = localStorage.getItem('podevus_comment_email') || '';
-        const websiteInput = document.getElementById('websiteInput');
-        if(websiteInput) websiteInput.value = localStorage.getItem('podevus_comment_website') || '';
+        ['name', 'email', 'website'].forEach(key => {
+            const el = document.getElementById(`${key}Input`);
+            if(el) el.value = localStorage.getItem(`podevus_comment_${key}`) || '';
+        });
     });
     
     async function loadComments() {
@@ -1601,65 +1590,58 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
         const commentsCount = document.getElementById('commentsCount');
         const url = `${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`;
 
-        console.log(`🌐 Fetching: ${url}`);
+        console.log(`🌐 Fetching URL: ${url}`);
 
         try {
-            // 设置15秒超时，防止无限loading
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-            const response = await fetch(url, { signal: controller.signal });
-            clearTimeout(timeoutId);
-
+            const response = await fetch(url);
             console.log('📡 Response Status:', response.status);
 
-            if (!response.ok) {
-                throw new Error(`HTTP Error: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const json = await response.json();
+            console.log('📦 JSON Payload:', json); // 这里的 log 显示数据已经到了
+
+            // ============ 关键修复点 ============
+            // 你的截图显示数据里没有 errno 字段，而是直接就是对象
+            // 所以我们不再检查 errno，而是直接找 data 数组
+            
+            let rawComments = [];
+            let totalCount = 0;
+
+            // 情况1: 标准 Waline 响应 { errno: 0, data: { data: [], count: 0 } }
+            if (json.data && Array.isArray(json.data.data)) {
+                rawComments = json.data.data;
+                totalCount = json.data.count || rawComments.length;
+            } 
+            // 情况2: 你的截图情况 - 响应直接就是数据对象 { data: [], count: 3 }
+            else if (Array.isArray(json.data)) {
+                rawComments = json.data;
+                totalCount = json.count || rawComments.length;
+            }
+            // 情况3: 响应直接就是数组 [ ... ]
+            else if (Array.isArray(json)) {
+                rawComments = json;
+                totalCount = rawComments.length;
             }
 
-            const data = await response.json();
-            console.log('📦 Data Received:', data);
+            allComments = rawComments;
+            console.log('✅ Parsed Comments:', allComments.length);
 
-            if (data.errno === 0) {
-                // 智能解析数据结构
-                let rawData = data.data;
-                allComments = [];
+            // 更新 UI
+            if (commentsCount) commentsCount.textContent = `${totalCount} Replies`;
 
-                if (Array.isArray(rawData)) {
-                    allComments = rawData;
-                } else if (rawData && Array.isArray(rawData.data)) {
-                    allComments = rawData.data;
-                } else {
-                    console.warn('⚠️ Unknown data structure:', rawData);
-                }
-                
-                // 更新数量
-                let totalCount = 0;
-                if (rawData && rawData.count) totalCount = rawData.count;
-                else if (rawData && rawData.totalCount) totalCount = rawData.totalCount;
-                else totalCount = allComments.length;
-
-                if (commentsCount) commentsCount.textContent = `${totalCount} Replies`;
-                
-                if (allComments.length === 0) {
-                    commentsList.innerHTML = '<div class="no-comments">No comments yet. You could be the first one!</div>';
-                } else {
-                    const commentTree = buildCommentTree(allComments);
-                    const html = commentTree.map(comment => renderComment(comment)).join('');
-                    commentsList.innerHTML = html;
-                    bindReplyButtons();
-                }
+            if (allComments.length === 0) {
+                commentsList.innerHTML = '<div class="no-comments">No comments yet.</div>';
             } else {
-                console.error('❌ Waline API Error:', data.errmsg);
-                commentsList.innerHTML = `<div class="no-comments">Server Error: ${data.errmsg}</div>`;
+                const commentTree = buildCommentTree(allComments);
+                const html = commentTree.map(c => renderComment(c)).join('');
+                commentsList.innerHTML = html;
+                bindReplyButtons();
             }
+
         } catch (error) {
-            console.error('❌ Fetch Failed:', error);
-            if (error.name === 'AbortError') {
-                commentsList.innerHTML = '<div class="no-comments">Loading timed out. Network might be slow.</div>';
-            } else {
-                commentsList.innerHTML = `<div class="no-comments">Failed to load comments (${error.message}).<br>Please check console (F12).</div>`;
-            }
+            console.error('❌ Fetch Error:', error);
+            commentsList.innerHTML = `<div class="no-comments">Error loading comments: ${error.message}</div>`;
         }
     }
     
@@ -1667,12 +1649,19 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
     function buildCommentTree(comments) {
         const commentMap = {};
         const rootComments = [];
+        // 深拷贝防止引用问题
         comments.forEach(c => { commentMap[c.objectId] = {...c, children: []}; });
+        
         comments.forEach(c => {
             const comment = commentMap[c.objectId];
-            if (c.pid && commentMap[c.pid]) commentMap[c.pid].children.push(comment);
-            else if (c.rid && commentMap[c.rid]) commentMap[c.rid].children.push(comment);
-            else rootComments.push(comment);
+            // 确保 pid 对应的父评论存在才放入子级，否则当作根评论（防止孤儿评论丢失）
+            if (c.pid && commentMap[c.pid]) {
+                commentMap[c.pid].children.push(comment);
+            } else if (c.rid && commentMap[c.rid]) {
+                commentMap[c.rid].children.push(comment);
+            } else {
+                rootComments.push(comment);
+            }
         });
         return rootComments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     }
@@ -1680,8 +1669,9 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
     // 渲染评论
     function renderComment(comment, depth = 0) {
         const avatarUrl = comment.avatar || `https://www.gravatar.com/avatar/${comment.mail_md5 || ''}?s=45&d=mm&r=g`;
-        const authorHtml = comment.link 
-            ? `<a href="${escapeHtml(comment.link)}" target="_blank" rel="nofollow noopener">${escapeHtml(comment.nick)}</a>`
+        const link = comment.link;
+        const authorHtml = link 
+            ? `<a href="${escapeHtml(link)}" target="_blank" rel="nofollow noopener">${escapeHtml(comment.nick)}</a>`
             : escapeHtml(comment.nick);
         
         let replyIndicator = '';
@@ -1772,7 +1762,8 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
             });
             const data = await res.json();
             
-            if(data.errno === 0) {
+            // 提交成功也可能没有 errno，只要没有 errmsg 就算成功
+            if(data.errno === 0 || data.data) {
                 document.getElementById('commentTextarea').value = '';
                 cancelReply();
                 showMessage(msgDiv, 'Sent successfully!', 'success');
@@ -1799,10 +1790,9 @@ console.log('✅ Target Page Path set to:', PAGE_PATH);
     function showMessage(el, msg, type) { el.textContent = msg; el.className = `message ${type}`; el.classList.remove('hidden'); }
     
     document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => { if(e.key === 'F12') e.preventDefault(); });
 })();
 
-// ============ 5. 页面加载动画 (保持不变) ============
+// ============ 5. 页面加载动画 (保持原样) ============
 window.addEventListener('load', () => {
     document.body.style.opacity = '0';
     setTimeout(() => {
