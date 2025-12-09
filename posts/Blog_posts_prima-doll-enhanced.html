@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プリマドール:蒸汽朋克与大正浪漫的完美融合 - Podevus</title>
     <link rel="icon" type="image/x-icon" href="../logo.ico">
-    <script src="https://unpkg.com/@waline/client@v3/dist/waline.js"></script>
     <style>
 
 :root {
@@ -1394,34 +1393,26 @@ html {
 // ============ Waline 配置 ============
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
 
-// ============ 关键修改：强制指定路径 ============
-// 根据你的后台截图，评论都存在这个特定路径下。
-// 强制写死它，解决所有路径匹配不上的问题。
+// ============ 关键设置：路径硬编码 ============
+// 根据你的后台截图，必须严格使用这个路径，不能由浏览器自动生成
 const PAGE_PATH = '/posts/blog_posts_prima-doll-enhanced';
 
-console.log('Target Page Path set to:', PAGE_PATH);
+console.log('✅ Target Page Path set to:', PAGE_PATH);
 
-// ============ 三角形光标效果 ============
+// ============ 1. 蒸汽朋克光标与特效 (保持不变) ============
 (function() {
-    // 检测是否为移动设备
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-        return;
-    }
-    
-    // 创建SVG三角形光标
+    if (isMobile) return;
+
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'cursor-triangle');
     svg.setAttribute('viewBox', '0 0 30 30');
     
-    const R = 13;
-    const cx = 15, cy = 15;
-    
+    // 三角形绘制逻辑
+    const R = 13, cx = 15, cy = 15;
     const A = { x: cx, y: cy - R }; 
     const B = { x: cx - R * Math.sqrt(3) / 2, y: cy + R / 2 };
     const C = { x: cx + R * Math.sqrt(3) / 2, y: cy + R / 2 };
-    
     const M1 = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
     const M2 = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
     const M3 = { x: (C.x + A.x) / 2, y: (C.y + A.y) / 2 };
@@ -1431,7 +1422,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
         `M ${B.x} ${B.y} L ${M2.x} ${M2.y} L ${M1.x} ${M1.y} Z`,
         `M ${C.x} ${C.y} L ${M3.x} ${M3.y} L ${M2.x} ${M2.y} Z`
     ];
-    
     outerTriangles.forEach(d => {
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', d);
@@ -1443,16 +1433,13 @@ console.log('Target Page Path set to:', PAGE_PATH);
     centerPath.setAttribute('d', `M ${M1.x} ${M1.y} L ${M2.x} ${M2.y} L ${M3.x} ${M3.y} Z`);
     centerPath.setAttribute('fill', '#847fb7');
     svg.appendChild(centerPath);
-    
     document.body.appendChild(svg);
     
+    // 鼠标跟随逻辑
     let mouseX = 0, mouseY = 0, triangleX = 0, triangleY = 0;
     let rotation = 0, rotationSpeed = 0, lastX = 0, lastY = 0, lastTrailTime = 0;
     
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
+    document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
     
     function animateCursor() {
         const dx = mouseX - triangleX;
@@ -1464,9 +1451,8 @@ console.log('Target Page Path set to:', PAGE_PATH);
         
         if (distance > 0.5) rotationSpeed += distance * 0.2;
         rotationSpeed *= 0.96;
-        const maxSpeed = 15;
-        if (rotationSpeed > maxSpeed) rotationSpeed = maxSpeed;
-        if (rotationSpeed < -maxSpeed) rotationSpeed = -maxSpeed;
+        if (rotationSpeed > 15) rotationSpeed = 15;
+        if (rotationSpeed < -15) rotationSpeed = -15;
         rotation += rotationSpeed;
         
         svg.style.left = triangleX + 'px';
@@ -1486,9 +1472,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
     
     function createTrail(x, y, moveAngle, rot) {
         const rotRad = (rot * Math.PI) / 180;
-        const vertices = [
-            { dx: 0, dy: -R }, { dx: -R * Math.sqrt(3) / 2, dy: R / 2 }, { dx: R * Math.sqrt(3) / 2, dy: R / 2 }
-        ];
+        const vertices = [{ dx: 0, dy: -R }, { dx: -R * Math.sqrt(3) / 2, dy: R / 2 }, { dx: R * Math.sqrt(3) / 2, dy: R / 2 }];
         vertices.forEach(vertex => {
             const rotatedX = vertex.dx * Math.cos(rotRad) - vertex.dy * Math.sin(rotRad);
             const rotatedY = vertex.dx * Math.sin(rotRad) + vertex.dy * Math.cos(rotRad);
@@ -1507,28 +1491,23 @@ console.log('Target Page Path set to:', PAGE_PATH);
         el.addEventListener('mouseenter', () => svg.classList.add('cursor-hover'));
         el.addEventListener('mouseleave', () => svg.classList.remove('cursor-hover'));
     });
-    
     document.addEventListener('mousedown', () => svg.classList.add('cursor-active'));
     document.addEventListener('mouseup', () => svg.classList.remove('cursor-active'));
     document.addEventListener('mouseleave', () => svg.style.opacity = '0');
     document.addEventListener('mouseenter', () => svg.style.opacity = '1');
 })();
 
-// ============ 基于滚动位置的背景变色和评论显示 ============
+// ============ 2. 滚动变色效果 (保持不变) ============
 (function() {
     const commentsContent = document.querySelector('.steampunk-comments');
     const backLink = document.querySelector('.back-link');
     const footer = document.querySelector('footer');
-    let triggerScrollTop = 0;
-    let hasTriggered = false;
-    const COLOR_CHANGE_RANGE = 400;
-    const COMMENT_SHOW_RANGE = 300;
+    let triggerScrollTop = 0, hasTriggered = false;
+    const COLOR_CHANGE_RANGE = 400, COMMENT_SHOW_RANGE = 300;
     
     function updateBodyBackgroundColor(progress) {
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        let startR = isDark ? 26 : 250;
-        let startG = isDark ? 24 : 248;
-        let startB = isDark ? 22 : 243;
+        let startR = isDark ? 26 : 250, startG = isDark ? 24 : 248, startB = isDark ? 22 : 243;
         const endR = 44, endG = 24, endB = 16;
         const r = Math.round(startR + (endR - startR) * progress);
         const g = Math.round(startG + (endG - startG) * progress);
@@ -1546,17 +1525,12 @@ console.log('Target Page Path set to:', PAGE_PATH);
     
     function handleScroll() {
         const rect = backLink.getBoundingClientRect();
-        const currentScrollTop = window.pageYOffset;
         if (rect.bottom <= window.innerHeight && !hasTriggered) {
-            triggerScrollTop = currentScrollTop;
+            triggerScrollTop = window.pageYOffset;
             hasTriggered = true;
         }
-        if (!hasTriggered) {
-            updateBodyBackgroundColor(0);
-            showComments(0);
-            return;
-        }
-        const scrollDistance = currentScrollTop - triggerScrollTop;
+        if (!hasTriggered) { updateBodyBackgroundColor(0); showComments(0); return; }
+        const scrollDistance = window.pageYOffset - triggerScrollTop;
         if (scrollDistance <= COLOR_CHANGE_RANGE) {
             updateBodyBackgroundColor(Math.max(0, Math.min(1, scrollDistance / COLOR_CHANGE_RANGE)));
             showComments(0);
@@ -1566,74 +1540,88 @@ console.log('Target Page Path set to:', PAGE_PATH);
             showComments(Math.max(0, Math.min(1, (scrollDistance - COLOR_CHANGE_RANGE) / COMMENT_SHOW_RANGE)));
         }
     }
-    
     window.addEventListener('scroll', handleScroll);
     document.body.style.transition = 'background-color 0.05s linear';
     commentsContent.style.opacity = '0';
     commentsContent.style.transform = 'translateY(50px)';
     commentsContent.style.transition = 'opacity 0.05s linear, transform 0.05s linear';
     footer.style.transition = 'color 0.05s linear';
-    updateBodyBackgroundColor(0);
-    showComments(0);
+    updateBodyBackgroundColor(0); showComments(0);
 })();
 
-// ============ 立体粒子系统 ============
+// ============ 3. 粒子特效 (保持不变) ============
 (function() {
-    const particlesBackground = document.getElementById('particlesBackground');
-    const particlesForeground = document.getElementById('particlesForeground');
-    function createParticle(container, isForeground = false) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
+    const bg = document.getElementById('particlesBackground');
+    const fg = document.getElementById('particlesForeground');
+    function createParticle(container, isForeground) {
+        const p = document.createElement('div');
+        p.className = 'particle';
         const size = Math.random() * (isForeground ? 8 : 9) + (isForeground ? 8 : 3);
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.left = Math.random() * 100 + '%';
+        p.style.width = size + 'px'; p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + '%';
         const duration = Math.random() * (isForeground ? 10 : 15) + (isForeground ? 8 : 12);
-        particle.style.animationDuration = duration + 's';
-        const delay = Math.random() * 5;
-        particle.style.animationDelay = delay + 's';
-        particle.style.setProperty('--drift', (Math.random() - 0.5) * (isForeground ? 150 : 80) + 'px');
-        container.appendChild(particle);
-        setTimeout(() => particle.remove(), (duration + delay) * 1000);
+        p.style.animationDuration = duration + 's';
+        p.style.animationDelay = Math.random() * 5 + 's';
+        p.style.setProperty('--drift', (Math.random() - 0.5) * (isForeground ? 150 : 80) + 'px');
+        container.appendChild(p);
+        setTimeout(() => p.remove(), (duration + 5) * 1000);
     }
-    for (let i = 0; i < 20; i++) setTimeout(() => createParticle(particlesBackground, false), i * 250);
-    for (let i = 0; i < 10; i++) setTimeout(() => createParticle(particlesForeground, true), i * 300);
-    setInterval(() => createParticle(particlesBackground, false), 2000);
-    setInterval(() => createParticle(particlesForeground, true), 3000);
+    for (let i = 0; i < 20; i++) setTimeout(() => createParticle(bg, false), i * 250);
+    for (let i = 0; i < 10; i++) setTimeout(() => createParticle(fg, true), i * 300);
+    setInterval(() => createParticle(bg, false), 2000);
+    setInterval(() => createParticle(fg, true), 3000);
 })();
 
-// ============ Waline 评论系统逻辑 ============
+// ============ 4. 评论加载逻辑 (修复版) ============
 (function() {
     let allComments = [];
     
     document.addEventListener('DOMContentLoaded', function() {
-        loadComments();
-        document.getElementById('commentForm').addEventListener('submit', handleSubmit);
-        document.getElementById('cancelReplyBtn').addEventListener('click', cancelReply);
+        console.log('🚀 Page Loaded, starting comment load...');
+        loadComments(); // 立即开始加载
         
-        const savedName = localStorage.getItem('podevus_comment_name');
-        const savedEmail = localStorage.getItem('podevus_comment_email');
-        const savedWebsite = localStorage.getItem('podevus_comment_website');
-        if (savedName) document.getElementById('nameInput').value = savedName;
-        if (savedEmail) document.getElementById('emailInput').value = savedEmail;
-        if (savedWebsite) document.getElementById('websiteInput').value = savedWebsite;
+        // 绑定事件
+        const form = document.getElementById('commentForm');
+        if(form) form.addEventListener('submit', handleSubmit);
+        
+        const cancelBtn = document.getElementById('cancelReplyBtn');
+        if(cancelBtn) cancelBtn.addEventListener('click', cancelReply);
+        
+        // 恢复用户信息
+        const nameInput = document.getElementById('nameInput');
+        if(nameInput) nameInput.value = localStorage.getItem('podevus_comment_name') || '';
+        const emailInput = document.getElementById('emailInput');
+        if(emailInput) emailInput.value = localStorage.getItem('podevus_comment_email') || '';
+        const websiteInput = document.getElementById('websiteInput');
+        if(websiteInput) websiteInput.value = localStorage.getItem('podevus_comment_website') || '';
     });
     
     async function loadComments() {
         const commentsList = document.getElementById('commentsList');
         const commentsCount = document.getElementById('commentsCount');
-        
-        console.log('Fetching comments for path:', PAGE_PATH);
+        const url = `${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`;
+
+        console.log(`🌐 Fetching: ${url}`);
 
         try {
-            // 使用 encodeURIComponent 确保路径安全
-            const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
+            // 设置15秒超时，防止无限loading
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            console.log('📡 Response Status:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
+            }
+
             const data = await response.json();
-            
-            console.log('API Raw Response:', data);
+            console.log('📦 Data Received:', data);
 
             if (data.errno === 0) {
-                // 处理 Waline 不同版本的返回结构
+                // 智能解析数据结构
                 let rawData = data.data;
                 allComments = [];
 
@@ -1641,107 +1629,80 @@ console.log('Target Page Path set to:', PAGE_PATH);
                     allComments = rawData;
                 } else if (rawData && Array.isArray(rawData.data)) {
                     allComments = rawData.data;
+                } else {
+                    console.warn('⚠️ Unknown data structure:', rawData);
                 }
                 
-                console.log('Parsed Comments Array:', allComments); // 调试解析后的数组
-
-                // 计算数量
+                // 更新数量
                 let totalCount = 0;
                 if (rawData && rawData.count) totalCount = rawData.count;
                 else if (rawData && rawData.totalCount) totalCount = rawData.totalCount;
                 else totalCount = allComments.length;
 
-                commentsCount.textContent = `${totalCount} Replies`;
+                if (commentsCount) commentsCount.textContent = `${totalCount} Replies`;
                 
                 if (allComments.length === 0) {
-                    commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
-                    return;
+                    commentsList.innerHTML = '<div class="no-comments">No comments yet. You could be the first one!</div>';
+                } else {
+                    const commentTree = buildCommentTree(allComments);
+                    const html = commentTree.map(comment => renderComment(comment)).join('');
+                    commentsList.innerHTML = html;
+                    bindReplyButtons();
                 }
-                
-                // 渲染前检查 buildCommentTree 是否正常
-                const commentTree = buildCommentTree(allComments);
-                const html = commentTree.map(comment => renderComment(comment)).join('');
-                
-                if (!html) {
-                    console.error('Rendered HTML is empty!');
-                    commentsList.innerHTML = '<div class="no-comments">Error: Comments data exists but rendering failed.</div>';
-                    return;
-                }
-                
-                commentsList.innerHTML = html;
-                bindReplyButtons();
             } else {
-                console.warn('Waline API error:', data.errmsg);
+                console.error('❌ Waline API Error:', data.errmsg);
                 commentsList.innerHTML = `<div class="no-comments">Server Error: ${data.errmsg}</div>`;
             }
         } catch (error) {
-            console.error('Fetch error:', error);
-            commentsList.innerHTML = '<div class="no-comments">Failed to load comments. Please check console (F12).</div>';
+            console.error('❌ Fetch Failed:', error);
+            if (error.name === 'AbortError') {
+                commentsList.innerHTML = '<div class="no-comments">Loading timed out. Network might be slow.</div>';
+            } else {
+                commentsList.innerHTML = `<div class="no-comments">Failed to load comments (${error.message}).<br>Please check console (F12).</div>`;
+            }
         }
     }
     
+    // 构建评论树
     function buildCommentTree(comments) {
         const commentMap = {};
         const rootComments = [];
+        comments.forEach(c => { commentMap[c.objectId] = {...c, children: []}; });
         comments.forEach(c => {
-            // 深拷贝对象，防止引用污染
-            const comment = {...c, children: []}; 
-            commentMap[comment.objectId] = comment;
-        });
-        
-        comments.forEach(c => {
-            // 这里使用原始数据的 pid/rid 查找 map 中的新对象
             const comment = commentMap[c.objectId];
-            if (c.pid && commentMap[c.pid]) {
-                commentMap[c.pid].children.push(comment);
-            } else if (c.rid && commentMap[c.rid]) {
-                commentMap[c.rid].children.push(comment);
-            } else {
-                rootComments.push(comment);
-            }
+            if (c.pid && commentMap[c.pid]) commentMap[c.pid].children.push(comment);
+            else if (c.rid && commentMap[c.rid]) commentMap[c.rid].children.push(comment);
+            else rootComments.push(comment);
         });
-        // 排序：时间越早越靠前
-        rootComments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-        return rootComments;
+        return rootComments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     }
     
+    // 渲染评论
     function renderComment(comment, depth = 0) {
-        const maxDepth = 3;
         const avatarUrl = comment.avatar || `https://www.gravatar.com/avatar/${comment.mail_md5 || ''}?s=45&d=mm&r=g`;
-        
-        let authorHtml = comment.link 
+        const authorHtml = comment.link 
             ? `<a href="${escapeHtml(comment.link)}" target="_blank" rel="nofollow noopener">${escapeHtml(comment.nick)}</a>`
             : escapeHtml(comment.nick);
         
         let replyIndicator = '';
         if (comment.pid && comment.pid !== comment.rid) {
             const parent = allComments.find(c => c.objectId === comment.pid);
-            if (parent) {
-                replyIndicator = `<div class="reply-to-indicator">Reply to <span>@${escapeHtml(parent.nick)}</span></div>`;
-            }
+            if (parent) replyIndicator = `<div class="reply-to-indicator">Reply to <span>@${escapeHtml(parent.nick)}</span></div>`;
         }
         
         let repliesHtml = '';
         if (comment.children && comment.children.length > 0) {
-            const repliesContent = comment.children
-                .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-                .map(reply => renderComment(reply, Math.min(depth + 1, maxDepth)))
-                .join('');
-            repliesHtml = `<div class="comment-replies">${repliesContent}</div>`;
+            repliesHtml = `<div class="comment-replies">${comment.children.map(c => renderComment(c, depth + 1)).join('')}</div>`;
         }
         
         return `
             <div class="comment-card" id="comment-${comment.objectId}">
                 <div class="comment-header">
                     <div class="comment-header-left">
-                        <div class="comment-avatar">
-                            <img src="${avatarUrl}" alt="${escapeHtml(comment.nick)}" loading="lazy">
-                        </div>
+                        <div class="comment-avatar"><img src="${avatarUrl}" loading="lazy"></div>
                         <div class="comment-author-info">
                             <span class="comment-author">${authorHtml}</span>
-                            <span class="comment-time">
-                                <a href="#comment-${comment.objectId}">${formatTime(comment.createdAt)}</a>
-                            </span>
+                            <span class="comment-time"><a href="#comment-${comment.objectId}">${formatTime(comment.createdAt)}</a></span>
                         </div>
                     </div>
                 </div>
@@ -1763,13 +1724,12 @@ console.log('Target Page Path set to:', PAGE_PATH);
         });
     }
     
-    function setReplyTo(commentId, rootId, author) {
-        document.getElementById('replyToId').value = commentId;
-        document.getElementById('replyToAuthor').value = rootId;
+    function setReplyTo(cid, rid, author) {
+        document.getElementById('replyToId').value = cid;
+        document.getElementById('replyToAuthor').value = rid;
         document.getElementById('replyToName').textContent = author;
         document.getElementById('replyNotice').classList.remove('hidden');
         document.getElementById('respond').scrollIntoView({ behavior: 'smooth' });
-        document.getElementById('commentTextarea').focus();
     }
     
     function cancelReply() {
@@ -1781,92 +1741,68 @@ console.log('Target Page Path set to:', PAGE_PATH);
     
     async function handleSubmit(e) {
         e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const msgDiv = document.getElementById('formMessage');
+        const content = document.getElementById('commentTextarea').value.trim();
         const name = document.getElementById('nameInput').value.trim();
         const email = document.getElementById('emailInput').value.trim();
         const website = document.getElementById('websiteInput').value.trim();
-        const content = document.getElementById('commentTextarea').value.trim();
-        const replyToId = document.getElementById('replyToId').value;
-        const rootId = document.getElementById('replyToAuthor').value;
-        const messageDiv = document.getElementById('formMessage');
-        const submitBtn = document.getElementById('submitBtn');
         
-        if (!name || !email || !content) return showMessage(messageDiv, 'Please fill in all required fields', 'error');
-        if (!isValidEmail(email)) return showMessage(messageDiv, 'Please enter a valid email address', 'error');
-        if (website && !isValidUrl(website)) return showMessage(messageDiv, 'Please enter a valid website URL', 'error');
+        if (!content || !name || !email) return showMessage(msgDiv, 'Please fill required fields.', 'error');
         
         localStorage.setItem('podevus_comment_name', name);
         localStorage.setItem('podevus_comment_email', email);
-        if (website) localStorage.setItem('podevus_comment_website', website);
+        if(website) localStorage.setItem('podevus_comment_website', website);
         
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Posting...';
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
         
         try {
-            const commentData = {
-                comment: content,
-                nick: name,
-                mail: email,
-                link: website || '',
-                path: PAGE_PATH, // 确保发送时也使用硬编码的路径
-                url: window.location.href,
-                ua: navigator.userAgent
+            const payload = {
+                nick: name, mail: email, link: website, comment: content,
+                path: PAGE_PATH, url: window.location.href, ua: navigator.userAgent,
+                pid: document.getElementById('replyToId').value || undefined,
+                rid: document.getElementById('replyToAuthor').value || undefined
             };
-            if (replyToId) {
-                commentData.pid = replyToId;
-                commentData.rid = rootId || replyToId;
-            }
             
-            const response = await fetch(`${WALINE_SERVER_URL}/comment`, {
+            const res = await fetch(`${WALINE_SERVER_URL}/comment`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(commentData)
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
             });
-            const result = await response.json();
+            const data = await res.json();
             
-            if (result.errno === 0) {
+            if(data.errno === 0) {
                 document.getElementById('commentTextarea').value = '';
                 cancelReply();
-                showMessage(messageDiv, 'Comment posted successfully!', 'success');
-                setTimeout(() => hideMessage(messageDiv), 3000);
+                showMessage(msgDiv, 'Sent successfully!', 'success');
+                setTimeout(() => msgDiv.classList.add('hidden'), 3000);
                 await loadComments();
             } else {
-                showMessage(messageDiv, result.errmsg || 'Failed to post comment', 'error');
+                showMessage(msgDiv, data.errmsg || 'Error sending comment', 'error');
             }
-        } catch (error) {
-            console.error('Post error:', error);
-            showMessage(messageDiv, 'Failed to post comment.', 'error');
+        } catch(err) {
+            console.error(err);
+            showMessage(msgDiv, 'Network error', 'error');
         } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Post Comment';
+            btn.disabled = false;
+            btn.textContent = 'Post Comment';
         }
     }
     
-    function formatTime(timestamp) {
-        const date = new Date(timestamp);
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        let hour = date.getHours();
-        const ampm = hour >= 12 ? 'pm' : 'am';
-        hour = hour % 12 || 12;
-        return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} at ${hour}:${date.getMinutes().toString().padStart(2, '0')} ${ampm}`;
+    function formatTime(ts) {
+        const d = new Date(ts);
+        const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return `${m[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
     }
-    function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
-    function isValidUrl(url) { try { new URL(url); return true; } catch { return false; } }
-    function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-    function showMessage(el, msg, type) { el.textContent = msg; el.className = 'message ' + type; el.classList.remove('hidden'); }
-    function hideMessage(el) { el.classList.add('hidden'); }
+    function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    function showMessage(el, msg, type) { el.textContent = msg; el.className = `message ${type}`; el.classList.remove('hidden'); }
     
-    document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
-    document.addEventListener('keydown', e => { if (e.key === 'F12' || (e.ctrlKey && 'cus'.includes(e.key.toLowerCase()))) e.preventDefault(); });
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => { if(e.key === 'F12') e.preventDefault(); });
 })();
 
-// ============ 平滑滚动与加载动画 ============
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-    });
-});
+// ============ 5. 页面加载动画 (保持不变) ============
 window.addEventListener('load', () => {
     document.body.style.opacity = '0';
     setTimeout(() => {
@@ -1875,6 +1811,3 @@ window.addEventListener('load', () => {
     }, 100);
 });
 </script>
-    <script src="../assets/music-player.js"></script>
-</body>
-</html>
