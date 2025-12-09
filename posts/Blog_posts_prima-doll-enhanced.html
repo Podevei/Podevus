@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プリマドール:蒸汽朋克与大正浪漫的完美融合 - Podevus</title>
     <link rel="icon" type="image/x-icon" href="../logo.ico">
-    <!-- Waline 评论系统（仅使用API，不使用默认UI） -->
     <script src="https://unpkg.com/@waline/client@v3/dist/waline.js"></script>
     <style>
 
@@ -1330,13 +1329,10 @@ html {
         </div>
     </article>
 
-    <!-- 评论区域（带动态变色和立体粒子效果） -->
     <div class="comments-gradient-wrapper" id="commentsSection">
-        <!-- 后景粒子层（在评论块后面） -->
         <div class="particles-background" id="particlesBackground"></div>
         
         <div class="steampunk-comments">
-            <!-- 历史评论区 -->
             <div class="comments-history-section">
                 <h2 class="section-title">Comments</h2>
                 <div class="comments-count" id="commentsCount">0 Replies</div>
@@ -1345,11 +1341,9 @@ html {
                 </div>
             </div>
 
-            <!-- 发表评论区 -->
             <div class="comment-form-section" id="respond">
                 <h3 class="form-title">Leave a Reply</h3>
                 
-                <!-- 回复提示 -->
                 <div class="reply-notice hidden" id="replyNotice">
                     <span class="reply-notice-text">Replying to <span id="replyToName"></span>'s comment</span>
                     <button type="button" class="cancel-reply-btn" id="cancelReplyBtn">Cancel reply</button>
@@ -1375,7 +1369,6 @@ html {
                     </div>
                     <textarea class="comment-textarea" id="commentTextarea" placeholder="Share your thoughts..." required></textarea>
                     
-                    <!-- 通知选项 -->
                     <div class="notify-options">
                         <label class="notify-option">
                             <input type="checkbox" id="notifyReplies">
@@ -1389,7 +1382,6 @@ html {
             </div>
         </div>
         
-        <!-- 前景粒子层（在评论块前面） -->
         <div class="particles-foreground" id="particlesForeground"></div>
     </div>
 
@@ -1402,7 +1394,25 @@ html {
 
 // ============ Waline 配置 ============
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
-const PAGE_PATH = window.location.pathname || '/article/primadoll';
+
+// ============ 关键修复：动态获取当前路径，但移除末尾斜杠 ============
+// 这样做是为了匹配你数据库中存储的 "/posts/blog_posts_prima-doll-enhanced" (无斜杠)
+let path = window.location.pathname;
+
+// 1. 解码 URL (处理中文路径或特殊字符)
+try {
+    path = decodeURIComponent(path);
+} catch (e) {
+    console.error('URL Decode failed:', e);
+}
+
+// 2. 移除末尾斜杠 (除非是根路径 /)
+if (path.length > 1 && path.endsWith('/')) {
+    path = path.slice(0, -1);
+}
+
+const PAGE_PATH = path;
+console.log('Normalized Page Path:', PAGE_PATH);
 
 // ============ 三角形光标效果 ============
 (function() {
@@ -1775,62 +1785,60 @@ const PAGE_PATH = window.location.pathname || '/article/primadoll';
     });
     
     // 从 Waline 服务器加载评论
-async function loadComments() {
-    const commentsList = document.getElementById('commentsList');
-    const commentsCount = document.getElementById('commentsCount');
-    
-    // 调试：在控制台打印当前请求的路径，请按 F12 确认此路径与你在 Waline 后台看到的路径完全一致
-    console.log('Current Page Path:', PAGE_PATH);
-
-    try {
-        // 使用 encodeURIComponent 确保路径特殊字符被正确转义
-        const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
-        const data = await response.json();
+    async function loadComments() {
+        const commentsList = document.getElementById('commentsList');
+        const commentsCount = document.getElementById('commentsCount');
         
-        // 调试：查看服务器实际返回的数据结构
-        console.log('Waline Response:', data);
+        // 打印调试信息，你可以F12查看这个路径是否和数据库一致
+        console.log('Loading comments for path:', PAGE_PATH);
 
-        if (data.errno === 0) {
-            // ============ 关键修改开始 ============
-            // 兼容性修复：Waline 不同版本返回的数据结构可能不同
-            // 情况 A: data.data 直接就是一个数组 (常见于 Waline V2/V3 部分配置)
-            if (Array.isArray(data.data)) {
-                allComments = data.data;
-            } 
-            // 情况 B: data.data 是个对象，评论在 data.data.data 中 (你原本的代码逻辑)
-            else if (data.data && Array.isArray(data.data.data)) {
-                allComments = data.data.data;
-            } 
-            // 情况 C: 数据为空
-            else {
+        try {
+            // 请求评论数据
+            const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
+            const data = await response.json();
+            
+            console.log('API Response:', data); // 调试返回数据
+
+            if (data.errno === 0) {
+                // ============ 关键修复：兼容不同的数据返回结构 ============
+                let rawData = data.data;
                 allComments = [];
-            }
-            
-            // 修复评论计数逻辑
-            const totalCount = (data.data && data.data.count) || (data.data && data.data.totalCount) || allComments.length || 0;
-            // ============ 关键修改结束 ============
 
-            commentsCount.textContent = `${totalCount} Replies`;
-            
-            if (allComments.length === 0) {
+                if (Array.isArray(rawData)) {
+                    // 结构1: { data: [Array] }
+                    allComments = rawData;
+                } else if (rawData && Array.isArray(rawData.data)) {
+                    // 结构2: { data: { data: [Array] } }
+                    allComments = rawData.data;
+                }
+                
+                // 计算评论总数
+                let totalCount = 0;
+                if (rawData && rawData.count) totalCount = rawData.count;
+                else if (rawData && rawData.totalCount) totalCount = rawData.totalCount;
+                else totalCount = allComments.length;
+
+                commentsCount.textContent = `${totalCount} Replies`;
+                
+                if (allComments.length === 0) {
+                    commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
+                    return;
+                }
+                
+                // 构建评论树并渲染
+                const commentTree = buildCommentTree(allComments);
+                commentsList.innerHTML = commentTree.map(comment => renderComment(comment)).join('');
+                
+                // 绑定回复按钮事件
+                bindReplyButtons();
+            } else {
                 commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
-                return;
             }
-            
-            // 构建评论树并渲染
-            const commentTree = buildCommentTree(allComments);
-            commentsList.innerHTML = commentTree.map(comment => renderComment(comment)).join('');
-            
-            // 绑定回复按钮事件
-            bindReplyButtons();
-        } else {
-            commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
+        } catch (error) {
+            console.error('Failed to load comments:', error);
+            commentsList.innerHTML = '<div class="no-comments">Failed to load comments. Please refresh the page.</div>';
         }
-    } catch (error) {
-        console.error('Failed to load comments:', error);
-        commentsList.innerHTML = '<div class="no-comments">Failed to load comments. Please refresh the page.</div>';
     }
-}
     
     // 构建评论树
     function buildCommentTree(comments) {
@@ -2007,7 +2015,8 @@ async function loadComments() {
                 nick: name,
                 mail: email,
                 link: website || '',
-                url: PAGE_PATH,
+                path: PAGE_PATH, // 确保发送评论时使用相同的路径变量
+                url: window.location.href,
                 ua: navigator.userAgent
             };
             
