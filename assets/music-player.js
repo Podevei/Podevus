@@ -62,7 +62,7 @@
                 ]
             },
             {
-                name: '若大将合辑',
+                name: '若大将合集',
                 artist: '加山雄三',
                 expanded: false,
                 songs: [
@@ -71,7 +71,7 @@
                 ]
             },
             {
-                name: 'MANYO合辑',
+                name: 'MANYO合集',
                 artist: 'MANYO',
                 expanded: false,
                 songs: [
@@ -86,12 +86,12 @@
                 ]
             },
             {
-                name: 'Key合辑',
+                name: 'Key合集',
                 artist: 'VISUAL ARTS/Key',
                 expanded: false,
                 songs: [
                     { title: 'ニリンソウ', artist: 'VISUAL ARTS, Key Sounds Label', file: 'VISUAL ARTS _ Key Sounds Label - ニリンソウ (鹅掌草).ogg' },
-                    { title: 'ロック风アレンジ', artist: '麻枝准', file: '麻枝准 (まえだ じゅん) - ロック风アレンジ.flac' },
+                    { title: 'Theme of SSSロック风アレンジ', artist: '麻枝准', file: '麻枝准 (まえだ じゅん) - ロック风アレンジ.flac' },
                     { title: '散花', artist: 'VISUAL ARTS, Key Sounds Label (キー・サウンズ・レーベル)', file: 'VISUAL ARTS_Key Sounds Label (キー・サウンズ・レーベル) - 散花.ogg' },
                     { title: 'Vitae', artist: 'VISUAL ARTS/Key', file: 'Various Artists _ VISUAL ARTS _ Key - Vitae.ogg' },
                     { title: 'Reminiscence', artist: 'VISUAL ARTS/Key', file: 'Various Artists _ VISUAL ARTS _ Key - Reminiscence.ogg' },

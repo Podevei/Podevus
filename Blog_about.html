@@ -220,12 +220,103 @@ footer::before {
 footer p:first-child { font-family: var(--font-serif); margin-bottom: 12px; font-size: 1.05em; }
 footer p:last-child { font-size: 0.85em; font-style: italic; letter-spacing: 0.05em; }
 
+/* 音乐播放器按钮 */
+.music-entry-section {
+    position: relative;
+}
+
+.music-player-entry {
+    position: relative;
+    background: linear-gradient(135deg, #1a1614 0%, #2d2520 100%);
+    border: none;
+    padding: 18px 45px;
+    font-size: 0.95em;
+    color: var(--accent-color);
+    font-family: var(--font-sans);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    clip-path: polygon(
+        0 0, calc(100% - 15px) 0, 100% 15px,
+        100% 100%, 15px 100%, 0 calc(100% - 15px)
+    );
+    box-shadow: 
+        0 0 0 2px var(--accent-color),
+        0 0 0 4px rgba(200, 155, 109, 0.2),
+        inset 3px 3px 8px rgba(0, 0, 0, 0.4),
+        inset -3px -3px 8px rgba(200, 155, 109, 0.1),
+        0 8px 20px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.music-player-entry::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid rgba(200, 155, 109, 0.3);
+    clip-path: polygon(
+        0 0, calc(100% - 10px) 0, 100% 10px,
+        100% 100%, 10px 100%, 0 calc(100% - 10px)
+    );
+    pointer-events: none;
+}
+
+.music-player-entry::after {
+    content: '';
+    position: absolute;
+    top: 3px; right: 3px;
+    width: 20px; height: 20px;
+    background: 
+        linear-gradient(45deg, transparent 45%, var(--accent-color) 45%, var(--accent-color) 55%, transparent 55%),
+        linear-gradient(-45deg, transparent 45%, var(--accent-color) 45%, var(--accent-color) 55%, transparent 55%);
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.music-player-entry:hover {
+    background: linear-gradient(135deg, #2d2520 0%, #3d3530 100%);
+    box-shadow: 
+        0 0 0 2px var(--accent-hover),
+        0 0 0 4px rgba(200, 155, 109, 0.3),
+        inset 3px 3px 8px rgba(0, 0, 0, 0.4),
+        inset -3px -3px 8px rgba(200, 155, 109, 0.2),
+        0 12px 30px rgba(200, 155, 109, 0.2);
+    transform: translateY(-3px);
+}
+
+.music-player-entry:hover::after {
+    opacity: 0.7;
+}
+
+.music-player-entry:active {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 0 0 2px var(--accent-color),
+        0 0 0 4px rgba(200, 155, 109, 0.2),
+        inset 4px 4px 10px rgba(0, 0, 0, 0.6),
+        0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.music-player-entry svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    filter: drop-shadow(0 2px 4px rgba(200, 155, 109, 0.4));
+}
+
 @media (max-width: 768px) {
     body { padding: 18px; }
     h1 { font-size: 2em; }
     .about-content { padding: 25px; }
     .custom-cursor { display: none; }
     html, body, html *, body * { cursor: auto !important; }
+    .music-player-entry {
+        padding: 15px 38px;
+        font-size: 0.88em;
+    }
 }
 
 html { scroll-behavior: smooth; }
@@ -252,7 +343,7 @@ html { scroll-behavior: smooth; }
             <p><strong>Podevus V2.1</strong></p>
             <p>欢迎来到 Podevus，这是一个记录思考、分享观点的个人空间。</p>
             <p>在这里，我会分享关于技术、阅读、动画作品以及日常思考的文章。希望这些文字能够引发一些共鸣，或者至少给你带来片刻的思考。</p>
-            <p>本站采用极简设计理念，融合大正浪漫时代的优雅美学，旨在让内容本身成为焦点。褪去繁复的装饰，让文字在宁静中绽放。</p>
+            <p>本站采用极简设计理念,融合大正浪漫时代的优雅美学，旨在让内容本身成为焦点。褪去繁复的装饰，让文字在宁静中绽放。</p>
         </div>
 
         <div class="about-content">
