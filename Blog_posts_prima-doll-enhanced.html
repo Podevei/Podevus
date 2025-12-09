@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プリマドール:蒸汽朋克与大正浪漫的完美融合 - Podevus</title>
+    <link rel="icon" type="image/x-icon" href="../logo.ico">
+    <style>
+
+:root {
+    /* 大正浪漫配色 - 温暖复古 */
+    --primary-bg: #faf8f3;
+    --secondary-bg: #f5f1e8;
+    --accent-color: #c89b6d;
+    --accent-hover: #a67c52;
+    --text-primary: #2d2520;
+    --text-secondary: #5a504a;
+    --text-muted: #8b7f76;
+    --border-light: #e8dfd2;
+    --border-dark: #d4c4b0;
+    --shadow-color: rgba(45, 37, 32, 0.08);
+    --card-bg: #ffffff;
+    
+    /* 评论区深色背景 */
+    --comment-bg-start: #2c1810;
+    --comment-bg-end: #1a0f0a;
+    --comment-text: #f5e6d3;
+    --comment-border: #8b5a2b;
+    --comment-accent: #c89b6d;
+    
+    /* 字体 */
+    --font-serif: "Noto Serif JP", "Source Han Serif CN", Georgia, serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-bg: #1a1816;
+        --secondary-bg: #242220;
+        --accent-color: #d4a574;
+        --accent-hover: #e6b786;
+        --text-primary: #e8e6e3;
+        --text-secondary: #c4bfb8;
+        --text-muted: #8b8580;
+        --border-light: #3a3633;
+        --border-dark: #4a4440;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --card-bg: #242220;
+        
+        /* 评论区在深色模式下也保持深色蒸汽朋克风格 */
+        --comment-bg-start: #2c1810;
+        --comment-bg-end: #1a0f0a;
+        --comment-text: #f5e6d3;
+        --comment-border: #8b5a2b;
+        --comment-accent: #c89b6d;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: none !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* 允许输入框可选择（如果有的话） */
+input, textarea {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+}
+
+/* ============ 三角形光标效果 ============ */
+body {
+    cursor: none !important;
+}
+
+html {
+    cursor: none !important;
+}
+
+/* 隐藏默认光标 */
+a, button, .post, nav a, input, textarea, select {
+    cursor: none !important;
+}
+
+/* 三角形光标 SVG */
+.cursor-triangle {
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    pointer-events: none;
+    z-index: 10000;
+    transform-origin: center center;
+    transition: opacity 0.3s ease;
+}
+
+/* 悬停效果 */
+.cursor-triangle.cursor-hover {
+    filter: drop-shadow(0 0 6px #847fb7);
+}
+
+/* 点击效果 */
+.cursor-triangle.cursor-active {
+    transform: scale(0.85);
+}
+
+/* 线条尾迹效果 */
+.cursor-trail {
+    position: fixed;
+    height: 2px;
+    background: linear-gradient(90deg, #97cce3, transparent);
+    pointer-events: none;
+    z-index: 9999;
+    transform-origin: left center;
+    animation: trailFade 0.5s ease-out forwards;
+}
+
+@keyframes trailFade {
+    0% {
+        opacity: 0.9;
+        width: 40px;
+    }
+    100% {
+        opacity: 0;
+        width: 10px;
+    }
+}
+
+/* ============ 页面基础样式 ============ */
+body {
+    font-family: var(--font-sans);
+    line-height: 1.8;
+    color: var(--text-primary);
+    background: var(--primary-bg);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    transition: background-color 0.05s linear;
+}
+
+/* 页面装饰 - 微妙的纹理 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            var(--shadow-color) 2px,
+            var(--shadow-color) 4px
+        );
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: -1;
+}
+
+header {
+    border-bottom: 2px solid var(--border-dark);
+    padding-bottom: 30px;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+/* 装饰线条 */
+header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 120px;
+    height: 2px;
+    background: var(--accent-color);
+    transition: width 0.5s ease;
+}
+
+header:hover::after {
+    width: 200px;
+}
+
+h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5em;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+
+h1 a {
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+}
+
+h1 a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+h1 a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.subtitle {
+    font-family: var(--font-serif);
+    font-size: 1.15em;
+    color: var(--text-secondary);
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    margin-left: 0.15em;
+}
+
+nav {
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 30px;
+}
+
+nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95em;
+    position: relative;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+    font-weight: 400;
+}
+
+nav a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+nav a:hover {
+    color: var(--accent-color);
+}
+
+nav a:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+nav a.active {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+nav a.active::before {
+    transform: scaleX(1);
+}
+
+/* 文章卡片 */
+.post {
+    background: var(--card-bg);
+    margin-bottom: 40px;
+    padding: 35px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.post::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+}
+
+.post:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--shadow-color);
+    border-color: var(--border-dark);
+}
+
+.post:hover::before {
+    transform: scaleX(1);
+}
+
+.post-title {
+    font-family: var(--font-serif);
+    font-size: 1.65em;
+    font-weight: 500;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.post-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.post-title a:hover {
+    color: var(--accent-color);
+}
+
+.post-meta {
+    font-size: 0.88em;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+}
+
+.post-category {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+.post-category:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 155, 109, 0.3);
+}
+
+.post-excerpt {
+    color: var(--text-secondary);
+    font-size: 1.02em;
+    line-height: 1.85;
+    margin-bottom: 18px;
+}
+
+.read-more {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 0.92em;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.3s ease, color 0.3s ease;
+}
+
+.read-more::after {
+    content: '→';
+    transition: transform 0.3s ease;
+}
+
+.read-more:hover {
+    gap: 10px;
+    color: var(--accent-hover);
+}
+
+.read-more:hover::after {
+    transform: translateX(3px);
+}
+
+/* 分类页标题 */
+.category-header {
+    margin-bottom: 40px;
+}
+
+.category-title {
+    font-family: var(--font-serif);
+    font-size: 1.8em;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.category-description {
+    color: var(--text-secondary);
+    font-size: 1em;
+}
+
+/* 文章详情页 */
+.article-header {
+    margin-bottom: 40px;
+}
+
+.article-title {
+    font-family: var(--font-serif);
+    font-size: 2em;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.article-meta {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.article-meta span {
+    margin-right: 15px;
+}
+
+.article-content {
+    font-size: 1.05em;
+    line-height: 1.9;
+    color: var(--text-secondary);
+}
+
+.article-content p {
+    margin-bottom: 1.5em;
+}
+
+.article-content h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    color: var(--text-primary);
+}
+
+.article-content h3 {
+    font-family: var(--font-serif);
+    font-size: 1.3em;
+    font-weight: 500;
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    color: var(--text-primary);
+}
+
+.back-link {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.back-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: color 0.3s ease;
+    margin-right: 20px;
+}
+
+.back-link a:hover {
+    color: var(--accent-hover);
+}
+
+footer {
+    margin-top: 0;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-top: 2px solid var(--border-dark);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    position: relative;
+    /* 让footer也铺满宽度 */
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    background: transparent;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--accent-color);
+}
+
+footer p:first-child {
+    font-family: var(--font-serif);
+    margin-bottom: 12px;
+    font-size: 1.05em;
+}
+
+footer p:last-child {
+    font-size: 0.85em;
+    font-style: italic;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+/* ============ 评论区域 - 铺满屏幕 + 动态变色 ============ */
+.comments-gradient-wrapper {
+    position: relative;
+    margin-top: 60px;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    padding: 120px 20px 100px;
+    overflow: visible;
+    /* 背景透明，使用body的背景色 */
+    background: transparent;
+    min-height: 100vh;
+}
+
+/* 后景粒子层（在评论块后面） */
+.particles-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+/* 前景粒子层（在评论块前面） */
+.particles-foreground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 10;
+}
+
+/* 粒子样式 */
+.particle {
+    position: absolute;
+    bottom: -20px;
+    background: radial-gradient(circle, rgba(200, 155, 109, 0.8), rgba(200, 155, 109, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: floatUp linear infinite;
+    box-shadow: 0 0 10px rgba(200, 155, 109, 0.5);
+}
+
+/* 前景粒子稍微大一些，制造景深 */
+.particles-foreground .particle {
+    filter: blur(1px);
+    opacity: 0.6;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) translateX(0) scale(0.5);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-180vh) translateX(var(--drift)) scale(1);
+        opacity: 0;
+    }
+}
+
+/* ============ 评论系统样式 - 蒸汽朋克风格 ============ */
+.steampunk-comments {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+    padding: 120px 20px 100px;
+    /* 初始隐藏，等待变色完成后弹出 */
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+/* 历史评论区块 */
+.comments-history-section {
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-family: var(--font-serif);
+    font-size: 1.8em;
+    color: var(--comment-accent);
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--comment-accent), transparent);
+}
+
+.comments-count {
+    text-align: center;
+    color: var(--comment-text);
+    opacity: 0.7;
+    font-size: 0.9em;
+    margin-bottom: 25px;
+}
+
+/* 加载状态 */
+.comments-loading {
+    text-align: center;
+    color: var(--comment-text);
+    opacity: 0.7;
+    padding: 40px 20px;
+    font-size: 1em;
+}
+
+.comments-loading::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--comment-accent);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 蒸汽朋克风格评论卡片 */
+.comment-card {
+    background: rgba(44, 24, 16, 0.4);
+    margin-bottom: 20px;
+    padding: 25px;
+    position: relative;
+    clip-path: polygon(
+        0 0,
+        calc(100% - 15px) 0,
+        100% 15px,
+        100% 100%,
+        15px 100%,
+        0 calc(100% - 15px)
+    );
+    border: 1px solid var(--comment-border);
+    transition: all 0.3s ease;
+}
+
+.comment-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(200, 155, 109, 0.05), 
+        transparent 50%,
+        rgba(200, 155, 109, 0.03));
+    pointer-events: none;
+}
+
+/* 装饰角 */
+.comment-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    background: linear-gradient(135deg, var(--comment-border), transparent);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.comment-card:hover {
+    transform: translateX(5px);
+    border-color: var(--comment-accent);
+    box-shadow: -5px 0 15px rgba(200, 155, 109, 0.2);
+}
+
+/* 嵌套回复样式 */
+.comment-replies {
+    margin-left: 40px;
+    margin-top: 15px;
+    padding-left: 20px;
+    border-left: 2px solid rgba(200, 155, 109, 0.3);
+}
+
+.comment-replies .comment-card {
+    background: rgba(44, 24, 16, 0.25);
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.comment-replies .comment-replies {
+    margin-left: 30px;
+}
+
+/* 评论头像 */
+.comment-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--comment-accent);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.comment-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(139, 90, 43, 0.3);
+    gap: 15px;
+}
+
+.comment-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.comment-author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.comment-author {
+    color: var(--comment-accent);
+    font-weight: 600;
+    font-size: 1.05em;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comment-author::before {
+    content: '⚙';
+    color: var(--comment-accent);
+    font-size: 0.9em;
+}
+
+.comment-author a {
+    color: var(--comment-accent);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.comment-author a:hover {
+    color: #e6b786;
+    text-decoration: underline;
+}
+
+.comment-time {
+    color: var(--comment-text);
+    opacity: 0.6;
+    font-size: 0.85em;
+    font-family: 'Courier New', monospace;
+}
+
+.comment-time a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.comment-time a:hover {
+    color: var(--comment-accent);
+}
+
+.comment-content {
+    color: var(--comment-text);
+    line-height: 1.8;
+    font-size: 1em;
+    margin-bottom: 12px;
+}
+
+/* 回复提示 */
+.reply-to-indicator {
+    color: var(--comment-accent);
+    font-size: 0.9em;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+.reply-to-indicator span {
+    font-weight: 600;
+}
+
+/* 回复按钮 */
+.comment-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.reply-btn {
+    background: transparent;
+    border: 1px solid var(--comment-border);
+    color: var(--comment-accent);
+    padding: 5px 15px;
+    font-size: 0.85em;
+    cursor: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.reply-btn::before {
+    content: '↩';
+}
+
+.reply-btn:hover {
+    background: rgba(200, 155, 109, 0.2);
+    border-color: var(--comment-accent);
+    transform: translateY(-1px);
+}
+
+.no-comments {
+    text-align: center;
+    color: var(--comment-text);
+    opacity: 0.5;
+    padding: 60px 20px;
+    font-size: 1.1em;
+}
+
+/* 发表评论区块 - 更复杂的边框 */
+.comment-form-section {
+    background: rgba(44, 24, 16, 0.3);
+    padding: 35px;
+    position: relative;
+    clip-path: polygon(
+        15px 0,
+        calc(100% - 15px) 0,
+        100% 15px,
+        100% calc(100% - 15px),
+        calc(100% - 15px) 100%,
+        15px 100%,
+        0 calc(100% - 15px),
+        0 15px
+    );
+    border: 2px solid var(--comment-accent);
+}
+
+/* 四角装饰 */
+.comment-form-section::before,
+.comment-form-section::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--comment-accent);
+}
+
+.comment-form-section::before {
+    top: -2px;
+    left: -2px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.comment-form-section::after {
+    bottom: -2px;
+    right: -2px;
+    border-left: none;
+    border-top: none;
+}
+
+.form-title {
+    font-family: var(--font-serif);
+    font-size: 1.6em;
+    color: var(--comment-accent);
+    margin-bottom: 25px;
+    text-align: center;
+    position: relative;
+}
+
+/* 回复提示栏 */
+.reply-notice {
+    background: rgba(200, 155, 109, 0.15);
+    border: 1px solid var(--comment-border);
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 4px;
+}
+
+.reply-notice.hidden {
+    display: none;
+}
+
+.reply-notice-text {
+    color: var(--comment-text);
+    font-size: 0.95em;
+}
+
+.reply-notice-text span {
+    color: var(--comment-accent);
+    font-weight: 600;
+}
+
+.cancel-reply-btn {
+    background: transparent;
+    border: 1px solid #b43232;
+    color: #ff8888;
+    padding: 4px 12px;
+    font-size: 0.85em;
+    cursor: none;
+    transition: all 0.3s ease;
+}
+
+.cancel-reply-btn:hover {
+    background: rgba(180, 50, 50, 0.2);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-group label {
+    color: var(--comment-accent);
+    font-size: 0.95em;
+    font-weight: 500;
+    padding-left: 5px;
+}
+
+.form-group label .optional {
+    color: var(--comment-text);
+    opacity: 0.5;
+    font-weight: 400;
+    font-size: 0.85em;
+}
+
+.form-group input {
+    background: rgba(26, 15, 10, 0.6);
+    border: 1px solid var(--comment-border);
+    border-left: 3px solid var(--comment-accent);
+    padding: 12px 15px;
+    color: var(--comment-text);
+    font-size: 0.95em;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--comment-accent);
+    box-shadow: 0 0 10px rgba(200, 155, 109, 0.3);
+    background: rgba(26, 15, 10, 0.8);
+}
+
+.comment-textarea {
+    width: 100%;
+    min-height: 130px;
+    background: rgba(26, 15, 10, 0.6);
+    border: 1px solid var(--comment-border);
+    border-left: 3px solid var(--comment-accent);
+    padding: 15px;
+    color: var(--comment-text);
+    font-size: 0.95em;
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.comment-textarea:focus {
+    outline: none;
+    border-color: var(--comment-accent);
+    box-shadow: 0 0 10px rgba(200, 155, 109, 0.3);
+    background: rgba(26, 15, 10, 0.8);
+}
+
+/* 通知选项 */
+.notify-options {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notify-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--comment-text);
+    font-size: 0.9em;
+    opacity: 0.8;
+    cursor: none;
+}
+
+.notify-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--comment-accent);
+    cursor: none;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, var(--comment-accent), #a67c52);
+    border: 2px solid var(--comment-accent);
+    padding: 12px 40px;
+    color: #1a0f0a;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: none;
+    transition: all 0.3s ease;
+    width: 100%;
+    position: relative;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(200, 155, 109, 0.4);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.message {
+    margin-top: 15px;
+    padding: 12px 20px;
+    border-left: 3px solid;
+    font-size: 0.9em;
+}
+
+.message.error {
+    background: rgba(180, 50, 50, 0.2);
+    border-color: #b43232;
+    color: #ff8888;
+}
+
+.message.success {
+    background: rgba(80, 180, 100, 0.2);
+    border-color: #50b464;
+    color: #88ffaa;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    body {
+        padding: 18px;
+    }
+    
+    *, body, html {
+        cursor: auto !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
+        user-select: text !important;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .subtitle {
+        font-size: 1em;
+        letter-spacing: 0.2em;
+    }
+
+    .post {
+        padding: 25px;
+    }
+
+    .post-title {
+        font-size: 1.4em;
+    }
+
+    nav {
+        gap: 8px 20px;
+    }
+    
+    .cursor-triangle,
+    .cursor-trail {
+        display: none;
+    }
+    
+    .comments-gradient-wrapper {
+        padding: 60px 18px 50px;
+    }
+    
+    .form-row,
+    .form-row-3 {
+        grid-template-columns: 1fr;
+    }
+    
+    .comment-card,
+    .comment-form-section {
+        padding: 20px;
+    }
+    
+    .comment-replies {
+        margin-left: 15px;
+        padding-left: 10px;
+    }
+    
+    .comment-avatar {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .comment-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .comment-header-left {
+        width: 100%;
+    }
+    
+    .reply-notice {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.7em;
+    }
+
+    .post {
+        padding: 20px;
+    }
+
+    .post-title {
+        font-size: 1.25em;
+    }
+    
+    .comment-replies {
+        margin-left: 10px;
+        padding-left: 8px;
+    }
+    
+    .comment-replies .comment-replies {
+        margin-left: 8px;
+    }
+}
+
+/* 平滑滚动 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 选中文本样式 */
+::selection {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="../index.html">Podevus</a></h1>
+        <p class="subtitle">記 · 思 · 道</p>
+        <nav>
+            <a href="../index.html">首页</a>
+            <a href="../category/Blog_category_tech.html">技术</a>
+            <a href="../category/Blog_category_reading.html">读书</a>
+            <a href="../category/Blog_category_anime.html">幻想</a>
+            <a href="../category/Blog_category_thinking.html">思考</a>
+            <a href="../Blog_about.html">关于</a>
+        </nav>
+    </header>
+
+    <article>
+        <div class="article-header">
+            <h1 class="article-title">プリマドール:蒸汽朋克与大正浪漫的完美融合</h1>
+            <div class="article-meta">
+                <a href="../category/Blog_category_anime.html" class="post-category">幻想</a>
+                <span>2025年11月10日</span>
+                <span>阅读时间: 约5分钟</span>
+            </div>
+        </div>
+
+        <div class="article-content">
+            <p>《プリマドール》最吸引人的地方，不只是"战争人偶咖啡馆"这么简单的设定，而是整个 IP 在不同媒介里共同搭建出的一个<strong>理想化的复古未来主义世界</strong>：电视动画、网页&杂志连载短篇《Encore》《Interlude》、漫画《New Order》《ようこそ黒猫亭へ》，再到后来的前日谭/后日谭キネティックノベル，都围绕同一套世界观不断补完细节，把一个虚构的"帝国与大战之后"打磨得既浪漫又柔和。</p>
+<h2>一、跨媒介共同完成的理想世界观</h2>
+<p>如果只看动画版，《プリマドール》的舞台似乎很小：皇都五区一角的喫茶店"黑猫亭"，几位自律人偶（オートマタ）在这里工作，接待客人、打扫整理，在暖黄色灯光下过着近乎"日常番"的生活。</p>
+<p>但一旦把视野放到整个企划，你会发现：</p>
+<ul>
+  <li>网页连载《Encore》与杂志短篇补完了战争前后、人偶诞生与部署的历史细节；</li>
+  <li>漫画《New Order》描写黑猫亭以外的部队与人偶小队，让这个世界不再只有一间咖啡馆；</li>
+  <li>キネティックノベル作为动画的前日谭/后日谭，则把"战争记忆"与"战后余波"展开成更长的叙事线索。</li>
+</ul>
+<p>这种"跨作品拼图式"的世界构建，让观众在不同媒介之间来回切换时，总是能再多看到一点：前线与后方、皇都与边境、胜利者与被抛弃的兵器。结果就是——这个世界既保留了现实中近代日本的轮廓，又因为被不断修饰、删减、理想化，看起来比真实历史柔软得多。</p>
+<h2>二、被"修正"的战后帝国：背景为何如此有吸引力？</h2>
+<p>《プリマドール》的时间点发生在"数年前大战刚刚结束"的战后帝国。皇都街道上仍保留着军队、贵族、殖民的影子，但作品有意把<strong>军国主义最尖锐、最血腥的部分淡化掉</strong>：</p>
+<ul>
+  <li>战争已经结束，观众看到的是"战后重建"而非"战争进行时"；</li>
+  <li>帝国扩张、殖民、种族冲突等议题，只以"东方国""前线""失落的故乡"之类的模糊名词一笔带过；</li>
+  <li>军服、军徽、阅兵等视觉符号大多退到背景，人偶们真正面对的是"如何在和平年代活下去"。</li>
+</ul>
+<p>这种处理方式很微妙：一方面，<strong>它借用了现实历史中军国主义日本的外壳</strong>——殖民地、前线战区、战败后的疲惫与失落；另一方面，又刻意避免触碰真实历史里的加害与责任，把视角收缩在"被当作兵器的人偶"身上。对观众来说，这样的设定既能感受到时代的重量，又不会被现实中的沉重伦理问题拉出作品。</p>
+<p>换句话说，《プリマドール》提供的是一种<strong>"如果那个时代没有走向彻底的狂热与毁灭，而是适可而止就好了"的平行世界</strong>。我们看到的是略带伤痕、却仍然保有余地的帝国——大战当然残酷，但它已经结束；军队当然冷酷，但也有像ナギ那样把人偶带回咖啡馆的个人选择。现实历史中压迫感极强的军国主义，在这个世界里被"修正"为一种略带感伤、但还能被温柔收尾的过去。</p>
+<h2>三、从军用机器到日常主体：人偶与军国主义的隐性对话</h2>
+<p>作为一个以"兵器少女"为核心的企划，《プリマドール》绕不开军国主义这个主题，但它选择的不是批判式的正面冲撞，而是<strong>以日常与创伤叙事来"慢慢拆弹"</strong>。</p>
+<p>在不同作品里，我们都能看到类似的路径：</p>
+<ul>
+  <li>动画主线中，灰桜、鴉羽、月下、箒星、レーツェル等人偶，几乎都有"战场功能""编号""任务失败/完成"的过去；</li>
+  <li>外传与前日谭则进一步展示她们在前线被如何编组、部署、牺牲——但这些内容往往以回忆、闪回或只言片语出现，很少展示真正血腥的画面。</li>
+</ul>
+<p>这种处理有两个效果：</p>
+<ol>
+  <li><strong>让"军用机器"获得了人格与主体性。</strong>  
+  人偶在战时只是工具，但战后她们开始质疑："我为什么被制造出来？我的使命是不是只有战斗？"从战场回到黑猫亭，冲咖啡、端甜点、擦桌子，对人类来说是琐事，对她们而言却是第一次被允许"作为一个人去生活"。</li>
+  <li><strong>把军国主义"温柔抽离"为个人创伤。</strong>  
+  作品很少追问"国家为什么要发动这场战争""帝国对他国做了什么"，而是问："这场战争给这些人偶留下了什么伤口？"军国主义从宏大的意识形态，变成了一个个女孩无法释怀的任务记忆与失去战友的痛苦。</li>
+</ol>
+<p>于是，观众无需面对复杂的历史责任问题，只需要跟着人偶一起思考：<strong>"如果我一生都被当作武器，现在还有没有资格选择别的活法？"</strong>这是一种很"Key 式"的处理方式——用个人的眼泪代替宏大叙事的清算，用温柔的抚慰代替尖锐的控诉。</p>
+<h2>四、审美层面的魅力：大正浪漫 × 蒸汽机械 × 少女人偶</h2>
+<p>在审美上，《プリマドール》几乎是为"喜欢大正浪漫 + 蒸汽朋克 + 机械少女"的观众量身打造。</p>
+<h3>1. 色彩与光影：被浪漫化的战后世界</h3>
+<p>无论是动画还是后续的キネティックノベル CG，作品都大量使用暖色调和柔和的光影：</p>
+<ul>
+  <li>室内常常是金色与棕色的层叠：木地板、琥珀色灯光、咖啡与红茶的深色液面；</li>
+  <li>即便是战争回忆，画面也很少极端冷色，而是用褪色、偏灰的色调来表达"已经远去的悲伤"。</li>
+</ul>
+<p>这使得《プリマドール》里的战后世界看上去不像真实历史那样肮脏破败，更像是一张略有折痕的老照片——其伤痕被柔焦和滤镜覆盖。观众在这样的影像里，很自然就会把注意力从"战争多惨烈"转移到人偶身上。</p>
+<h3>2. 音乐与声音：机械躯体里的"人类情感"</h3>
+<p>作为 Key 企划，音乐几乎是默认的加分项。从动画的 OP《Tin Toy Melody》到各人偶的角色曲，歌曲里都不断呼应"玩具""机械""记忆""祈愿"等意象，把人偶的存在感从画面延伸到听觉。</p>
+<p>更细腻的是声音演出：齿轮转动的轻响、金属关节微微碰撞、脚步落在木地板上的声线，都在提醒你——这些少女不是血肉之躯。但当她们开口歌唱，声音却又如此柔软、人类化。<strong>这种听觉上的反差，本身就是"机械与生命结合体"的绝佳呈现。</strong></p>
+<h2>五、与现实的差别：一种"经过美化的战后幻想"</h2>
+<p>如果把《プリマドール》里的世界观拉到现实面前进行对照，会发现它在很多关键点上都做了美化处理：</p>
+<ul>
+  <li><strong>现实中的军国主义</strong>意味着系统性的暴力、殖民、言论控制与民主彻底的崩溃，而作品中的帝国更多是"犯过错，但还能回头"或者是单纯挂个"以军为主"的模糊存在；</li>
+  <li><strong>现实中的战争创伤</strong>长期体现在政治、经济、家庭结构里，而作品把它压缩成个人记忆、噩梦与几场情绪爆发，最后往往能通过"哭一场""唱一首歌""在黑猫亭找到归属"等方式而得到某种程度的和解；</li>
+  <li><strong>现实中的退伍军人</strong>常常面对失业、歧视与心理疾病，而人偶们则拥有一个在审美上极度浪漫化的"第二人生"——歌唱、烹饪、出行并遇见善良的人。</li>
+</ul>
+<p>所以，《プリマドール》所提供的并不是对历史的真实还原，而是一种<strong>"经过审美过滤的战后幻想"</strong>。它承认战争带来了伤口，却坚信这些伤口最终可以被温柔包裹；它知道军用机器曾被当作工具使用，却选择把"机器的晚年"安排在灯火温暖的咖啡馆里，而不是冷冰冰的报废场或实验室。</p>
+<h2>六、为什么我们仍然需要这样的作品？</h2>
+<p>在现实世界，我们面对的是更加凌乱的历史与当下：国与国的冲突远没有动画里那样"干净地结束"，意识形态和利益纠葛也不会因为一首歌就烟消云散。正因如此，像《プリマドール》这样的作品才显得格外动人——它为我们提供了一个<strong>"经过修正的历史空间"</strong>，激发人们的想象：</p>
+<ul>
+  <li>如果兵器真的拥有心，它们是否也有机会放下武器，在黄昏的咖啡馆里端起托盘？</li>
+  <li>如果军国主义的狂热没有把一切都推向不可挽回的深渊，我们是否还能在废墟间，搭起一间像黑猫亭那样的小店？</li>
+</ul>
+<p>这种想象当然带有逃避的成分，但它也并非全然幼稚。<strong>当现实令人难以直视时，经由审美过滤的"理想化战后世界"反而能成为我们重新思考现实意义的安全起点。</strong>在作品中我们更多看到的是：</p>
+<ul>
+  <li>战争并非荣耀，而是让连人偶都留下伤疤的暴力；</li>
+  <li>军用机器也有资格选择存在于世上的目的；</li>
+  <li>和平并不意味着一切问题消失，而是一个"重新学习如何活下去"的漫长过程。</li>
+</ul>
+<p>《プリマドール》的魅力，就停留在这样一个被永久拉长的瞬间——黄昏降临，黑猫亭的灯光刚刚亮起，街道上行人渐少，自律人偶们开始准备晚间营业。那是一个被历史与现实共同包围、却又暂时被隔绝出来的小小时间口袋。作为观众的我们，就像推门走进来的那位客人，在这理想化的战后世界里小坐片刻——等到再次走回现实街道时，或许能带着一点点新的温柔，去面对真正复杂而凌乱的人间。</p>
+        </div>
+
+        <div class="back-link">
+            <a href="../index.html">返回首页</a>
+            <a href="../category/Blog_category_anime.html">查看更多幻想主题文章</a>
+        </div>
+    </article>
+
+    <div class="comments-gradient-wrapper" id="commentsSection">
+        <div class="particles-background" id="particlesBackground"></div>
+        
+        <div class="steampunk-comments">
+            <div class="comments-history-section">
+                <h2 class="section-title">Comments</h2>
+                <div class="comments-count" id="commentsCount">0 Replies</div>
+                <div id="commentsList">
+                    <div class="comments-loading">Loading comments...</div>
+                </div>
+            </div>
+
+            <div class="comment-form-section" id="respond">
+                <h3 class="form-title">Leave a Reply</h3>
+                
+                <div class="reply-notice hidden" id="replyNotice">
+                    <span class="reply-notice-text">Replying to <span id="replyToName"></span>'s comment</span>
+                    <button type="button" class="cancel-reply-btn" id="cancelReplyBtn">Cancel reply</button>
+                </div>
+                
+                <form id="commentForm">
+                    <input type="hidden" id="replyToId" value="">
+                    <input type="hidden" id="replyToAuthor" value="">
+                    
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label for="nameInput">Name *</label>
+                            <input type="text" id="nameInput" placeholder="Enter your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailInput">Email *</label>
+                            <input type="email" id="emailInput" placeholder="Email (will not be published)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="websiteInput">Website <span class="optional">(optional)</span></label>
+                            <input type="url" id="websiteInput" placeholder="https://your-website.com">
+                        </div>
+                    </div>
+                    <textarea class="comment-textarea" id="commentTextarea" placeholder="Share your thoughts..." required></textarea>
+                    
+                    <div class="notify-options">
+                        <label class="notify-option">
+                            <input type="checkbox" id="notifyReplies">
+                            <span>Notify me of follow-up replies by email.</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitBtn">Post Comment</button>
+                    <div id="formMessage" class="hidden"></div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="particles-foreground" id="particlesForeground"></div>
+    </div>
+
+    <footer>
+        <p>© 2025 Podevus</p>
+        <p>存质</p>
+    </footer>
+    
+    <script>
+// ============ Waline 配置 ============
+const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
+
+// ============ 关键设置：定义两个路径 ============
+// 1. 相对路径 (旧评论大多在这里)
+const PATH_RELATIVE = '/posts/blog_posts_prima-doll-enhanced';
+// 2. 绝对路径 (新评论意外跑到了这里)
+const PATH_ABSOLUTE = 'https://podevus.netlify.app/posts/blog_posts_prima-doll-enhanced';
+
+console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
+
+// ============ 1. 蒸汽朋克光标与特效 (保持不变) ============
+(function() {
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) return;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'cursor-triangle'); svg.setAttribute('viewBox', '0 0 30 30');
+    const R = 13, cx = 15, cy = 15;
+    const A = { x: cx, y: cy - R }, B = { x: cx - R * Math.sqrt(3) / 2, y: cy + R / 2 }, C = { x: cx + R * Math.sqrt(3) / 2, y: cy + R / 2 };
+    const M1 = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 }, M2 = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 }, M3 = { x: (C.x + A.x) / 2, y: (C.y + A.y) / 2 };
+    [ `M ${A.x} ${A.y} L ${M1.x} ${M1.y} L ${M3.x} ${M3.y} Z`, `M ${B.x} ${B.y} L ${M2.x} ${M2.y} L ${M1.x} ${M1.y} Z`, `M ${C.x} ${C.y} L ${M3.x} ${M3.y} L ${M2.x} ${M2.y} Z` ].forEach(d => {
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d); p.setAttribute('fill', '#3a2326'); svg.appendChild(p);
+    });
+    const cp = document.createElementNS('http://www.w3.org/2000/svg', 'path'); cp.setAttribute('d', `M ${M1.x} ${M1.y} L ${M2.x} ${M2.y} L ${M3.x} ${M3.y} Z`); cp.setAttribute('fill', '#847fb7'); svg.appendChild(cp);
+    document.body.appendChild(svg);
+    let mx=0, my=0, tx=0, ty=0, rot=0, rotSpd=0, lx=0, ly=0, ltt=0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function loop() {
+        const dx = mx - tx, dy = my - ty, dist = Math.sqrt(dx*dx + dy*dy);
+        tx += dx * 0.25; ty += dy * 0.25;
+        if (dist > 0.5) rotSpd += dist * 0.2;
+        rotSpd *= 0.96; rot += Math.max(-15, Math.min(15, rotSpd));
+        svg.style.left = tx + 'px'; svg.style.top = ty + 'px';
+        svg.style.transform = `translate(-15px, -15px) rotate(${rot}deg)`;
+        if (Math.sqrt((tx-lx)**2+(ty-ly)**2) > 2 && Date.now()-ltt > 20) {
+            const t = document.createElement('div'); t.className = 'cursor-trail'; t.style.left=tx+'px'; t.style.top=ty+'px'; 
+            t.style.transform=`rotate(${Math.atan2(dy, dx)+Math.PI}rad)`; document.body.appendChild(t); setTimeout(()=>t.remove(),500); ltt=Date.now();
+        }
+        lx=tx; ly=ty; requestAnimationFrame(loop);
+    }
+    loop();
+    document.querySelectorAll('a, button, .post, input, textarea, .reply-btn').forEach(el => {
+        el.addEventListener('mouseenter', () => svg.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => svg.classList.remove('cursor-hover'));
+    });
+    document.addEventListener('mousedown', () => svg.classList.add('cursor-active'));
+    document.addEventListener('mouseup', () => svg.classList.remove('cursor-active'));
+    document.addEventListener('mouseleave', () => svg.style.opacity = '0');
+    document.addEventListener('mouseenter', () => svg.style.opacity = '1');
+})();
+
+// ============ 2. 滚动变色效果 (保持不变) ============
+(function() {
+    const cc = document.querySelector('.steampunk-comments'), ft = document.querySelector('footer'), bl = document.querySelector('.back-link');
+    let tst = 0, ht = false;
+    window.addEventListener('scroll', () => {
+        if (bl.getBoundingClientRect().bottom <= window.innerHeight && !ht) { tst = window.pageYOffset; ht = true; }
+        if (!ht) { document.body.style.backgroundColor = 'var(--primary-bg)'; cc.style.opacity = 0; return; }
+        const d = window.pageYOffset - tst;
+        if (d <= 400) {
+            const p = Math.max(0, Math.min(1, d/400));
+            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const r = Math.round((isDark?26:250) + (44 - (isDark?26:250))*p);
+            const g = Math.round((isDark?24:248) + (24 - (isDark?24:248))*p);
+            const b = Math.round((isDark?22:243) + (16 - (isDark?22:243))*p);
+            document.body.style.backgroundColor = `rgb(${r},${g},${b})`;
+            cc.style.opacity = 0;
+            ft.style.color = r < 128 ? '#f5e6d3' : '#8b7f76';
+        } else {
+            document.body.style.backgroundColor = 'rgb(44,24,16)';
+            ft.style.color = '#f5e6d3';
+            cc.style.opacity = Math.min(1, (d-400)/300);
+            cc.style.transform = `translateY(${Math.max(0, 50*(1 - Math.min(1, (d-400)/300)))}px)`;
+        }
+    });
+})();
+
+// ============ 3. 粒子特效 (保持不变) ============
+(function() {
+    const bg = document.getElementById('particlesBackground'), fg = document.getElementById('particlesForeground');
+    function cp(c, f) {
+        const p = document.createElement('div'); p.className = 'particle';
+        const s = Math.random()*(f?8:9)+(f?8:3); p.style.width=s+'px'; p.style.height=s+'px';
+        p.style.left=Math.random()*100+'%'; p.style.animationDuration=(Math.random()*(f?10:15)+(f?8:12))+'s';
+        p.style.setProperty('--drift', (Math.random()-0.5)*(f?150:80)+'px');
+        c.appendChild(p); setTimeout(()=>p.remove(), 25000);
+    }
+    for(let i=0;i<15;i++) setTimeout(()=>cp(bg, false), i*200);
+    setInterval(()=>cp(bg, false), 2000); setInterval(()=>cp(fg, true), 3000);
+})();
+
+// ============ 4. 核心评论逻辑 (双路径合并版) ============
+(function() {
+    let allComments = [];
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        loadComments();
+        document.getElementById('commentForm')?.addEventListener('submit', handleSubmit);
+        document.getElementById('cancelReplyBtn')?.addEventListener('click', cancelReply);
+        ['name', 'email', 'website'].forEach(k => {
+            const el = document.getElementById(`${k}Input`);
+            if(el) el.value = localStorage.getItem(`podevus_comment_${k}`) || '';
+        });
+    });
+
+    // 🌟 时间解析修复：处理 "2025-12-10 07:47:39" 这种格式
+    function parseDate(item) {
+        const raw = item.insertedAt || item.createdAt || item.time || item.created;
+        if (!raw) return new Date();
+        
+        // 如果是数字时间戳，直接返回
+        if (typeof raw === 'number') return new Date(raw);
+        
+        // 如果是字符串
+        if (typeof raw === 'string') {
+            // 解决 Safari/iOS 不支持 "YYYY-MM-DD HH:MM:SS" 的问题
+            // 将 "-" 替换为 "/"，将 "T" 替换为 " "
+            const safeStr = raw.replace(/-/g, '/').replace('T', ' ');
+            return new Date(safeStr);
+        }
+        return new Date(raw);
+    }
+
+    async function fetchPath(path) {
+        try {
+            const url = `${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(path)}&pageSize=100`;
+            const res = await fetch(url);
+            const json = await res.json();
+            
+            if (json.data && Array.isArray(json.data.data)) return json.data.data;
+            if (Array.isArray(json.data)) return json.data;
+            return [];
+        } catch (e) {
+            console.warn('Path fetch failed:', path, e);
+            return [];
+        }
+    }
+    
+    async function loadComments() {
+        const list = document.getElementById('commentsList');
+        const countEl = document.getElementById('commentsCount');
+        list.innerHTML = '<div class="comments-loading">Searching timeline...</div>';
+
+        try {
+            // 🌟 并行抓取两个路径的数据
+            console.log('📡 Fetching from both paths...');
+            const [dataRelative, dataAbsolute] = await Promise.all([
+                fetchPath(PATH_RELATIVE),
+                fetchPath(PATH_ABSOLUTE)
+            ]);
+
+            console.log(`📦 Got ${dataRelative.length} from Relative, ${dataAbsolute.length} from Absolute`);
+
+            // 🌟 合并并去重 (根据 objectId)
+            const combinedMap = new Map();
+            [...dataRelative, ...dataAbsolute].forEach(item => {
+                combinedMap.set(item.objectId, item);
+            });
+            allComments = Array.from(combinedMap.values());
+
+            console.log('✅ Total unique comments:', allComments.length);
+
+            if (countEl) countEl.textContent = `${allComments.length} Replies`;
+
+            if (allComments.length === 0) {
+                list.innerHTML = '<div class="no-comments">No comments yet. Be the first!</div>';
+            } else {
+                const tree = buildCommentTree(allComments);
+                list.innerHTML = tree.map(c => renderComment(c)).join('');
+                bindReplyButtons();
+            }
+
+        } catch (err) {
+            console.error(err);
+            list.innerHTML = `<div class="no-comments">System Error: ${err.message}</div>`;
+        }
+    }
+    
+    function buildCommentTree(comments) {
+        const map = {};
+        const roots = [];
+        comments.forEach(c => { map[c.objectId] = { ...c, children: [] }; });
+        
+        comments.forEach(c => {
+            const node = map[c.objectId];
+            // 🌟 宽松 ID 匹配
+            if (c.pid && map[c.pid]) {
+                map[c.pid].children.push(node);
+            } else if (c.rid && map[c.rid] && c.rid != c.objectId) {
+                map[c.rid].children.push(node);
+            } else {
+                roots.push(node);
+            }
+        });
+
+        // 按时间倒序
+        const sortFn = (a, b) => parseDate(b) - parseDate(a);
+        roots.sort(sortFn);
+        return roots;
+    }
+    
+    function renderComment(c, depth = 0) {
+        const avatar = c.avatar || `https://www.gravatar.com/avatar/${c.mail_md5 || ''}?s=45&d=mm&r=g`;
+        const link = c.link ? `<a href="${c.link}" target="_blank">${c.nick}</a>` : c.nick;
+        const timeStr = formatTime(parseDate(c));
+        
+        let replyHtml = '';
+        if (c.pid && c.pid != c.rid) {
+            // 🌟 修复 @undefined: 使用 loose equality (==)
+            const p = allComments.find(x => x.objectId == c.pid);
+            const pName = p ? p.nick : 'someone';
+            replyHtml = `<div class="reply-to-indicator">Reply to <span>@${pName}</span></div>`;
+        }
+        
+        let childrenHtml = '';
+        if (c.children.length > 0) {
+            childrenHtml = `<div class="comment-replies">${c.children.map(child => renderComment(child, depth+1)).join('')}</div>`;
+        }
+
+        const cid = c.objectId;
+        const rid = c.rid || c.objectId;
+
+        return `
+            <div class="comment-card" id="comment-${cid}">
+                <div class="comment-header">
+                    <div class="comment-header-left">
+                        <div class="comment-avatar"><img src="${avatar}" loading="lazy"></div>
+                        <div class="comment-author-info">
+                            <span class="comment-author">${link}</span>
+                            <span class="comment-time">${timeStr}</span>
+                        </div>
+                    </div>
+                </div>
+                ${replyHtml}
+                <div class="comment-content">${c.comment}</div>
+                <div class="comment-footer">
+                    <button class="reply-btn" data-cid="${cid}" data-rid="${rid}" data-author="${c.nick}">Reply</button>
+                </div>
+            </div>
+            ${childrenHtml}
+        `;
+    }
+    
+    function formatTime(d) {
+        if (isNaN(d.getTime())) return 'Unknown Date';
+        const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const min = String(d.getMinutes()).padStart(2, '0');
+        return `${m[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${d.getHours()}:${min}`;
+    }
+
+    function bindReplyButtons() {
+        document.querySelectorAll('.reply-btn').forEach(b => {
+            b.addEventListener('click', e => {
+                const { cid, rid, author } = e.target.dataset;
+                setReply(cid, rid, author);
+            });
+        });
+    }
+
+    function setReply(cid, rid, author) {
+        document.getElementById('replyToId').value = cid;
+        document.getElementById('replyToAuthor').value = rid;
+        document.getElementById('replyToName').textContent = author;
+        document.getElementById('replyNotice').classList.remove('hidden');
+        document.getElementById('respond').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelReply() {
+        document.getElementById('replyToId').value = '';
+        document.getElementById('replyToAuthor').value = '';
+        document.getElementById('replyNotice').classList.add('hidden');
+    }
+    window.cancelReply = cancelReply;
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('formMessage');
+        const data = {
+            nick: document.getElementById('nameInput').value,
+            mail: document.getElementById('emailInput').value,
+            link: document.getElementById('websiteInput').value,
+            comment: document.getElementById('commentTextarea').value,
+            // 🌟 以后发送评论，统一只用相对路径，避免分裂继续发生！
+            path: PATH_RELATIVE,
+            url: window.location.href,
+            ua: navigator.userAgent,
+            pid: document.getElementById('replyToId').value,
+            rid: document.getElementById('replyToAuthor').value
+        };
+
+        if (!data.nick || !data.mail || !data.comment) return alert('Please fill required fields');
+        
+        localStorage.setItem('podevus_comment_name', data.nick);
+        localStorage.setItem('podevus_comment_email', data.mail);
+        localStorage.setItem('podevus_comment_website', data.link);
+
+        btn.disabled = true; btn.textContent = 'Sending...';
+
+        try {
+            const res = await fetch(`${WALINE_SERVER_URL}/comment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const json = await res.json();
+            
+            if (json.errno === 0 || json.data) {
+                document.getElementById('commentTextarea').value = '';
+                cancelReply();
+                msg.textContent = 'Success!'; msg.className = 'message success'; msg.classList.remove('hidden');
+                setTimeout(() => msg.classList.add('hidden'), 3000);
+                await loadComments(); // 重新双重抓取，确保新评论立即显示
+            } else {
+                throw new Error(json.errmsg || 'Unknown error');
+            }
+        } catch (err) {
+            msg.textContent = err.message; msg.className = 'message error'; msg.classList.remove('hidden');
+        } finally {
+            btn.disabled = false; btn.textContent = 'Post Comment';
+        }
+    }
+})();
+</script>
