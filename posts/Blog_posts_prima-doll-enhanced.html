@@ -1775,39 +1775,62 @@ const PAGE_PATH = window.location.pathname || '/article/primadoll';
     });
     
     // 从 Waline 服务器加载评论
-    async function loadComments() {
-        const commentsList = document.getElementById('commentsList');
-        const commentsCount = document.getElementById('commentsCount');
+async function loadComments() {
+    const commentsList = document.getElementById('commentsList');
+    const commentsCount = document.getElementById('commentsCount');
+    
+    // 调试：在控制台打印当前请求的路径，请按 F12 确认此路径与你在 Waline 后台看到的路径完全一致
+    console.log('Current Page Path:', PAGE_PATH);
+
+    try {
+        // 使用 encodeURIComponent 确保路径特殊字符被正确转义
+        const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
+        const data = await response.json();
         
-        try {
-            const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
-            const data = await response.json();
-            
-            if (data.errno === 0 && data.data) {
-                allComments = data.data.data || [];
-                const totalCount = data.data.totalCount || 0;
-                
-                commentsCount.textContent = `${totalCount} Replies`;
-                
-                if (allComments.length === 0) {
-                    commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
-                    return;
-                }
-                
-                // 构建评论树并渲染
-                const commentTree = buildCommentTree(allComments);
-                commentsList.innerHTML = commentTree.map(comment => renderComment(comment)).join('');
-                
-                // 绑定回复按钮事件
-                bindReplyButtons();
-            } else {
-                commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
+        // 调试：查看服务器实际返回的数据结构
+        console.log('Waline Response:', data);
+
+        if (data.errno === 0) {
+            // ============ 关键修改开始 ============
+            // 兼容性修复：Waline 不同版本返回的数据结构可能不同
+            // 情况 A: data.data 直接就是一个数组 (常见于 Waline V2/V3 部分配置)
+            if (Array.isArray(data.data)) {
+                allComments = data.data;
+            } 
+            // 情况 B: data.data 是个对象，评论在 data.data.data 中 (你原本的代码逻辑)
+            else if (data.data && Array.isArray(data.data.data)) {
+                allComments = data.data.data;
+            } 
+            // 情况 C: 数据为空
+            else {
+                allComments = [];
             }
-        } catch (error) {
-            console.error('Failed to load comments:', error);
-            commentsList.innerHTML = '<div class="no-comments">Failed to load comments. Please refresh the page.</div>';
+            
+            // 修复评论计数逻辑
+            const totalCount = (data.data && data.data.count) || (data.data && data.data.totalCount) || allComments.length || 0;
+            // ============ 关键修改结束 ============
+
+            commentsCount.textContent = `${totalCount} Replies`;
+            
+            if (allComments.length === 0) {
+                commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
+                return;
+            }
+            
+            // 构建评论树并渲染
+            const commentTree = buildCommentTree(allComments);
+            commentsList.innerHTML = commentTree.map(comment => renderComment(comment)).join('');
+            
+            // 绑定回复按钮事件
+            bindReplyButtons();
+        } else {
+            commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
         }
+    } catch (error) {
+        console.error('Failed to load comments:', error);
+        commentsList.innerHTML = '<div class="no-comments">Failed to load comments. Please refresh the page.</div>';
     }
+}
     
     // 构建评论树
     function buildCommentTree(comments) {
