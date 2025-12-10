@@ -1395,9 +1395,8 @@ html {
 // ============ Waline 配置 ============
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
 
-// ============ [关键修复] 路径锁定 ============
-// 仍然使用 Netlify 的绝对路径，确保新旧评论都能显示
-const PAGE_PATH = 'https://podevus.netlify.app/posts/blog_posts_prima-doll-enhanced';
+// ============ [修复] 更新为新的 GitHub Pages 路径 ============
+const PAGE_PATH = 'https://podevei.github.io/Podevus/posts/Blog_posts_prima-doll-enhanced.html';
 
 console.log('Target Page Path set to:', PAGE_PATH);
 
@@ -1751,7 +1750,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
     setInterval(() => createParticle(particlesForeground, true), 3000);
 })();
 
-// ============ Waline 评论系统（自定义UI - 已注入修复逻辑） ============
+// ============ Waline 评论系统（自定义UI - 已修复 @undefined 问题） ============
 (function() {
     let allComments = [];
     
@@ -1771,7 +1770,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
         if (savedWebsite) document.getElementById('websiteInput').value = savedWebsite;
     });
 
-    // [关键修复] 通用日期解析函数：解决 NaN 问题
+    // [修复] 通用日期解析函数：解决 NaN 问题
     function parseDate(item) {
         // 兼容 Waline 不同版本的字段名
         const raw = item.insertedAt || item.createdAt || item.updatedAt || item.time || item.created;
@@ -1784,8 +1783,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
         // 如果是字符串
         if (typeof raw === 'string') {
             // 修复 Safari/iOS 不支持 "YYYY-MM-DD HH:MM:SS" (空格分隔) 的问题
-            // 将 " " 替换为 "T"，或者将 "-" 替换为 "/"
-            // 尝试标准化 ISO 格式
             let safe = raw.replace(' ', 'T'); 
             const d = new Date(safe);
             if (!isNaN(d.getTime())) return d;
@@ -1796,36 +1793,29 @@ console.log('Target Page Path set to:', PAGE_PATH);
         }
         return new Date();
     }
-    
+
     // 从 Waline 服务器加载评论
     async function loadComments() {
         const commentsList = document.getElementById('commentsList');
         const commentsCount = document.getElementById('commentsCount');
         
-        console.log('Loading comments for absolute path:', PAGE_PATH);
-
+        console.log('Loading comments for path:', PAGE_PATH);
         try {
-            // [关键修复] 使用 encodeURIComponent 且使用绝对路径
             const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
             const data = await response.json();
             
             console.log('API Response:', data);
-
             if (data.errno === 0 || (data.data && Array.isArray(data.data.data)) || Array.isArray(data.data)) {
-                // [关键修复] 兼容不同的数据返回结构
+                // 兼容不同的数据返回结构
                 let rawData = [];
                 let totalCount = 0;
-
                 if (data.data && Array.isArray(data.data.data)) {
-                    // 结构: { errno: 0, data: { data: [], count: 0 } }
                     rawData = data.data.data;
                     totalCount = data.data.count;
                 } else if (Array.isArray(data.data)) {
-                    // 结构: { errno: 0, data: [], count: 0 }
                     rawData = data.data;
                     totalCount = data.count || rawData.length;
                 } else if (Array.isArray(data)) {
-                     // 极简结构
                      rawData = data;
                      totalCount = rawData.length;
                 }
@@ -1867,22 +1857,30 @@ console.log('Target Page Path set to:', PAGE_PATH);
         
         // 构建树结构
         comments.forEach(comment => {
-            // [关键修复] 使用 == 进行比较，忽略数字/字符串类型差异
             if (comment.pid && commentMap[comment.pid]) {
                 commentMap[comment.pid].children.push(comment);
             } else if (comment.rid && commentMap[comment.rid] && comment.rid != comment.objectId) {
-                // rid 是根评论ID
                 commentMap[comment.rid].children.push(comment);
             } else {
                 rootComments.push(comment);
             }
         });
         
-        // [关键修复] 按时间排序（使用 parseDate 函数）
-        // 根评论：新发布的在上面 (倒序)
+        // 按时间排序（使用 parseDate 函数）
         rootComments.sort((a, b) => parseDate(b) - parseDate(a));
         
         return rootComments;
+    }
+    
+    // [修复] 安全获取评论作者昵称
+    function getCommentNick(comment) {
+        if (!comment) return 'Anonymous';
+        // 优先使用 nick 字段
+        if (comment.nick && comment.nick.trim()) return comment.nick;
+        // 其次尝试 user.nick
+        if (comment.user && comment.user.nick && comment.user.nick.trim()) return comment.user.nick;
+        // 最后返回默认值
+        return 'Anonymous';
     }
     
     // 渲染单个评论（递归）
@@ -1890,9 +1888,10 @@ console.log('Target Page Path set to:', PAGE_PATH);
         const maxDepth = 3;
         const avatarUrl = comment.avatar || `https://www.gravatar.com/avatar/${comment.mail_md5 || ''}?s=45&d=mm&r=g`;
         
+        // [修复] 使用安全获取昵称函数
+        const nickName = getCommentNick(comment);
+        
         // 作者显示（带网站链接或不带）
-        // [关键修复] 增加 fallback，防止 user 对象缺失导致报错
-        const nickName = comment.nick || (comment.user ? comment.user.nick : 'Anonymous');
         let authorHtml;
         if (comment.link) {
             authorHtml = `<a href="${escapeHtml(comment.link)}" target="_blank" rel="nofollow noopener">${escapeHtml(nickName)}</a>`;
@@ -1903,11 +1902,10 @@ console.log('Target Page Path set to:', PAGE_PATH);
         // 回复提示
         let replyIndicator = '';
         if (comment.pid && comment.pid != comment.rid) {
-            // [关键修复] 查找被回复的评论作者 (使用 ==)
+            // 查找被回复的评论作者
             const parentComment = allComments.find(c => c.objectId == comment.pid);
             if (parentComment) {
-                // [关键修复] 获取父评论作者名
-                const pName = parentComment.nick || (parentComment.user ? parentComment.user.nick : 'someone');
+                const pName = getCommentNick(parentComment);
                 replyIndicator = `<div class="reply-to-indicator">Reply to <span>@${escapeHtml(pName)}</span></div>`;
             }
         }
@@ -1916,13 +1914,12 @@ console.log('Target Page Path set to:', PAGE_PATH);
         let repliesHtml = '';
         if (comment.children && comment.children.length > 0) {
             const repliesContent = comment.children
-                .sort((a, b) => parseDate(a) - parseDate(b)) // 子评论通常按时间正序
+                .sort((a, b) => parseDate(a) - parseDate(b))
                 .map(reply => renderComment(reply, Math.min(depth + 1, maxDepth)))
                 .join('');
             repliesHtml = `<div class="comment-replies">${repliesContent}</div>`;
         }
         
-        // [关键修复] 使用 parseDate 格式化时间
         const timeStr = formatTime(parseDate(comment));
         
         return `
@@ -1966,13 +1963,13 @@ console.log('Target Page Path set to:', PAGE_PATH);
     function setReplyTo(commentId, rootId, author) {
         document.getElementById('replyPid').value = commentId;
         document.getElementById('replyRid').value = rootId;
-        document.getElementById('replyAt').value = author;  // 🔑 关键：存储被回复人昵称
+        document.getElementById('replyAt').value = author;
         document.getElementById('replyToName').textContent = author;
         document.getElementById('replyNotice').classList.remove('hidden');
         
         document.getElementById('respond').scrollIntoView({ behavior: 'smooth' });
         document.getElementById('commentTextarea').focus();
-}
+    }
     
     // 取消回复
     function cancelReply() {
@@ -1985,7 +1982,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
     // 暴露cancelReply到全局
     window.cancelReply = cancelReply;
     
-    // 处理表单提交
+    // [修复] 处理表单提交 - 修复变量名错误
     async function handleSubmit(e) {
         e.preventDefault();
         
@@ -2032,27 +2029,34 @@ console.log('Target Page Path set to:', PAGE_PATH);
         submitBtn.textContent = 'Posting...';
         
         try {
-            // [关键修复] 确保 pid/rid 类型正确 (如果是数字ID)
-            const safePid = replyToId ? (isNaN(replyToId) ? replyToId : Number(replyToId)) : undefined;
-            const safeRid = rootId ? (isNaN(rootId) ? rootId : Number(rootId)) : undefined;
-
             // 构建评论数据
             const commentData = {
                 comment: content,
                 nick: name,
                 mail: email,
                 link: website || '',
-                path: PAGE_PATH, // 确保发送评论时使用绝对路径
+                path: PAGE_PATH,
                 url: window.location.href,
                 ua: navigator.userAgent
             };
             
-            // 如果是回复
+            // [修复] 如果是回复，正确设置 pid, rid, at 字段
             if (pid) {
                 commentData.pid = pid;
                 commentData.rid = rid || pid;
-                commentData.at = at;  // 🔑 关键：发送被回复人昵称
+                // [关键修复] 确保 at 字段有值
+                if (at && at.trim()) {
+                    commentData.at = at;
+                } else {
+                    // 如果 at 为空，从 allComments 中查找被回复者昵称
+                    const parentComment = allComments.find(c => c.objectId == pid);
+                    if (parentComment) {
+                        commentData.at = getCommentNick(parentComment);
+                    }
+                }
             }
+            
+            console.log('Submitting comment data:', commentData);
             
             // 发送到 Waline 服务器
             const response = await fetch(`${WALINE_SERVER_URL}/comment`, {
@@ -2078,9 +2082,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
                 
                 // 重新加载评论列表
                 await loadComments();
-                
-                // 滚动到新评论
-                // ... (原有逻辑)
             } else {
                 showMessage(messageDiv, result.errmsg || 'Failed to post comment', 'error');
             }
@@ -2108,7 +2109,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
         const minute = date.getMinutes().toString().padStart(2, '0');
         
         const ampm = hour >= 12 ? 'pm' : 'am';
-        hour = hour % 12 || 12; // 转换为12小时制
+        hour = hour % 12 || 12;
         
         return `${month} ${day}, ${year} at ${hour}:${minute} ${ampm}`;
     }
@@ -2148,7 +2149,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
         element.classList.add('hidden');
     }
     
-    // [网站保护功能 - 已恢复]
+    // 网站保护功能
     
     // 禁用右键菜单
     document.addEventListener('contextmenu', function(e) {
