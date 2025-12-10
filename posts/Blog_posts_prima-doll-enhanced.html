@@ -1393,13 +1393,13 @@ html {
 // ============ Waline 配置 ============
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
 
-// ============ 关键设置：只认准绝对路径 ============
-// 以后所有评论都会存到这个完整的网址下，新评论绝对能显示
+// ============ 1. 路径锁定 (按你要求，只认绝对路径) ============
+// 这会读取 Netlify 的完整 URL，确保和你后台截图里的路径一模一样
 const PAGE_PATH = 'https://podevus.netlify.app/posts/blog_posts_prima-doll-enhanced';
 
-console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
+console.log('🔒 Waline Target Path:', PAGE_PATH);
 
-// ============ 1. 蒸汽朋克光标与特效 (保持不变) ============
+// ============ 2. 蒸汽朋克光标 (保持不变) ============
 (function() {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) return;
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -1428,7 +1428,6 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
         lx=tx; ly=ty; requestAnimationFrame(loop);
     }
     loop();
-    // 这里的交互效果保留，不用删
     document.querySelectorAll('a, button, .post, input, textarea, .reply-btn').forEach(el => {
         el.addEventListener('mouseenter', () => svg.classList.add('cursor-hover'));
         el.addEventListener('mouseleave', () => svg.classList.remove('cursor-hover'));
@@ -1439,7 +1438,7 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
     document.addEventListener('mouseenter', () => svg.style.opacity = '1');
 })();
 
-// ============ 2. 滚动变色效果 (保持不变) ============
+// ============ 3. 滚动与粒子特效 (保持不变) ============
 (function() {
     const cc = document.querySelector('.steampunk-comments'), ft = document.querySelector('footer'), bl = document.querySelector('.back-link');
     let tst = 0, ht = false;
@@ -1463,10 +1462,7 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
             cc.style.transform = `translateY(${Math.max(0, 50*(1 - Math.min(1, (d-400)/300)))}px)`;
         }
     });
-})();
 
-// ============ 3. 粒子特效 (保持不变) ============
-(function() {
     const bg = document.getElementById('particlesBackground'), fg = document.getElementById('particlesForeground');
     function cp(c, f) {
         const p = document.createElement('div'); p.className = 'particle';
@@ -1479,7 +1475,7 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
     setInterval(()=>cp(bg, false), 2000); setInterval(()=>cp(fg, true), 3000);
 })();
 
-// ============ 4. 核心评论逻辑 (绝对路径版) ============
+// ============ 4. 评论核心逻辑 (修复NaN和undefined) ============
 (function() {
     let allComments = [];
     
@@ -1493,35 +1489,44 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
         });
     });
 
-    // 🌟 时间解析：处理各种奇葩格式
+    // 🌟 强力时间解析器：修复 NaN 问题
     function parseDate(item) {
-        const raw = item.insertedAt || item.createdAt || item.time || item.created;
-        if (!raw) return new Date();
+        // Waline V2/V3 字段混乱，这里全部兼容
+        const raw = item.insertedAt || item.createdAt || item.updatedAt || item.time || item.created;
+        
+        if (!raw) return new Date(); // 没时间就用现在
+        
         if (typeof raw === 'number') return new Date(raw);
+        
         if (typeof raw === 'string') {
-            // 解决 Safari/iOS 兼容性
-            const safeStr = raw.replace(/-/g, '/').replace('T', ' ');
-            return new Date(safeStr);
+            // 修复 Safari/iOS 不支持 "YYYY-MM-DD HH:MM:SS" (空格分隔) 的问题
+            // 将 " " 替换为 "T"，或者将 "-" 替换为 "/"
+            // 尝试标准化 ISO 格式
+            let safe = raw.replace(' ', 'T'); 
+            const d = new Date(safe);
+            if (!isNaN(d.getTime())) return d;
+            
+            // 还是不行？尝试 / 分隔
+            safe = raw.replace(/-/g, '/');
+            return new Date(safe);
         }
-        return new Date(raw);
+        return new Date();
     }
 
     async function loadComments() {
         const list = document.getElementById('commentsList');
         const countEl = document.getElementById('commentsCount');
-        // 🌟 严格使用绝对路径请求
         const url = `${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`;
 
-        console.log('📡 Fetching Absolute Path:', url);
+        console.log('📡 Fetching:', url);
 
         try {
             const res = await fetch(url);
             const json = await res.json();
-            console.log('📦 Data Received:', json);
-
+            
+            // 兼容各种奇葩的返回结构
             let rawData = [];
             let total = 0;
-
             if (json.data && Array.isArray(json.data.data)) {
                 rawData = json.data.data;
                 total = json.data.count;
@@ -1535,10 +1540,15 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
 
             allComments = rawData;
             
+            // 调试：看看获取到的第一条数据到底长啥样
+            if (allComments.length > 0) {
+                console.log('🔍 Sample Comment:', allComments[0]);
+            }
+
             if (countEl) countEl.textContent = `${total} Replies`;
 
             if (allComments.length === 0) {
-                list.innerHTML = '<div class="no-comments">No comments yet. Be the first!</div>';
+                list.innerHTML = '<div class="no-comments">No comments yet.</div>';
             } else {
                 const tree = buildCommentTree(allComments);
                 list.innerHTML = tree.map(c => renderComment(c)).join('');
@@ -1558,6 +1568,7 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
         
         comments.forEach(c => {
             const node = map[c.objectId];
+            // 🌟 使用 loose equality (==) 避免 ID 类型不一致问题
             if (c.pid && map[c.pid]) {
                 map[c.pid].children.push(node);
             } else if (c.rid && map[c.rid] && c.rid != c.objectId) {
@@ -1567,21 +1578,24 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
             }
         });
 
-        const sortFn = (a, b) => parseDate(b) - parseDate(a);
+        // 🌟 使用增强版 parseDate 修复排序崩溃
+        const sortFn = (a, b) => parseDate(b).getTime() - parseDate(a).getTime();
         roots.sort(sortFn);
         return roots;
     }
     
     function renderComment(c, depth = 0) {
         const avatar = c.avatar || `https://www.gravatar.com/avatar/${c.mail_md5 || ''}?s=45&d=mm&r=g`;
-        const link = c.link ? `<a href="${c.link}" target="_blank">${c.nick}</a>` : c.nick;
+        // 🌟 修复名字显示 undefined：增加 fallback
+        const nickName = c.nick || (c.user ? c.user.nick : 'Anonymous');
+        const link = c.link ? `<a href="${c.link}" target="_blank">${nickName}</a>` : nickName;
         const timeStr = formatTime(parseDate(c));
         
         let replyHtml = '';
         if (c.pid && c.pid != c.rid) {
-            // 🌟 修复 @undefined：确保找到父级
+            // 🌟 修复 @undefined：确保找到父级昵称
             const p = allComments.find(x => x.objectId == c.pid);
-            const pName = p ? p.nick : 'someone';
+            const pName = p ? (p.nick || (p.user ? p.user.nick : 'someone')) : 'someone';
             replyHtml = `<div class="reply-to-indicator">Reply to <span>@${pName}</span></div>`;
         }
         
@@ -1607,7 +1621,7 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
                 ${replyHtml}
                 <div class="comment-content">${c.comment}</div>
                 <div class="comment-footer">
-                    <button class="reply-btn" data-cid="${cid}" data-rid="${rid}" data-author="${c.nick}">Reply</button>
+                    <button class="reply-btn" data-cid="${cid}" data-rid="${rid}" data-author="${nickName}">Reply</button>
                 </div>
             </div>
             ${childrenHtml}
@@ -1649,17 +1663,24 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('formMessage');
+        const pid = document.getElementById('replyToId').value;
+        const rid = document.getElementById('replyToAuthor').value;
+
+        // 🌟 修复：发送数据时，确保 pid/rid 也是数字类型（如果原数据是数字）
+        // 大多数数据库如果是数字ID，传字符串过去会匹配失败
+        const safePid = pid ? (isNaN(pid) ? pid : Number(pid)) : undefined;
+        const safeRid = rid ? (isNaN(rid) ? rid : Number(rid)) : undefined;
+
         const data = {
             nick: document.getElementById('nameInput').value,
             mail: document.getElementById('emailInput').value,
             link: document.getElementById('websiteInput').value,
             comment: document.getElementById('commentTextarea').value,
-            // 🌟 发送时也严格使用绝对路径，保证一致性
-            path: PAGE_PATH,
+            path: PAGE_PATH, // 严格使用绝对路径
             url: window.location.href,
             ua: navigator.userAgent,
-            pid: document.getElementById('replyToId').value,
-            rid: document.getElementById('replyToAuthor').value
+            pid: safePid, 
+            rid: safeRid
         };
 
         if (!data.nick || !data.mail || !data.comment) return alert('Please fill required fields');
@@ -1683,7 +1704,7 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
                 cancelReply();
                 msg.textContent = 'Success!'; msg.className = 'message success'; msg.classList.remove('hidden');
                 setTimeout(() => msg.classList.add('hidden'), 3000);
-                await loadComments(); // 重新加载，新评论一定会出来
+                await loadComments();
             } else {
                 throw new Error(json.errmsg || 'Unknown error');
             }
@@ -1695,57 +1716,36 @@ console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
     }
 })();
 
-// ============ 5. 网站保护代码 (已恢复) ============
+// ============ 5. 网站保护代码 (按你要求恢复) ============
 (function() {
     // 禁用右键
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        return false;
-    });
+    document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
 
-    // 禁用文本选择 (允许评论区输入框)
-    document.addEventListener('selectstart', function(e) {
+    // 禁用选择 (除了输入框和评论内容)
+    document.addEventListener('selectstart', e => {
         if (!e.target.closest('input') && !e.target.closest('textarea') && !e.target.closest('.comment-content')) {
-            e.preventDefault();
-            return false;
+            e.preventDefault(); return false;
         }
     });
 
-    // 禁用复制
-    document.addEventListener('copy', function(e) {
+    // 禁用复制 (除了评论内容)
+    document.addEventListener('copy', e => {
         if (!e.target.closest('.comment-content')) {
-            e.preventDefault();
-            return false;
+            e.preventDefault(); return false;
         }
     });
 
-    // 禁用 F12 和开发者工具快捷键
-    document.addEventListener('keydown', function(e) {
-        // F12
-        if (e.key === 'F12') {
-            e.preventDefault();
-            return false;
-        }
-        // Ctrl+Shift+I (Inspect), Ctrl+Shift+J (Console), Ctrl+Shift+C (Element), Ctrl+U (Source), Ctrl+S (Save)
-        if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'I' || e.key === 'j' || e.key === 'J' || e.key === 'c' || e.key === 'C')) {
-            e.preventDefault();
-            return false;
+    // 禁用 F12 和开发工具快捷键
+    document.addEventListener('keydown', e => {
+        if (e.key === 'F12' || 
+            (e.ctrlKey && 'uUsS'.includes(e.key)) || 
+            (e.ctrlKey && e.shiftKey && 'iIjJcCm'.includes(e.key))) {
+            e.preventDefault(); return false;
         }
     });
 })();
 
-// ============ 6. 平滑滚动与加载动画 ============
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-    });
-});
+// ============ 6. 页面加载动画 ============
 window.addEventListener('load', () => {
     document.body.style.opacity = '0';
     setTimeout(() => {
