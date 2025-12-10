@@ -69,7 +69,7 @@
     -webkit-touch-callout: none;
 }
 
-/* 允许输入框可选择（如果有的话） */
+/* 允许输入框可选择 */
 input, textarea {
     -webkit-user-select: text !important;
     -moz-user-select: text !important;
@@ -729,6 +729,8 @@ footer p:last-child {
     background: rgba(44, 24, 16, 0.25);
     padding: 20px;
     margin-bottom: 15px;
+    /* 回复的卡片稍微小一点 */
+    font-size: 0.95em;
 }
 
 .comment-replies .comment-replies {
@@ -822,6 +824,7 @@ footer p:last-child {
     line-height: 1.8;
     font-size: 1em;
     margin-bottom: 12px;
+    word-break: break-word; /* 防止长文本溢出 */
 }
 
 /* 回复提示 */
@@ -874,7 +877,7 @@ footer p:last-child {
     font-size: 1.1em;
 }
 
-/* 发表评论区块 - 更复杂的边框 */
+/* 发表评论区块 */
 .comment-form-section {
     background: rgba(44, 24, 16, 0.3);
     padding: 35px;
@@ -1394,46 +1397,33 @@ html {
 
 // ============ Waline 配置 ============
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
-
-// ============ [更新] 新的 GitHub Pages 路径 ============
 const PAGE_PATH = 'https://podevei.github.io/Podevus/posts/Blog_posts_prima-doll-enhanced.html';
 
 console.log('Target Page Path set to:', PAGE_PATH);
 
-// ============ 三角形光标效果 (完全恢复原版) ============
+// ============ 三角形光标效果 ============
 (function() {
-    // 检测是否为移动设备
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) return;
     
-    if (isMobile) {
-        return;
-    }
-    
-    // 创建SVG三角形光标 (标准等边三角形 Medial Triangle Partition)
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'cursor-triangle');
     svg.setAttribute('viewBox', '0 0 30 30');
     
-    // 等边三角形的三个顶点（外接圆半径 R = 13）
-    // 中心在 (15, 15)
     const R = 13;
     const cx = 15, cy = 15;
+    const A = { x: cx, y: cy - R };
+    const B = { x: cx - R * Math.sqrt(3) / 2, y: cy + R / 2 };
+    const C = { x: cx + R * Math.sqrt(3) / 2, y: cy + R / 2 };
     
-    // 顶点坐标（顶点朝上）
-    const A = { x: cx, y: cy - R };                              // 顶点 (15, 2)
-    const B = { x: cx - R * Math.sqrt(3) / 2, y: cy + R / 2 };  // 左下 (3.74, 21.5)
-    const C = { x: cx + R * Math.sqrt(3) / 2, y: cy + R / 2 };  // 右下 (26.26, 21.5)
+    const M1 = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+    const M2 = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
+    const M3 = { x: (C.x + A.x) / 2, y: (C.y + A.y) / 2 };
     
-    // Medial Triangle 的顶点（各边中点）
-    const M1 = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };  // AB中点 (9.37, 11.75)
-    const M2 = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };  // BC中点 (15, 21.5)
-    const M3 = { x: (C.x + A.x) / 2, y: (C.y + A.y) / 2 };  // CA中点 (20.63, 11.75)
-    
-    // 外围三个三角形 (#3a2326)
     const outerTriangles = [
-        `M ${A.x} ${A.y} L ${M1.x} ${M1.y} L ${M3.x} ${M3.y} Z`,       // 上
-        `M ${B.x} ${B.y} L ${M2.x} ${M2.y} L ${M1.x} ${M1.y} Z`,       // 左下
-        `M ${C.x} ${C.y} L ${M3.x} ${M3.y} L ${M2.x} ${M2.y} Z`        // 右下
+        `M ${A.x} ${A.y} L ${M1.x} ${M1.y} L ${M3.x} ${M3.y} Z`,
+        `M ${B.x} ${B.y} L ${M2.x} ${M2.y} L ${M1.x} ${M1.y} Z`,
+        `M ${C.x} ${C.y} L ${M3.x} ${M3.y} L ${M2.x} ${M2.y} Z`
     ];
     
     outerTriangles.forEach(d => {
@@ -1443,7 +1433,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
         svg.appendChild(path);
     });
     
-    // 中心小三角形 (#847fb7)
     const centerPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     centerPath.setAttribute('d', `M ${M1.x} ${M1.y} L ${M2.x} ${M2.y} L ${M3.x} ${M3.y} Z`);
     centerPath.setAttribute('fill', '#847fb7');
@@ -1451,59 +1440,38 @@ console.log('Target Page Path set to:', PAGE_PATH);
     
     document.body.appendChild(svg);
     
-    // 光标位置和旋转
-    let mouseX = 0;
-    let mouseY = 0;
-    let triangleX = 0;
-    let triangleY = 0;
-    let rotation = 0;
-    let rotationSpeed = 0;
+    let mouseX = 0, mouseY = 0, triangleX = 0, triangleY = 0;
+    let rotation = 0, rotationSpeed = 0;
+    let lastX = 0, lastY = 0, lastTrailTime = 0;
     
-    // 记录上一帧的位置，用于计算速度
-    let lastX = 0;
-    let lastY = 0;
-    let lastTrailTime = 0;
-    
-    // 更新光标位置
     document.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
     });
     
-    // 平滑跟随动画
     function animateCursor() {
-        // 计算移动距离
         const dx = mouseX - triangleX;
         const dy = mouseY - triangleY;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        // 三角形跟随鼠标
         triangleX += dx * 0.25;
         triangleY += dy * 0.25;
         
-        // 根据移动距离增加旋转速度
         if (distance > 0.5) {
-            const speedIncrease = distance * 0.2;
-            rotationSpeed += speedIncrease;
+            rotationSpeed += distance * 0.2;
         }
-        
-        // 应用惯性衰减
         rotationSpeed *= 0.96;
         
-        // 限制最大旋转速度
         const maxSpeed = 15;
         if (rotationSpeed > maxSpeed) rotationSpeed = maxSpeed;
         if (rotationSpeed < -maxSpeed) rotationSpeed = -maxSpeed;
         
-        // 更新旋转角度
         rotation += rotationSpeed;
         
-        // 应用变换
         svg.style.left = triangleX + 'px';
         svg.style.top = triangleY + 'px';
         svg.style.transform = `translate(-15px, -15px) rotate(${rotation}deg)`;
         
-        // 创建尾迹
         const moveDistance = Math.sqrt((triangleX - lastX) ** 2 + (triangleY - lastY) ** 2);
         const now = Date.now();
         
@@ -1514,12 +1482,10 @@ console.log('Target Page Path set to:', PAGE_PATH);
         
         lastX = triangleX;
         lastY = triangleY;
-        
         requestAnimationFrame(animateCursor);
     }
     animateCursor();
     
-    // 创建线条尾迹效果
     function createTrail(x, y, moveAngle, rot) {
         const rotRad = (rot * Math.PI) / 180;
         const vertices = [
@@ -1544,155 +1510,84 @@ console.log('Target Page Path set to:', PAGE_PATH);
             
             document.body.appendChild(trail);
             
-            setTimeout(() => {
-                trail.remove();
-            }, 500);
+            setTimeout(() => trail.remove(), 500);
         });
     }
     
-    // 悬停效果
     const hoverElements = document.querySelectorAll('a, button, .post, .post-category, .submit-btn, input, textarea, .reply-btn');
-    
     hoverElements.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            svg.classList.add('cursor-hover');
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            svg.classList.remove('cursor-hover');
-        });
+        el.addEventListener('mouseenter', () => svg.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => svg.classList.remove('cursor-hover'));
     });
     
-    // 点击效果
-    document.addEventListener('mousedown', () => {
-        svg.classList.add('cursor-active');
-    });
-    
-    document.addEventListener('mouseup', () => {
-        svg.classList.remove('cursor-active');
-    });
-    
-    // 鼠标离开页面时隐藏光标
-    document.addEventListener('mouseleave', () => {
-        svg.style.opacity = '0';
-    });
-    
-    document.addEventListener('mouseenter', () => {
-        svg.style.opacity = '1';
-    });
+    document.addEventListener('mousedown', () => svg.classList.add('cursor-active'));
+    document.addEventListener('mouseup', () => svg.classList.remove('cursor-active'));
+    document.addEventListener('mouseleave', () => svg.style.opacity = '0');
+    document.addEventListener('mouseenter', () => svg.style.opacity = '1');
 })();
 
-// ============ 基于滚动位置的背景变色和评论显示 (完全恢复原版) ============
+// ============ 基于滚动位置的背景变色和评论显示 ============
 (function() {
-    const commentsSection = document.getElementById('commentsSection');
     const commentsContent = document.querySelector('.steampunk-comments');
     const backLink = document.querySelector('.back-link');
     const footer = document.querySelector('footer');
     
-    let triggerScrollTop = 0; // "返回首页"出现时的滚动位置
-    let hasTriggered = false; // 是否已经触发过变色
+    let triggerScrollTop = 0;
+    let hasTriggered = false;
     
-    const COLOR_CHANGE_RANGE = 400; // 背景变色需要的滚动距离
-    const COMMENT_SHOW_RANGE = 300; // 评论弹出需要的滚动距离
+    const COLOR_CHANGE_RANGE = 400;
+    const COMMENT_SHOW_RANGE = 300;
     
-    // 更新body背景颜色（根据模式选择起始颜色）
     function updateBodyBackgroundColor(progress) {
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let startR = isDark ? 26 : 250;
+        let startG = isDark ? 24 : 248;
+        let startB = isDark ? 22 : 243;
         
-        // 根据模式选择起始颜色
-        let startR, startG, startB;
-        if (isDark) {
-            // 深色模式：从深灰色开始
-            startR = 26;
-            startG = 24;
-            startB = 22;
-        } else {
-            // 浅色模式：从米白色开始
-            startR = 250;
-            startG = 248;
-            startB = 243;
-        }
+        const endR = 44, endG = 24, endB = 16;
         
-        // 目标颜色：深色蒸汽朋克
-        const endR = 44;
-        const endG = 24;
-        const endB = 16;
-        
-        // 计算当前颜色
         const r = Math.round(startR + (endR - startR) * progress);
         const g = Math.round(startG + (endG - startG) * progress);
         const b = Math.round(startB + (endB - startB) * progress);
         
         document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-        
-        if (r < 128) {
-            footer.style.color = '#f5e6d3';
-        } else {
-            footer.style.color = '#8b7f76';
-        }
+        footer.style.color = r < 128 ? '#f5e6d3' : '#8b7f76';
     }
     
-    // 显示评论内容
     function showComments(progress) {
-        const opacity = Math.min(1, progress);
-        const translateY = Math.max(0, 50 * (1 - progress));
-        
-        commentsContent.style.opacity = opacity;
-        commentsContent.style.transform = `translateY(${translateY}px)`;
+        commentsContent.style.opacity = Math.min(1, progress);
+        commentsContent.style.transform = `translateY(${Math.max(0, 50 * (1 - progress))}px)`;
     }
     
-    // 监听滚动事件
     function handleScroll() {
         const rect = backLink.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
         const currentScrollTop = window.pageYOffset;
         
-        // 检测"返回首页"是否出现在屏幕底部
-        const isBackLinkVisible = rect.bottom <= windowHeight;
-        
-        // 首次触发：记录触发位置
-        if (isBackLinkVisible && !hasTriggered) {
+        if (rect.bottom <= window.innerHeight && !hasTriggered) {
             triggerScrollTop = currentScrollTop;
             hasTriggered = true;
         }
         
-        // 如果还没触发，保持初始状态
         if (!hasTriggered) {
             updateBodyBackgroundColor(0);
             showComments(0);
             return;
         }
         
-        // 计算相对于触发点的滚动距离
         const scrollDistance = currentScrollTop - triggerScrollTop;
         
-        // 阶段1：背景变色（0 到 COLOR_CHANGE_RANGE）
         if (scrollDistance <= COLOR_CHANGE_RANGE) {
-            const colorProgress = Math.max(0, Math.min(1, scrollDistance / COLOR_CHANGE_RANGE));
-            updateBodyBackgroundColor(colorProgress);
+            updateBodyBackgroundColor(Math.max(0, Math.min(1, scrollDistance / COLOR_CHANGE_RANGE)));
             showComments(0);
-            
-            // 如果向上滚回到触发点之前，重置状态
-            if (scrollDistance < 0) {
-                hasTriggered = false;
-            }
-        }
-        // 阶段2：评论弹出（COLOR_CHANGE_RANGE 到 COLOR_CHANGE_RANGE + COMMENT_SHOW_RANGE）
-        else {
-            // 背景保持完全变色
+            if (scrollDistance < 0) hasTriggered = false;
+        } else {
             updateBodyBackgroundColor(1);
-            
-            // 计算评论弹出进度
-            const commentDistance = scrollDistance - COLOR_CHANGE_RANGE;
-            const commentProgress = Math.max(0, Math.min(1, commentDistance / COMMENT_SHOW_RANGE));
-            showComments(commentProgress);
+            showComments(Math.max(0, Math.min(1, (scrollDistance - COLOR_CHANGE_RANGE) / COMMENT_SHOW_RANGE)));
         }
     }
     
-    // 监听滚动
     window.addEventListener('scroll', handleScroll);
     
-    // 初始化
     document.body.style.transition = 'background-color 0.05s linear';
     commentsContent.style.opacity = '0';
     commentsContent.style.transform = 'translateY(50px)';
@@ -1703,7 +1598,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
     showComments(0);
 })();
 
-// ============ 立体粒子系统 (完全恢复原版) ============
+// ============ 立体粒子系统 ============
 (function() {
     const particlesBackground = document.getElementById('particlesBackground');
     const particlesForeground = document.getElementById('particlesForeground');
@@ -1712,55 +1607,35 @@ console.log('Target Page Path set to:', PAGE_PATH);
         const particle = document.createElement('div');
         particle.className = 'particle';
         
-        const baseSize = isForeground ? 8 : 3;
-        const sizeRange = isForeground ? 8 : 9;
-        const size = Math.random() * sizeRange + baseSize;
+        const size = Math.random() * (isForeground ? 8 : 9) + (isForeground ? 8 : 3);
         particle.style.width = size + 'px';
         particle.style.height = size + 'px';
-        
         particle.style.left = Math.random() * 100 + '%';
         
-        const duration = isForeground 
-            ? Math.random() * 10 + 8
-            : Math.random() * 15 + 12;
+        const duration = (isForeground ? Math.random() * 10 + 8 : Math.random() * 15 + 12);
         particle.style.animationDuration = duration + 's';
-        
-        const delay = Math.random() * 5;
-        particle.style.animationDelay = delay + 's';
-        
-        const drift = (Math.random() - 0.5) * (isForeground ? 150 : 80);
-        particle.style.setProperty('--drift', drift + 'px');
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.setProperty('--drift', (Math.random() - 0.5) * (isForeground ? 150 : 80) + 'px');
         
         container.appendChild(particle);
-        
-        setTimeout(() => {
-            particle.remove();
-        }, (duration + delay) * 1000);
+        setTimeout(() => particle.remove(), (duration + 5) * 1000);
     }
     
-    for (let i = 0; i < 20; i++) {
-        setTimeout(() => createParticle(particlesBackground, false), i * 250);
-    }
-    
-    for (let i = 0; i < 10; i++) {
-        setTimeout(() => createParticle(particlesForeground, true), i * 300);
-    }
-    
+    for (let i = 0; i < 20; i++) setTimeout(() => createParticle(particlesBackground, false), i * 250);
+    for (let i = 0; i < 10; i++) setTimeout(() => createParticle(particlesForeground, true), i * 300);
     setInterval(() => createParticle(particlesBackground, false), 2000);
     setInterval(() => createParticle(particlesForeground, true), 3000);
 })();
 
-// ============ Waline 评论系统（自定义UI - 修复 @undefined 和 路径） ============
+// ============ Waline 评论系统（[修复] 父子回复显示问题） ============
 (function() {
     let allComments = [];
     
-    // 初始化
     document.addEventListener('DOMContentLoaded', function() {
         loadComments();
         document.getElementById('commentForm').addEventListener('submit', handleSubmit);
         document.getElementById('cancelReplyBtn').addEventListener('click', cancelReply);
         
-        // 从localStorage恢复用户信息
         const savedName = localStorage.getItem('podevus_comment_name');
         const savedEmail = localStorage.getItem('podevus_comment_email');
         const savedWebsite = localStorage.getItem('podevus_comment_website');
@@ -1770,38 +1645,30 @@ console.log('Target Page Path set to:', PAGE_PATH);
         if (savedWebsite) document.getElementById('websiteInput').value = savedWebsite;
     });
 
-    // 通用日期解析函数
     function parseDate(item) {
         const raw = item.insertedAt || item.createdAt || item.updatedAt || item.time || item.created;
-        
         if (!raw) return new Date();
         if (typeof raw === 'number') return new Date(raw);
-        
         if (typeof raw === 'string') {
-            let safe = raw.replace(' ', 'T'); 
+            let safe = raw.replace(' ', 'T').replace(/-/g, '/');
             const d = new Date(safe);
-            if (!isNaN(d.getTime())) return d;
-            
-            safe = raw.replace(/-/g, '/');
-            return new Date(safe);
+            return isNaN(d.getTime()) ? new Date() : d;
         }
         return new Date();
     }
 
-    // 从 Waline 服务器加载评论
     async function loadComments() {
         const commentsList = document.getElementById('commentsList');
         const commentsCount = document.getElementById('commentsCount');
         
-        console.log('Loading comments for path:', PAGE_PATH);
         try {
             const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
             const data = await response.json();
             
-            console.log('API Response:', data);
             if (data.errno === 0 || (data.data && Array.isArray(data.data.data)) || Array.isArray(data.data)) {
                 let rawData = [];
                 let totalCount = 0;
+                
                 if (data.data && Array.isArray(data.data.data)) {
                     rawData = data.data.data;
                     totalCount = data.data.count;
@@ -1814,7 +1681,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
                 }
                 
                 allComments = rawData;
-                
                 commentsCount.textContent = `${totalCount} Replies`;
                 
                 if (allComments.length === 0) {
@@ -1824,7 +1690,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
                 
                 const commentTree = buildCommentTree(allComments);
                 commentsList.innerHTML = commentTree.map(comment => renderComment(comment)).join('');
-                
                 bindReplyButtons();
             } else {
                 commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
@@ -1835,66 +1700,68 @@ console.log('Target Page Path set to:', PAGE_PATH);
         }
     }
     
-    // 构建评论树
+    // [核心修复] 构建评论树
     function buildCommentTree(comments) {
         const commentMap = {};
         const rootComments = [];
         
+        // 1. 先把所有评论放进 Map，【强制 ID 为 String】避免类型不匹配
         comments.forEach(comment => {
             comment.children = [];
-            commentMap[comment.objectId] = comment;
+            // 使用 String() 确保 ID 类型一致
+            commentMap[String(comment.objectId)] = comment;
         });
         
+        // 2. 再次遍历，建立父子关系
         comments.forEach(comment => {
-            if (comment.pid && commentMap[comment.pid]) {
-                commentMap[comment.pid].children.push(comment);
-            } else if (comment.rid && commentMap[comment.rid] && comment.rid != comment.objectId) {
-                commentMap[comment.rid].children.push(comment);
+            const id = String(comment.objectId);
+            const pid = comment.pid ? String(comment.pid) : null;
+            
+            // 如果有 pid 且父评论存在，则加入父评论的 children
+            if (pid && commentMap[pid]) {
+                commentMap[pid].children.push(comment);
             } else {
+                // 否则视为根评论
                 rootComments.push(comment);
             }
         });
         
+        // 3. 根评论按时间倒序（最新的在最上面）
         rootComments.sort((a, b) => parseDate(b) - parseDate(a));
         
         return rootComments;
     }
     
-    // 安全获取评论作者昵称 (增强版)
     function getCommentNick(comment) {
         if (!comment) return 'Anonymous';
-        // 优先使用 nick 字段
         if (comment.nick && String(comment.nick).trim()) return comment.nick;
-        // 其次尝试 user.nick
         if (comment.user && comment.user.nick && String(comment.user.nick).trim()) return comment.user.nick;
         return 'Anonymous';
     }
     
-    // 渲染单个评论
     function renderComment(comment, depth = 0) {
         const maxDepth = 3;
         const avatarUrl = comment.avatar || `https://www.gravatar.com/avatar/${comment.mail_md5 || ''}?s=45&d=mm&r=g`;
-        
         const nickName = getCommentNick(comment);
         
-        let authorHtml;
-        if (comment.link) {
-            authorHtml = `<a href="${escapeHtml(comment.link)}" target="_blank" rel="nofollow noopener">${escapeHtml(nickName)}</a>`;
-        } else {
-            authorHtml = escapeHtml(nickName);
-        }
+        let authorHtml = comment.link 
+            ? `<a href="${escapeHtml(comment.link)}" target="_blank" rel="nofollow noopener">${escapeHtml(nickName)}</a>` 
+            : escapeHtml(nickName);
         
+        // 渲染回复提示（Reply to @xxx）
         let replyIndicator = '';
         if (comment.pid && comment.pid != comment.rid) {
-            const parentComment = allComments.find(c => c.objectId == comment.pid);
+            const parentComment = allComments.find(c => String(c.objectId) === String(comment.pid));
             if (parentComment) {
                 const pName = getCommentNick(parentComment);
                 replyIndicator = `<div class="reply-to-indicator">Reply to <span>@${escapeHtml(pName)}</span></div>`;
             }
         }
         
+        // 渲染子评论（嵌套）
         let repliesHtml = '';
         if (comment.children && comment.children.length > 0) {
+            // 子评论按时间正序排列（旧的在前）
             const repliesContent = comment.children
                 .sort((a, b) => parseDate(a) - parseDate(b))
                 .map(reply => renderComment(reply, Math.min(depth + 1, maxDepth)))
@@ -1929,7 +1796,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
         `;
     }
     
-    // 绑定回复按钮事件
     function bindReplyButtons() {
         document.querySelectorAll('.reply-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1941,19 +1807,16 @@ console.log('Target Page Path set to:', PAGE_PATH);
         });
     }
     
-    // 设置回复目标
     function setReplyTo(commentId, rootId, author) {
         document.getElementById('replyPid').value = commentId;
         document.getElementById('replyRid').value = rootId;
         document.getElementById('replyAt').value = author;
         document.getElementById('replyToName').textContent = author;
         document.getElementById('replyNotice').classList.remove('hidden');
-        
         document.getElementById('respond').scrollIntoView({ behavior: 'smooth' });
         document.getElementById('commentTextarea').focus();
     }
     
-    // 取消回复
     function cancelReply() {
         document.getElementById('replyPid').value = '';
         document.getElementById('replyRid').value = '';
@@ -1963,7 +1826,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
     
     window.cancelReply = cancelReply;
     
-    // [重要修复] 处理表单提交 - 解决 @undefined 问题
     async function handleSubmit(e) {
         e.preventDefault();
         
@@ -1974,37 +1836,18 @@ console.log('Target Page Path set to:', PAGE_PATH);
         
         const pid = document.getElementById('replyPid').value || null;
         const rid = document.getElementById('replyRid').value || null;
-        // 注意：不信任 hidden input 里的 'at'，而是通过 pid 实时查找
         
         const messageDiv = document.getElementById('formMessage');
         const submitBtn = document.getElementById('submitBtn');
         
-        // 验证
-        if (!name || !email || !content) {
-            showMessage(messageDiv, 'Please fill in all required fields', 'error');
-            return;
-        }
-        
-        if (!isValidEmail(email)) {
-            showMessage(messageDiv, 'Please enter a valid email address', 'error');
-            return;
-        }
-        
-        if (website && !isValidUrl(website)) {
-            showMessage(messageDiv, 'Please enter a valid website URL', 'error');
-            return;
-        }
-        
-        if (content.length > 1000) {
-            showMessage(messageDiv, 'Comment must be less than 1000 characters', 'error');
-            return;
-        }
+        if (!name || !email || !content) return showMessage(messageDiv, 'Please fill in all required fields', 'error');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMessage(messageDiv, 'Please enter a valid email address', 'error');
+        if (website && !isValidUrl(website)) return showMessage(messageDiv, 'Please enter a valid website URL', 'error');
+        if (content.length > 1000) return showMessage(messageDiv, 'Comment must be less than 1000 characters', 'error');
         
         localStorage.setItem('podevus_comment_name', name);
         localStorage.setItem('podevus_comment_email', email);
-        if (website) {
-            localStorage.setItem('podevus_comment_website', website);
-        }
+        if (website) localStorage.setItem('podevus_comment_website', website);
         
         submitBtn.disabled = true;
         submitBtn.textContent = 'Posting...';
@@ -2020,29 +1863,16 @@ console.log('Target Page Path set to:', PAGE_PATH);
                 ua: navigator.userAgent
             };
             
-            // [逻辑修复核心] 如果是回复，从已加载的 allComments 中查找父评论的昵称
             if (pid) {
                 commentData.pid = pid;
                 commentData.rid = rid || pid;
-                
-                // 查找父评论
-                const parentComment = allComments.find(c => c.objectId == pid);
-                if (parentComment) {
-                    // 使用安全的获取昵称函数，确保不会 undefined
-                    commentData.at = getCommentNick(parentComment);
-                } else {
-                    // 万一找不到（极少情况），回退到 input 值
-                    commentData.at = document.getElementById('replyAt').value || 'Anonymous';
-                }
+                const parentComment = allComments.find(c => String(c.objectId) === String(pid));
+                commentData.at = parentComment ? getCommentNick(parentComment) : (document.getElementById('replyAt').value || 'Anonymous');
             }
-            
-            console.log('Submitting comment data:', commentData);
             
             const response = await fetch(`${WALINE_SERVER_URL}/comment`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(commentData)
             });
             
@@ -2066,37 +1896,16 @@ console.log('Target Page Path set to:', PAGE_PATH);
         }
     }
     
-    // 格式化时间
     function formatTime(date) {
         if (isNaN(date.getTime())) return 'Unknown Date';
-        
-        const months = ['January', 'February', 'March', 'April', 'May', 'June',
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        const month = months[date.getMonth()];
-        const day = date.getDate();
-        const year = date.getFullYear();
+        const months = ['January', 'February', 'March', 'April', 'May', 'June','July', 'August', 'September', 'October', 'November', 'December'];
         let hour = date.getHours();
-        const minute = date.getMinutes().toString().padStart(2, '0');
-        
         const ampm = hour >= 12 ? 'pm' : 'am';
         hour = hour % 12 || 12;
-        
-        return `${month} ${day}, ${year} at ${hour}:${minute} ${ampm}`;
+        return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} at ${hour}:${date.getMinutes().toString().padStart(2, '0')} ${ampm}`;
     }
     
-    function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-    
-    function isValidUrl(url) {
-        try {
-            new URL(url);
-            return true;
-        } catch {
-            return false;
-        }
-    }
+    function isValidUrl(url) { try { new URL(url); return true; } catch { return false; } }
     
     function escapeHtml(text) {
         if (!text) return '';
@@ -2115,51 +1924,30 @@ console.log('Target Page Path set to:', PAGE_PATH);
         element.classList.add('hidden');
     }
     
-    // 网站保护功能
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        return false;
-    });
-    
-    document.addEventListener('selectstart', function(e) {
+    document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
+    document.addEventListener('selectstart', e => {
         if (!e.target.closest('input') && !e.target.closest('textarea') && !e.target.closest('.comment-content')) {
-            e.preventDefault();
-            return false;
+            e.preventDefault(); return false;
         }
     });
-    
-    document.addEventListener('copy', function(e) {
-        if (!e.target.closest('.comment-content')) {
-            e.preventDefault();
-            return false;
-        }
+    document.addEventListener('copy', e => {
+        if (!e.target.closest('.comment-content')) { e.preventDefault(); return false; }
     });
-    
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey && (e.key === 'c' || e.key === 'C' || 
-                           e.key === 'u' || e.key === 'U' || 
-                           e.key === 's' || e.key === 'S')) || 
-            e.key === 'F12') {
-            e.preventDefault();
-            return false;
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey && ['c','u','s'].includes(e.key.toLowerCase())) || e.key === 'F12') {
+            e.preventDefault(); return false;
         }
     });
 })();
 
-// ============ 平滑滚动 ============
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
     });
 });
 
-// ============ 页面加载动画 ============
 window.addEventListener('load', () => {
     document.body.style.opacity = '0';
     setTimeout(() => {
