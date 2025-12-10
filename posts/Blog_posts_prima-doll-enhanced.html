@@ -1393,13 +1393,11 @@ html {
 // ============ Waline 配置 ============
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
 
-// ============ 关键设置：定义两个路径 ============
-// 1. 相对路径 (旧评论大多在这里)
-const PATH_RELATIVE = '/posts/blog_posts_prima-doll-enhanced';
-// 2. 绝对路径 (新评论意外跑到了这里)
-const PATH_ABSOLUTE = 'https://podevus.netlify.app/posts/blog_posts_prima-doll-enhanced';
+// ============ 关键设置：只认准绝对路径 ============
+// 以后所有评论都会存到这个完整的网址下，新评论绝对能显示
+const PAGE_PATH = 'https://podevus.netlify.app/posts/blog_posts_prima-doll-enhanced';
 
-console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
+console.log('🔒 Locked to Absolute Path:', PAGE_PATH);
 
 // ============ 1. 蒸汽朋克光标与特效 (保持不变) ============
 (function() {
@@ -1430,6 +1428,7 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
         lx=tx; ly=ty; requestAnimationFrame(loop);
     }
     loop();
+    // 这里的交互效果保留，不用删
     document.querySelectorAll('a, button, .post, input, textarea, .reply-btn').forEach(el => {
         el.addEventListener('mouseenter', () => svg.classList.add('cursor-hover'));
         el.addEventListener('mouseleave', () => svg.classList.remove('cursor-hover'));
@@ -1480,7 +1479,7 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
     setInterval(()=>cp(bg, false), 2000); setInterval(()=>cp(fg, true), 3000);
 })();
 
-// ============ 4. 核心评论逻辑 (双路径合并版) ============
+// ============ 4. 核心评论逻辑 (绝对路径版) ============
 (function() {
     let allComments = [];
     
@@ -1494,64 +1493,49 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
         });
     });
 
-    // 🌟 时间解析修复：处理 "2025-12-10 07:47:39" 这种格式
+    // 🌟 时间解析：处理各种奇葩格式
     function parseDate(item) {
         const raw = item.insertedAt || item.createdAt || item.time || item.created;
         if (!raw) return new Date();
-        
-        // 如果是数字时间戳，直接返回
         if (typeof raw === 'number') return new Date(raw);
-        
-        // 如果是字符串
         if (typeof raw === 'string') {
-            // 解决 Safari/iOS 不支持 "YYYY-MM-DD HH:MM:SS" 的问题
-            // 将 "-" 替换为 "/"，将 "T" 替换为 " "
+            // 解决 Safari/iOS 兼容性
             const safeStr = raw.replace(/-/g, '/').replace('T', ' ');
             return new Date(safeStr);
         }
         return new Date(raw);
     }
 
-    async function fetchPath(path) {
-        try {
-            const url = `${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(path)}&pageSize=100`;
-            const res = await fetch(url);
-            const json = await res.json();
-            
-            if (json.data && Array.isArray(json.data.data)) return json.data.data;
-            if (Array.isArray(json.data)) return json.data;
-            return [];
-        } catch (e) {
-            console.warn('Path fetch failed:', path, e);
-            return [];
-        }
-    }
-    
     async function loadComments() {
         const list = document.getElementById('commentsList');
         const countEl = document.getElementById('commentsCount');
-        list.innerHTML = '<div class="comments-loading">Searching timeline...</div>';
+        // 🌟 严格使用绝对路径请求
+        const url = `${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`;
+
+        console.log('📡 Fetching Absolute Path:', url);
 
         try {
-            // 🌟 并行抓取两个路径的数据
-            console.log('📡 Fetching from both paths...');
-            const [dataRelative, dataAbsolute] = await Promise.all([
-                fetchPath(PATH_RELATIVE),
-                fetchPath(PATH_ABSOLUTE)
-            ]);
+            const res = await fetch(url);
+            const json = await res.json();
+            console.log('📦 Data Received:', json);
 
-            console.log(`📦 Got ${dataRelative.length} from Relative, ${dataAbsolute.length} from Absolute`);
+            let rawData = [];
+            let total = 0;
 
-            // 🌟 合并并去重 (根据 objectId)
-            const combinedMap = new Map();
-            [...dataRelative, ...dataAbsolute].forEach(item => {
-                combinedMap.set(item.objectId, item);
-            });
-            allComments = Array.from(combinedMap.values());
+            if (json.data && Array.isArray(json.data.data)) {
+                rawData = json.data.data;
+                total = json.data.count;
+            } else if (Array.isArray(json.data)) {
+                rawData = json.data;
+                total = json.count || rawData.length;
+            } else if (Array.isArray(json)) {
+                rawData = json;
+                total = rawData.length;
+            }
 
-            console.log('✅ Total unique comments:', allComments.length);
-
-            if (countEl) countEl.textContent = `${allComments.length} Replies`;
+            allComments = rawData;
+            
+            if (countEl) countEl.textContent = `${total} Replies`;
 
             if (allComments.length === 0) {
                 list.innerHTML = '<div class="no-comments">No comments yet. Be the first!</div>';
@@ -1563,7 +1547,7 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
 
         } catch (err) {
             console.error(err);
-            list.innerHTML = `<div class="no-comments">System Error: ${err.message}</div>`;
+            list.innerHTML = `<div class="no-comments">Error: ${err.message}</div>`;
         }
     }
     
@@ -1574,7 +1558,6 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
         
         comments.forEach(c => {
             const node = map[c.objectId];
-            // 🌟 宽松 ID 匹配
             if (c.pid && map[c.pid]) {
                 map[c.pid].children.push(node);
             } else if (c.rid && map[c.rid] && c.rid != c.objectId) {
@@ -1584,7 +1567,6 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
             }
         });
 
-        // 按时间倒序
         const sortFn = (a, b) => parseDate(b) - parseDate(a);
         roots.sort(sortFn);
         return roots;
@@ -1597,7 +1579,7 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
         
         let replyHtml = '';
         if (c.pid && c.pid != c.rid) {
-            // 🌟 修复 @undefined: 使用 loose equality (==)
+            // 🌟 修复 @undefined：确保找到父级
             const p = allComments.find(x => x.objectId == c.pid);
             const pName = p ? p.nick : 'someone';
             replyHtml = `<div class="reply-to-indicator">Reply to <span>@${pName}</span></div>`;
@@ -1672,8 +1654,8 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
             mail: document.getElementById('emailInput').value,
             link: document.getElementById('websiteInput').value,
             comment: document.getElementById('commentTextarea').value,
-            // 🌟 以后发送评论，统一只用相对路径，避免分裂继续发生！
-            path: PATH_RELATIVE,
+            // 🌟 发送时也严格使用绝对路径，保证一致性
+            path: PAGE_PATH,
             url: window.location.href,
             ua: navigator.userAgent,
             pid: document.getElementById('replyToId').value,
@@ -1701,7 +1683,7 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
                 cancelReply();
                 msg.textContent = 'Success!'; msg.className = 'message success'; msg.classList.remove('hidden');
                 setTimeout(() => msg.classList.add('hidden'), 3000);
-                await loadComments(); // 重新双重抓取，确保新评论立即显示
+                await loadComments(); // 重新加载，新评论一定会出来
             } else {
                 throw new Error(json.errmsg || 'Unknown error');
             }
@@ -1712,4 +1694,63 @@ console.log('🔧 Waline Mode: Dual-Path Fetching Initialized');
         }
     }
 })();
+
+// ============ 5. 网站保护代码 (已恢复) ============
+(function() {
+    // 禁用右键
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    // 禁用文本选择 (允许评论区输入框)
+    document.addEventListener('selectstart', function(e) {
+        if (!e.target.closest('input') && !e.target.closest('textarea') && !e.target.closest('.comment-content')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // 禁用复制
+    document.addEventListener('copy', function(e) {
+        if (!e.target.closest('.comment-content')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // 禁用 F12 和开发者工具快捷键
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+I (Inspect), Ctrl+Shift+J (Console), Ctrl+Shift+C (Element), Ctrl+U (Source), Ctrl+S (Save)
+        if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'I' || e.key === 'j' || e.key === 'J' || e.key === 'c' || e.key === 'C')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+})();
+
+// ============ 6. 平滑滚动与加载动画 ============
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+});
+window.addEventListener('load', () => {
+    document.body.style.opacity = '0';
+    setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease';
+        document.body.style.opacity = '1';
+    }, 100);
+});
 </script>
