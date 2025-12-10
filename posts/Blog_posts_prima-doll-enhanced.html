@@ -1395,7 +1395,7 @@ html {
 // ============ Waline 配置 ============
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
 
-// ============ [修复] 更新为新的 GitHub Pages 路径 ============
+// ============ [更新] 新的 GitHub Pages 路径 ============
 const PAGE_PATH = 'https://podevei.github.io/Podevus/posts/Blog_posts_prima-doll-enhanced.html';
 
 console.log('Target Page Path set to:', PAGE_PATH);
@@ -1431,9 +1431,9 @@ console.log('Target Page Path set to:', PAGE_PATH);
     
     // 外围三个三角形 (#3a2326)
     const outerTriangles = [
-        `M ${A.x} ${A.y} L ${M1.x} ${M1.y} L ${M3.x} ${M3.y} Z`,      // 上
-        `M ${B.x} ${B.y} L ${M2.x} ${M2.y} L ${M1.x} ${M1.y} Z`,      // 左下
-        `M ${C.x} ${C.y} L ${M3.x} ${M3.y} L ${M2.x} ${M2.y} Z`       // 右下
+        `M ${A.x} ${A.y} L ${M1.x} ${M1.y} L ${M3.x} ${M3.y} Z`,       // 上
+        `M ${B.x} ${B.y} L ${M2.x} ${M2.y} L ${M1.x} ${M1.y} Z`,       // 左下
+        `M ${C.x} ${C.y} L ${M3.x} ${M3.y} L ${M2.x} ${M2.y} Z`        // 右下
     ];
     
     outerTriangles.forEach(d => {
@@ -1750,7 +1750,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
     setInterval(() => createParticle(particlesForeground, true), 3000);
 })();
 
-// ============ Waline 评论系统（自定义UI - 已修复 @undefined 问题） ============
+// ============ Waline 评论系统（自定义UI - 修复 @undefined 和 路径） ============
 (function() {
     let allComments = [];
     
@@ -1770,24 +1770,18 @@ console.log('Target Page Path set to:', PAGE_PATH);
         if (savedWebsite) document.getElementById('websiteInput').value = savedWebsite;
     });
 
-    // [修复] 通用日期解析函数：解决 NaN 问题
+    // 通用日期解析函数
     function parseDate(item) {
-        // 兼容 Waline 不同版本的字段名
         const raw = item.insertedAt || item.createdAt || item.updatedAt || item.time || item.created;
         
-        if (!raw) return new Date(); // 如果没有时间，默认为现在
-        
-        // 如果已经是时间戳（数字），直接返回
+        if (!raw) return new Date();
         if (typeof raw === 'number') return new Date(raw);
         
-        // 如果是字符串
         if (typeof raw === 'string') {
-            // 修复 Safari/iOS 不支持 "YYYY-MM-DD HH:MM:SS" (空格分隔) 的问题
             let safe = raw.replace(' ', 'T'); 
             const d = new Date(safe);
             if (!isNaN(d.getTime())) return d;
             
-            // 还是不行？尝试 / 分隔
             safe = raw.replace(/-/g, '/');
             return new Date(safe);
         }
@@ -1806,7 +1800,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
             
             console.log('API Response:', data);
             if (data.errno === 0 || (data.data && Array.isArray(data.data.data)) || Array.isArray(data.data)) {
-                // 兼容不同的数据返回结构
                 let rawData = [];
                 let totalCount = 0;
                 if (data.data && Array.isArray(data.data.data)) {
@@ -1829,11 +1822,9 @@ console.log('Target Page Path set to:', PAGE_PATH);
                     return;
                 }
                 
-                // 构建评论树并渲染
                 const commentTree = buildCommentTree(allComments);
                 commentsList.innerHTML = commentTree.map(comment => renderComment(comment)).join('');
                 
-                // 绑定回复按钮事件
                 bindReplyButtons();
             } else {
                 commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
@@ -1849,13 +1840,11 @@ console.log('Target Page Path set to:', PAGE_PATH);
         const commentMap = {};
         const rootComments = [];
         
-        // 创建评论映射
         comments.forEach(comment => {
             comment.children = [];
             commentMap[comment.objectId] = comment;
         });
         
-        // 构建树结构
         comments.forEach(comment => {
             if (comment.pid && commentMap[comment.pid]) {
                 commentMap[comment.pid].children.push(comment);
@@ -1866,32 +1855,28 @@ console.log('Target Page Path set to:', PAGE_PATH);
             }
         });
         
-        // 按时间排序（使用 parseDate 函数）
         rootComments.sort((a, b) => parseDate(b) - parseDate(a));
         
         return rootComments;
     }
     
-    // [修复] 安全获取评论作者昵称
+    // 安全获取评论作者昵称 (增强版)
     function getCommentNick(comment) {
         if (!comment) return 'Anonymous';
         // 优先使用 nick 字段
-        if (comment.nick && comment.nick.trim()) return comment.nick;
+        if (comment.nick && String(comment.nick).trim()) return comment.nick;
         // 其次尝试 user.nick
-        if (comment.user && comment.user.nick && comment.user.nick.trim()) return comment.user.nick;
-        // 最后返回默认值
+        if (comment.user && comment.user.nick && String(comment.user.nick).trim()) return comment.user.nick;
         return 'Anonymous';
     }
     
-    // 渲染单个评论（递归）
+    // 渲染单个评论
     function renderComment(comment, depth = 0) {
         const maxDepth = 3;
         const avatarUrl = comment.avatar || `https://www.gravatar.com/avatar/${comment.mail_md5 || ''}?s=45&d=mm&r=g`;
         
-        // [修复] 使用安全获取昵称函数
         const nickName = getCommentNick(comment);
         
-        // 作者显示（带网站链接或不带）
         let authorHtml;
         if (comment.link) {
             authorHtml = `<a href="${escapeHtml(comment.link)}" target="_blank" rel="nofollow noopener">${escapeHtml(nickName)}</a>`;
@@ -1899,10 +1884,8 @@ console.log('Target Page Path set to:', PAGE_PATH);
             authorHtml = escapeHtml(nickName);
         }
         
-        // 回复提示
         let replyIndicator = '';
         if (comment.pid && comment.pid != comment.rid) {
-            // 查找被回复的评论作者
             const parentComment = allComments.find(c => c.objectId == comment.pid);
             if (parentComment) {
                 const pName = getCommentNick(parentComment);
@@ -1910,7 +1893,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
             }
         }
         
-        // 渲染回复
         let repliesHtml = '';
         if (comment.children && comment.children.length > 0) {
             const repliesContent = comment.children
@@ -1979,10 +1961,9 @@ console.log('Target Page Path set to:', PAGE_PATH);
         document.getElementById('replyNotice').classList.add('hidden');
     }
     
-    // 暴露cancelReply到全局
     window.cancelReply = cancelReply;
     
-    // [修复] 处理表单提交 - 修复变量名错误
+    // [重要修复] 处理表单提交 - 解决 @undefined 问题
     async function handleSubmit(e) {
         e.preventDefault();
         
@@ -1990,9 +1971,11 @@ console.log('Target Page Path set to:', PAGE_PATH);
         const email = document.getElementById('emailInput').value.trim();
         const website = document.getElementById('websiteInput').value.trim();
         const content = document.getElementById('commentTextarea').value.trim();
+        
         const pid = document.getElementById('replyPid').value || null;
         const rid = document.getElementById('replyRid').value || null;
-        const at = document.getElementById('replyAt').value || null;
+        // 注意：不信任 hidden input 里的 'at'，而是通过 pid 实时查找
+        
         const messageDiv = document.getElementById('formMessage');
         const submitBtn = document.getElementById('submitBtn');
         
@@ -2017,19 +2000,16 @@ console.log('Target Page Path set to:', PAGE_PATH);
             return;
         }
         
-        // 保存用户信息到localStorage
         localStorage.setItem('podevus_comment_name', name);
         localStorage.setItem('podevus_comment_email', email);
         if (website) {
             localStorage.setItem('podevus_comment_website', website);
         }
         
-        // 禁用提交按钮
         submitBtn.disabled = true;
         submitBtn.textContent = 'Posting...';
         
         try {
-            // 构建评论数据
             const commentData = {
                 comment: content,
                 nick: name,
@@ -2040,25 +2020,24 @@ console.log('Target Page Path set to:', PAGE_PATH);
                 ua: navigator.userAgent
             };
             
-            // [修复] 如果是回复，正确设置 pid, rid, at 字段
+            // [逻辑修复核心] 如果是回复，从已加载的 allComments 中查找父评论的昵称
             if (pid) {
                 commentData.pid = pid;
                 commentData.rid = rid || pid;
-                // [关键修复] 确保 at 字段有值
-                if (at && at.trim()) {
-                    commentData.at = at;
+                
+                // 查找父评论
+                const parentComment = allComments.find(c => c.objectId == pid);
+                if (parentComment) {
+                    // 使用安全的获取昵称函数，确保不会 undefined
+                    commentData.at = getCommentNick(parentComment);
                 } else {
-                    // 如果 at 为空，从 allComments 中查找被回复者昵称
-                    const parentComment = allComments.find(c => c.objectId == pid);
-                    if (parentComment) {
-                        commentData.at = getCommentNick(parentComment);
-                    }
+                    // 万一找不到（极少情况），回退到 input 值
+                    commentData.at = document.getElementById('replyAt').value || 'Anonymous';
                 }
             }
             
             console.log('Submitting comment data:', commentData);
             
-            // 发送到 Waline 服务器
             const response = await fetch(`${WALINE_SERVER_URL}/comment`, {
                 method: 'POST',
                 headers: {
@@ -2070,17 +2049,10 @@ console.log('Target Page Path set to:', PAGE_PATH);
             const result = await response.json();
             
             if (result.errno === 0 || result.data) {
-                // 清空表单内容（保留用户信息）
                 document.getElementById('commentTextarea').value = '';
-                
-                // 重置回复状态
                 cancelReply();
-                
-                // 显示成功消息
                 showMessage(messageDiv, 'Comment posted successfully!', 'success');
                 setTimeout(() => hideMessage(messageDiv), 3000);
-                
-                // 重新加载评论列表
                 await loadComments();
             } else {
                 showMessage(messageDiv, result.errmsg || 'Failed to post comment', 'error');
@@ -2089,7 +2061,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
             console.error('Failed to post comment:', error);
             showMessage(messageDiv, 'Failed to post comment. Please try again.', 'error');
         } finally {
-            // 恢复提交按钮
             submitBtn.disabled = false;
             submitBtn.textContent = 'Post Comment';
         }
@@ -2114,12 +2085,10 @@ console.log('Target Page Path set to:', PAGE_PATH);
         return `${month} ${day}, ${year} at ${hour}:${minute} ${ampm}`;
     }
     
-    // 验证邮箱格式
     function isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
     
-    // 验证URL格式
     function isValidUrl(url) {
         try {
             new URL(url);
@@ -2129,7 +2098,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
         }
     }
     
-    // HTML转义
     function escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -2137,27 +2105,22 @@ console.log('Target Page Path set to:', PAGE_PATH);
         return div.innerHTML;
     }
     
-    // 显示消息
     function showMessage(element, message, type) {
         element.textContent = message;
         element.className = 'message ' + type;
         element.classList.remove('hidden');
     }
     
-    // 隐藏消息
     function hideMessage(element) {
         element.classList.add('hidden');
     }
     
     // 网站保护功能
-    
-    // 禁用右键菜单
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         return false;
     });
     
-    // 禁用文本选择（评论区域除外）
     document.addEventListener('selectstart', function(e) {
         if (!e.target.closest('input') && !e.target.closest('textarea') && !e.target.closest('.comment-content')) {
             e.preventDefault();
@@ -2165,7 +2128,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
         }
     });
     
-    // 禁用复制（评论区域除外）
     document.addEventListener('copy', function(e) {
         if (!e.target.closest('.comment-content')) {
             e.preventDefault();
@@ -2173,7 +2135,6 @@ console.log('Target Page Path set to:', PAGE_PATH);
         }
     });
     
-    // 禁用常见快捷键
     document.addEventListener('keydown', function(e) {
         if ((e.ctrlKey && (e.key === 'c' || e.key === 'C' || 
                            e.key === 'u' || e.key === 'U' || 
