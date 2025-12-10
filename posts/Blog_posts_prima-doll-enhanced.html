@@ -1349,8 +1349,9 @@ html {
                 </div>
                 
                 <form id="commentForm">
-                    <input type="hidden" id="replyToId" value="">
-                    <input type="hidden" id="replyToAuthor" value="">
+                    <input type="hidden" id="replyPid" value="">
+                    <input type="hidden" id="replyRid" value="">
+                    <input type="hidden" id="replyAt" value="">
                     
                     <div class="form-row-3">
                         <div class="form-group">
@@ -1390,114 +1391,397 @@ html {
     </footer>
     
     <script>
+
 // ============ Waline 配置 ============
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
 
-// ============ 1. 路径锁定 (按你要求，只认绝对路径) ============
-// 这会读取 Netlify 的完整 URL，确保和你后台截图里的路径一模一样
+// ============ [关键修复] 路径锁定 ============
+// 仍然使用 Netlify 的绝对路径，确保新旧评论都能显示
 const PAGE_PATH = 'https://podevus.netlify.app/posts/blog_posts_prima-doll-enhanced';
 
-console.log('🔒 Waline Target Path:', PAGE_PATH);
+console.log('Target Page Path set to:', PAGE_PATH);
 
-// ============ 2. 蒸汽朋克光标 (保持不变) ============
+// ============ 三角形光标效果 (完全恢复原版) ============
 (function() {
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) return;
+    // 检测是否为移动设备
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        return;
+    }
+    
+    // 创建SVG三角形光标 (标准等边三角形 Medial Triangle Partition)
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('class', 'cursor-triangle'); svg.setAttribute('viewBox', '0 0 30 30');
-    const R = 13, cx = 15, cy = 15;
-    const A = { x: cx, y: cy - R }, B = { x: cx - R * Math.sqrt(3) / 2, y: cy + R / 2 }, C = { x: cx + R * Math.sqrt(3) / 2, y: cy + R / 2 };
-    const M1 = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 }, M2 = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 }, M3 = { x: (C.x + A.x) / 2, y: (C.y + A.y) / 2 };
-    [ `M ${A.x} ${A.y} L ${M1.x} ${M1.y} L ${M3.x} ${M3.y} Z`, `M ${B.x} ${B.y} L ${M2.x} ${M2.y} L ${M1.x} ${M1.y} Z`, `M ${C.x} ${C.y} L ${M3.x} ${M3.y} L ${M2.x} ${M2.y} Z` ].forEach(d => {
-        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d); p.setAttribute('fill', '#3a2326'); svg.appendChild(p);
+    svg.setAttribute('class', 'cursor-triangle');
+    svg.setAttribute('viewBox', '0 0 30 30');
+    
+    // 等边三角形的三个顶点（外接圆半径 R = 13）
+    // 中心在 (15, 15)
+    const R = 13;
+    const cx = 15, cy = 15;
+    
+    // 顶点坐标（顶点朝上）
+    const A = { x: cx, y: cy - R };                              // 顶点 (15, 2)
+    const B = { x: cx - R * Math.sqrt(3) / 2, y: cy + R / 2 };  // 左下 (3.74, 21.5)
+    const C = { x: cx + R * Math.sqrt(3) / 2, y: cy + R / 2 };  // 右下 (26.26, 21.5)
+    
+    // Medial Triangle 的顶点（各边中点）
+    const M1 = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };  // AB中点 (9.37, 11.75)
+    const M2 = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };  // BC中点 (15, 21.5)
+    const M3 = { x: (C.x + A.x) / 2, y: (C.y + A.y) / 2 };  // CA中点 (20.63, 11.75)
+    
+    // 外围三个三角形 (#3a2326)
+    const outerTriangles = [
+        `M ${A.x} ${A.y} L ${M1.x} ${M1.y} L ${M3.x} ${M3.y} Z`,      // 上
+        `M ${B.x} ${B.y} L ${M2.x} ${M2.y} L ${M1.x} ${M1.y} Z`,      // 左下
+        `M ${C.x} ${C.y} L ${M3.x} ${M3.y} L ${M2.x} ${M2.y} Z`       // 右下
+    ];
+    
+    outerTriangles.forEach(d => {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('fill', '#3a2326');
+        svg.appendChild(path);
     });
-    const cp = document.createElementNS('http://www.w3.org/2000/svg', 'path'); cp.setAttribute('d', `M ${M1.x} ${M1.y} L ${M2.x} ${M2.y} L ${M3.x} ${M3.y} Z`); cp.setAttribute('fill', '#847fb7'); svg.appendChild(cp);
+    
+    // 中心小三角形 (#847fb7)
+    const centerPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    centerPath.setAttribute('d', `M ${M1.x} ${M1.y} L ${M2.x} ${M2.y} L ${M3.x} ${M3.y} Z`);
+    centerPath.setAttribute('fill', '#847fb7');
+    svg.appendChild(centerPath);
+    
     document.body.appendChild(svg);
-    let mx=0, my=0, tx=0, ty=0, rot=0, rotSpd=0, lx=0, ly=0, ltt=0;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-    function loop() {
-        const dx = mx - tx, dy = my - ty, dist = Math.sqrt(dx*dx + dy*dy);
-        tx += dx * 0.25; ty += dy * 0.25;
-        if (dist > 0.5) rotSpd += dist * 0.2;
-        rotSpd *= 0.96; rot += Math.max(-15, Math.min(15, rotSpd));
-        svg.style.left = tx + 'px'; svg.style.top = ty + 'px';
-        svg.style.transform = `translate(-15px, -15px) rotate(${rot}deg)`;
-        if (Math.sqrt((tx-lx)**2+(ty-ly)**2) > 2 && Date.now()-ltt > 20) {
-            const t = document.createElement('div'); t.className = 'cursor-trail'; t.style.left=tx+'px'; t.style.top=ty+'px'; 
-            t.style.transform=`rotate(${Math.atan2(dy, dx)+Math.PI}rad)`; document.body.appendChild(t); setTimeout(()=>t.remove(),500); ltt=Date.now();
-        }
-        lx=tx; ly=ty; requestAnimationFrame(loop);
-    }
-    loop();
-    document.querySelectorAll('a, button, .post, input, textarea, .reply-btn').forEach(el => {
-        el.addEventListener('mouseenter', () => svg.classList.add('cursor-hover'));
-        el.addEventListener('mouseleave', () => svg.classList.remove('cursor-hover'));
+    
+    // 光标位置和旋转
+    let mouseX = 0;
+    let mouseY = 0;
+    let triangleX = 0;
+    let triangleY = 0;
+    let rotation = 0;
+    let rotationSpeed = 0;
+    
+    // 记录上一帧的位置，用于计算速度
+    let lastX = 0;
+    let lastY = 0;
+    let lastTrailTime = 0;
+    
+    // 更新光标位置
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
     });
-    document.addEventListener('mousedown', () => svg.classList.add('cursor-active'));
-    document.addEventListener('mouseup', () => svg.classList.remove('cursor-active'));
-    document.addEventListener('mouseleave', () => svg.style.opacity = '0');
-    document.addEventListener('mouseenter', () => svg.style.opacity = '1');
+    
+    // 平滑跟随动画
+    function animateCursor() {
+        // 计算移动距离
+        const dx = mouseX - triangleX;
+        const dy = mouseY - triangleY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // 三角形跟随鼠标
+        triangleX += dx * 0.25;
+        triangleY += dy * 0.25;
+        
+        // 根据移动距离增加旋转速度
+        if (distance > 0.5) {
+            const speedIncrease = distance * 0.2;
+            rotationSpeed += speedIncrease;
+        }
+        
+        // 应用惯性衰减
+        rotationSpeed *= 0.96;
+        
+        // 限制最大旋转速度
+        const maxSpeed = 15;
+        if (rotationSpeed > maxSpeed) rotationSpeed = maxSpeed;
+        if (rotationSpeed < -maxSpeed) rotationSpeed = -maxSpeed;
+        
+        // 更新旋转角度
+        rotation += rotationSpeed;
+        
+        // 应用变换
+        svg.style.left = triangleX + 'px';
+        svg.style.top = triangleY + 'px';
+        svg.style.transform = `translate(-15px, -15px) rotate(${rotation}deg)`;
+        
+        // 创建尾迹
+        const moveDistance = Math.sqrt((triangleX - lastX) ** 2 + (triangleY - lastY) ** 2);
+        const now = Date.now();
+        
+        if (moveDistance > 2 && now - lastTrailTime > 20) {
+            createTrail(triangleX, triangleY, Math.atan2(dy, dx), rotation);
+            lastTrailTime = now;
+        }
+        
+        lastX = triangleX;
+        lastY = triangleY;
+        
+        requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    
+    // 创建线条尾迹效果
+    function createTrail(x, y, moveAngle, rot) {
+        const rotRad = (rot * Math.PI) / 180;
+        const vertices = [
+            { dx: 0, dy: -R },
+            { dx: -R * Math.sqrt(3) / 2, dy: R / 2 },
+            { dx: R * Math.sqrt(3) / 2, dy: R / 2 }
+        ];
+        
+        vertices.forEach(vertex => {
+            const rotatedX = vertex.dx * Math.cos(rotRad) - vertex.dy * Math.sin(rotRad);
+            const rotatedY = vertex.dx * Math.sin(rotRad) + vertex.dy * Math.cos(rotRad);
+            
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            
+            const startX = x + rotatedX;
+            const startY = y + rotatedY;
+            
+            trail.style.left = startX + 'px';
+            trail.style.top = startY + 'px';
+            trail.style.transform = `rotate(${moveAngle + Math.PI}rad)`;
+            
+            document.body.appendChild(trail);
+            
+            setTimeout(() => {
+                trail.remove();
+            }, 500);
+        });
+    }
+    
+    // 悬停效果
+    const hoverElements = document.querySelectorAll('a, button, .post, .post-category, .submit-btn, input, textarea, .reply-btn');
+    
+    hoverElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            svg.classList.add('cursor-hover');
+        });
+        
+        el.addEventListener('mouseleave', () => {
+            svg.classList.remove('cursor-hover');
+        });
+    });
+    
+    // 点击效果
+    document.addEventListener('mousedown', () => {
+        svg.classList.add('cursor-active');
+    });
+    
+    document.addEventListener('mouseup', () => {
+        svg.classList.remove('cursor-active');
+    });
+    
+    // 鼠标离开页面时隐藏光标
+    document.addEventListener('mouseleave', () => {
+        svg.style.opacity = '0';
+    });
+    
+    document.addEventListener('mouseenter', () => {
+        svg.style.opacity = '1';
+    });
 })();
 
-// ============ 3. 滚动与粒子特效 (保持不变) ============
+// ============ 基于滚动位置的背景变色和评论显示 (完全恢复原版) ============
 (function() {
-    const cc = document.querySelector('.steampunk-comments'), ft = document.querySelector('footer'), bl = document.querySelector('.back-link');
-    let tst = 0, ht = false;
-    window.addEventListener('scroll', () => {
-        if (bl.getBoundingClientRect().bottom <= window.innerHeight && !ht) { tst = window.pageYOffset; ht = true; }
-        if (!ht) { document.body.style.backgroundColor = 'var(--primary-bg)'; cc.style.opacity = 0; return; }
-        const d = window.pageYOffset - tst;
-        if (d <= 400) {
-            const p = Math.max(0, Math.min(1, d/400));
-            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const r = Math.round((isDark?26:250) + (44 - (isDark?26:250))*p);
-            const g = Math.round((isDark?24:248) + (24 - (isDark?24:248))*p);
-            const b = Math.round((isDark?22:243) + (16 - (isDark?22:243))*p);
-            document.body.style.backgroundColor = `rgb(${r},${g},${b})`;
-            cc.style.opacity = 0;
-            ft.style.color = r < 128 ? '#f5e6d3' : '#8b7f76';
+    const commentsSection = document.getElementById('commentsSection');
+    const commentsContent = document.querySelector('.steampunk-comments');
+    const backLink = document.querySelector('.back-link');
+    const footer = document.querySelector('footer');
+    
+    let triggerScrollTop = 0; // "返回首页"出现时的滚动位置
+    let hasTriggered = false; // 是否已经触发过变色
+    
+    const COLOR_CHANGE_RANGE = 400; // 背景变色需要的滚动距离
+    const COMMENT_SHOW_RANGE = 300; // 评论弹出需要的滚动距离
+    
+    // 更新body背景颜色（根据模式选择起始颜色）
+    function updateBodyBackgroundColor(progress) {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // 根据模式选择起始颜色
+        let startR, startG, startB;
+        if (isDark) {
+            // 深色模式：从深灰色开始
+            startR = 26;
+            startG = 24;
+            startB = 22;
         } else {
-            document.body.style.backgroundColor = 'rgb(44,24,16)';
-            ft.style.color = '#f5e6d3';
-            cc.style.opacity = Math.min(1, (d-400)/300);
-            cc.style.transform = `translateY(${Math.max(0, 50*(1 - Math.min(1, (d-400)/300)))}px)`;
+            // 浅色模式：从米白色开始
+            startR = 250;
+            startG = 248;
+            startB = 243;
         }
-    });
-
-    const bg = document.getElementById('particlesBackground'), fg = document.getElementById('particlesForeground');
-    function cp(c, f) {
-        const p = document.createElement('div'); p.className = 'particle';
-        const s = Math.random()*(f?8:9)+(f?8:3); p.style.width=s+'px'; p.style.height=s+'px';
-        p.style.left=Math.random()*100+'%'; p.style.animationDuration=(Math.random()*(f?10:15)+(f?8:12))+'s';
-        p.style.setProperty('--drift', (Math.random()-0.5)*(f?150:80)+'px');
-        c.appendChild(p); setTimeout(()=>p.remove(), 25000);
+        
+        // 目标颜色：深色蒸汽朋克
+        const endR = 44;
+        const endG = 24;
+        const endB = 16;
+        
+        // 计算当前颜色
+        const r = Math.round(startR + (endR - startR) * progress);
+        const g = Math.round(startG + (endG - startG) * progress);
+        const b = Math.round(startB + (endB - startB) * progress);
+        
+        document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        
+        if (r < 128) {
+            footer.style.color = '#f5e6d3';
+        } else {
+            footer.style.color = '#8b7f76';
+        }
     }
-    for(let i=0;i<15;i++) setTimeout(()=>cp(bg, false), i*200);
-    setInterval(()=>cp(bg, false), 2000); setInterval(()=>cp(fg, true), 3000);
+    
+    // 显示评论内容
+    function showComments(progress) {
+        const opacity = Math.min(1, progress);
+        const translateY = Math.max(0, 50 * (1 - progress));
+        
+        commentsContent.style.opacity = opacity;
+        commentsContent.style.transform = `translateY(${translateY}px)`;
+    }
+    
+    // 监听滚动事件
+    function handleScroll() {
+        const rect = backLink.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const currentScrollTop = window.pageYOffset;
+        
+        // 检测"返回首页"是否出现在屏幕底部
+        const isBackLinkVisible = rect.bottom <= windowHeight;
+        
+        // 首次触发：记录触发位置
+        if (isBackLinkVisible && !hasTriggered) {
+            triggerScrollTop = currentScrollTop;
+            hasTriggered = true;
+        }
+        
+        // 如果还没触发，保持初始状态
+        if (!hasTriggered) {
+            updateBodyBackgroundColor(0);
+            showComments(0);
+            return;
+        }
+        
+        // 计算相对于触发点的滚动距离
+        const scrollDistance = currentScrollTop - triggerScrollTop;
+        
+        // 阶段1：背景变色（0 到 COLOR_CHANGE_RANGE）
+        if (scrollDistance <= COLOR_CHANGE_RANGE) {
+            const colorProgress = Math.max(0, Math.min(1, scrollDistance / COLOR_CHANGE_RANGE));
+            updateBodyBackgroundColor(colorProgress);
+            showComments(0);
+            
+            // 如果向上滚回到触发点之前，重置状态
+            if (scrollDistance < 0) {
+                hasTriggered = false;
+            }
+        }
+        // 阶段2：评论弹出（COLOR_CHANGE_RANGE 到 COLOR_CHANGE_RANGE + COMMENT_SHOW_RANGE）
+        else {
+            // 背景保持完全变色
+            updateBodyBackgroundColor(1);
+            
+            // 计算评论弹出进度
+            const commentDistance = scrollDistance - COLOR_CHANGE_RANGE;
+            const commentProgress = Math.max(0, Math.min(1, commentDistance / COMMENT_SHOW_RANGE));
+            showComments(commentProgress);
+        }
+    }
+    
+    // 监听滚动
+    window.addEventListener('scroll', handleScroll);
+    
+    // 初始化
+    document.body.style.transition = 'background-color 0.05s linear';
+    commentsContent.style.opacity = '0';
+    commentsContent.style.transform = 'translateY(50px)';
+    commentsContent.style.transition = 'opacity 0.05s linear, transform 0.05s linear';
+    footer.style.transition = 'color 0.05s linear';
+    
+    updateBodyBackgroundColor(0);
+    showComments(0);
 })();
 
-// ============ 4. 评论核心逻辑 (修复NaN和undefined) ============
+// ============ 立体粒子系统 (完全恢复原版) ============
+(function() {
+    const particlesBackground = document.getElementById('particlesBackground');
+    const particlesForeground = document.getElementById('particlesForeground');
+    
+    function createParticle(container, isForeground = false) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        const baseSize = isForeground ? 8 : 3;
+        const sizeRange = isForeground ? 8 : 9;
+        const size = Math.random() * sizeRange + baseSize;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        
+        particle.style.left = Math.random() * 100 + '%';
+        
+        const duration = isForeground 
+            ? Math.random() * 10 + 8
+            : Math.random() * 15 + 12;
+        particle.style.animationDuration = duration + 's';
+        
+        const delay = Math.random() * 5;
+        particle.style.animationDelay = delay + 's';
+        
+        const drift = (Math.random() - 0.5) * (isForeground ? 150 : 80);
+        particle.style.setProperty('--drift', drift + 'px');
+        
+        container.appendChild(particle);
+        
+        setTimeout(() => {
+            particle.remove();
+        }, (duration + delay) * 1000);
+    }
+    
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => createParticle(particlesBackground, false), i * 250);
+    }
+    
+    for (let i = 0; i < 10; i++) {
+        setTimeout(() => createParticle(particlesForeground, true), i * 300);
+    }
+    
+    setInterval(() => createParticle(particlesBackground, false), 2000);
+    setInterval(() => createParticle(particlesForeground, true), 3000);
+})();
+
+// ============ Waline 评论系统（自定义UI - 已注入修复逻辑） ============
 (function() {
     let allComments = [];
     
-    document.addEventListener('DOMContentLoaded', () => {
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
         loadComments();
-        document.getElementById('commentForm')?.addEventListener('submit', handleSubmit);
-        document.getElementById('cancelReplyBtn')?.addEventListener('click', cancelReply);
-        ['name', 'email', 'website'].forEach(k => {
-            const el = document.getElementById(`${k}Input`);
-            if(el) el.value = localStorage.getItem(`podevus_comment_${k}`) || '';
-        });
+        document.getElementById('commentForm').addEventListener('submit', handleSubmit);
+        document.getElementById('cancelReplyBtn').addEventListener('click', cancelReply);
+        
+        // 从localStorage恢复用户信息
+        const savedName = localStorage.getItem('podevus_comment_name');
+        const savedEmail = localStorage.getItem('podevus_comment_email');
+        const savedWebsite = localStorage.getItem('podevus_comment_website');
+        
+        if (savedName) document.getElementById('nameInput').value = savedName;
+        if (savedEmail) document.getElementById('emailInput').value = savedEmail;
+        if (savedWebsite) document.getElementById('websiteInput').value = savedWebsite;
     });
 
-    // 🌟 强力时间解析器：修复 NaN 问题
+    // [关键修复] 通用日期解析函数：解决 NaN 问题
     function parseDate(item) {
-        // Waline V2/V3 字段混乱，这里全部兼容
+        // 兼容 Waline 不同版本的字段名
         const raw = item.insertedAt || item.createdAt || item.updatedAt || item.time || item.created;
         
-        if (!raw) return new Date(); // 没时间就用现在
+        if (!raw) return new Date(); // 如果没有时间，默认为现在
         
+        // 如果已经是时间戳（数字），直接返回
         if (typeof raw === 'number') return new Date(raw);
         
+        // 如果是字符串
         if (typeof raw === 'string') {
             // 修复 Safari/iOS 不支持 "YYYY-MM-DD HH:MM:SS" (空格分隔) 的问题
             // 将 " " 替换为 "T"，或者将 "-" 替换为 "/"
@@ -1512,240 +1796,408 @@ console.log('🔒 Waline Target Path:', PAGE_PATH);
         }
         return new Date();
     }
-
+    
+    // 从 Waline 服务器加载评论
     async function loadComments() {
-        const list = document.getElementById('commentsList');
-        const countEl = document.getElementById('commentsCount');
-        const url = `${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`;
-
-        console.log('📡 Fetching:', url);
+        const commentsList = document.getElementById('commentsList');
+        const commentsCount = document.getElementById('commentsCount');
+        
+        console.log('Loading comments for absolute path:', PAGE_PATH);
 
         try {
-            const res = await fetch(url);
-            const json = await res.json();
+            // [关键修复] 使用 encodeURIComponent 且使用绝对路径
+            const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
+            const data = await response.json();
             
-            // 兼容各种奇葩的返回结构
-            let rawData = [];
-            let total = 0;
-            if (json.data && Array.isArray(json.data.data)) {
-                rawData = json.data.data;
-                total = json.data.count;
-            } else if (Array.isArray(json.data)) {
-                rawData = json.data;
-                total = json.count || rawData.length;
-            } else if (Array.isArray(json)) {
-                rawData = json;
-                total = rawData.length;
-            }
+            console.log('API Response:', data);
 
-            allComments = rawData;
-            
-            // 调试：看看获取到的第一条数据到底长啥样
-            if (allComments.length > 0) {
-                console.log('🔍 Sample Comment:', allComments[0]);
-            }
+            if (data.errno === 0 || (data.data && Array.isArray(data.data.data)) || Array.isArray(data.data)) {
+                // [关键修复] 兼容不同的数据返回结构
+                let rawData = [];
+                let totalCount = 0;
 
-            if (countEl) countEl.textContent = `${total} Replies`;
-
-            if (allComments.length === 0) {
-                list.innerHTML = '<div class="no-comments">No comments yet.</div>';
-            } else {
-                const tree = buildCommentTree(allComments);
-                list.innerHTML = tree.map(c => renderComment(c)).join('');
+                if (data.data && Array.isArray(data.data.data)) {
+                    // 结构: { errno: 0, data: { data: [], count: 0 } }
+                    rawData = data.data.data;
+                    totalCount = data.data.count;
+                } else if (Array.isArray(data.data)) {
+                    // 结构: { errno: 0, data: [], count: 0 }
+                    rawData = data.data;
+                    totalCount = data.count || rawData.length;
+                } else if (Array.isArray(data)) {
+                     // 极简结构
+                     rawData = data;
+                     totalCount = rawData.length;
+                }
+                
+                allComments = rawData;
+                
+                commentsCount.textContent = `${totalCount} Replies`;
+                
+                if (allComments.length === 0) {
+                    commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
+                    return;
+                }
+                
+                // 构建评论树并渲染
+                const commentTree = buildCommentTree(allComments);
+                commentsList.innerHTML = commentTree.map(comment => renderComment(comment)).join('');
+                
+                // 绑定回复按钮事件
                 bindReplyButtons();
+            } else {
+                commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
             }
-
-        } catch (err) {
-            console.error(err);
-            list.innerHTML = `<div class="no-comments">Error: ${err.message}</div>`;
+        } catch (error) {
+            console.error('Failed to load comments:', error);
+            commentsList.innerHTML = '<div class="no-comments">Failed to load comments. Please refresh the page.</div>';
         }
     }
     
+    // 构建评论树
     function buildCommentTree(comments) {
-        const map = {};
-        const roots = [];
-        comments.forEach(c => { map[c.objectId] = { ...c, children: [] }; });
+        const commentMap = {};
+        const rootComments = [];
         
-        comments.forEach(c => {
-            const node = map[c.objectId];
-            // 🌟 使用 loose equality (==) 避免 ID 类型不一致问题
-            if (c.pid && map[c.pid]) {
-                map[c.pid].children.push(node);
-            } else if (c.rid && map[c.rid] && c.rid != c.objectId) {
-                map[c.rid].children.push(node);
+        // 创建评论映射
+        comments.forEach(comment => {
+            comment.children = [];
+            commentMap[comment.objectId] = comment;
+        });
+        
+        // 构建树结构
+        comments.forEach(comment => {
+            // [关键修复] 使用 == 进行比较，忽略数字/字符串类型差异
+            if (comment.pid && commentMap[comment.pid]) {
+                commentMap[comment.pid].children.push(comment);
+            } else if (comment.rid && commentMap[comment.rid] && comment.rid != comment.objectId) {
+                // rid 是根评论ID
+                commentMap[comment.rid].children.push(comment);
             } else {
-                roots.push(node);
+                rootComments.push(comment);
             }
         });
-
-        // 🌟 使用增强版 parseDate 修复排序崩溃
-        const sortFn = (a, b) => parseDate(b).getTime() - parseDate(a).getTime();
-        roots.sort(sortFn);
-        return roots;
+        
+        // [关键修复] 按时间排序（使用 parseDate 函数）
+        // 根评论：新发布的在上面 (倒序)
+        rootComments.sort((a, b) => parseDate(b) - parseDate(a));
+        
+        return rootComments;
     }
     
-    function renderComment(c, depth = 0) {
-        const avatar = c.avatar || `https://www.gravatar.com/avatar/${c.mail_md5 || ''}?s=45&d=mm&r=g`;
-        // 🌟 修复名字显示 undefined：增加 fallback
-        const nickName = c.nick || (c.user ? c.user.nick : 'Anonymous');
-        const link = c.link ? `<a href="${c.link}" target="_blank">${nickName}</a>` : nickName;
-        const timeStr = formatTime(parseDate(c));
+    // 渲染单个评论（递归）
+    function renderComment(comment, depth = 0) {
+        const maxDepth = 3;
+        const avatarUrl = comment.avatar || `https://www.gravatar.com/avatar/${comment.mail_md5 || ''}?s=45&d=mm&r=g`;
         
-        let replyHtml = '';
-        if (c.pid && c.pid != c.rid) {
-            // 🌟 修复 @undefined：确保找到父级昵称
-            const p = allComments.find(x => x.objectId == c.pid);
-            const pName = p ? (p.nick || (p.user ? p.user.nick : 'someone')) : 'someone';
-            replyHtml = `<div class="reply-to-indicator">Reply to <span>@${pName}</span></div>`;
+        // 作者显示（带网站链接或不带）
+        // [关键修复] 增加 fallback，防止 user 对象缺失导致报错
+        const nickName = comment.nick || (comment.user ? comment.user.nick : 'Anonymous');
+        let authorHtml;
+        if (comment.link) {
+            authorHtml = `<a href="${escapeHtml(comment.link)}" target="_blank" rel="nofollow noopener">${escapeHtml(nickName)}</a>`;
+        } else {
+            authorHtml = escapeHtml(nickName);
         }
         
-        let childrenHtml = '';
-        if (c.children.length > 0) {
-            childrenHtml = `<div class="comment-replies">${c.children.map(child => renderComment(child, depth+1)).join('')}</div>`;
+        // 回复提示
+        let replyIndicator = '';
+        if (comment.pid && comment.pid != comment.rid) {
+            // [关键修复] 查找被回复的评论作者 (使用 ==)
+            const parentComment = allComments.find(c => c.objectId == comment.pid);
+            if (parentComment) {
+                // [关键修复] 获取父评论作者名
+                const pName = parentComment.nick || (parentComment.user ? parentComment.user.nick : 'someone');
+                replyIndicator = `<div class="reply-to-indicator">Reply to <span>@${escapeHtml(pName)}</span></div>`;
+            }
         }
-
-        const cid = c.objectId;
-        const rid = c.rid || c.objectId;
-
+        
+        // 渲染回复
+        let repliesHtml = '';
+        if (comment.children && comment.children.length > 0) {
+            const repliesContent = comment.children
+                .sort((a, b) => parseDate(a) - parseDate(b)) // 子评论通常按时间正序
+                .map(reply => renderComment(reply, Math.min(depth + 1, maxDepth)))
+                .join('');
+            repliesHtml = `<div class="comment-replies">${repliesContent}</div>`;
+        }
+        
+        // [关键修复] 使用 parseDate 格式化时间
+        const timeStr = formatTime(parseDate(comment));
+        
         return `
-            <div class="comment-card" id="comment-${cid}">
+            <div class="comment-card" id="comment-${comment.objectId}">
                 <div class="comment-header">
                     <div class="comment-header-left">
-                        <div class="comment-avatar"><img src="${avatar}" loading="lazy"></div>
+                        <div class="comment-avatar">
+                            <img src="${avatarUrl}" alt="${escapeHtml(nickName)}" loading="lazy">
+                        </div>
                         <div class="comment-author-info">
-                            <span class="comment-author">${link}</span>
-                            <span class="comment-time">${timeStr}</span>
+                            <span class="comment-author">${authorHtml}</span>
+                            <span class="comment-time">
+                                <a href="#comment-${comment.objectId}">${timeStr}</a>
+                            </span>
                         </div>
                     </div>
                 </div>
-                ${replyHtml}
-                <div class="comment-content">${c.comment}</div>
+                ${replyIndicator}
+                <div class="comment-content">${comment.comment}</div>
                 <div class="comment-footer">
-                    <button class="reply-btn" data-cid="${cid}" data-rid="${rid}" data-author="${nickName}">Reply</button>
+                    <button class="reply-btn" data-comment-id="${comment.objectId}" data-root-id="${comment.rid || comment.objectId}" data-author="${escapeHtml(nickName)}">Reply</button>
                 </div>
             </div>
-            ${childrenHtml}
+            ${repliesHtml}
         `;
     }
     
-    function formatTime(d) {
-        if (isNaN(d.getTime())) return 'Unknown Date';
-        const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        const min = String(d.getMinutes()).padStart(2, '0');
-        return `${m[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${d.getHours()}:${min}`;
-    }
-
+    // 绑定回复按钮事件
     function bindReplyButtons() {
-        document.querySelectorAll('.reply-btn').forEach(b => {
-            b.addEventListener('click', e => {
-                const { cid, rid, author } = e.target.dataset;
-                setReply(cid, rid, author);
+        document.querySelectorAll('.reply-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const commentId = this.dataset.commentId;
+                const rootId = this.dataset.rootId;
+                const author = this.dataset.author;
+                setReplyTo(commentId, rootId, author);
             });
         });
     }
-
-    function setReply(cid, rid, author) {
-        document.getElementById('replyToId').value = cid;
-        document.getElementById('replyToAuthor').value = rid;
+    
+    // 设置回复目标
+    function setReplyTo(commentId, rootId, author) {
+        document.getElementById('replyPid').value = commentId;
+        document.getElementById('replyRid').value = rootId;
+        document.getElementById('replyAt').value = author;  // 🔑 关键：存储被回复人昵称
         document.getElementById('replyToName').textContent = author;
         document.getElementById('replyNotice').classList.remove('hidden');
+        
         document.getElementById('respond').scrollIntoView({ behavior: 'smooth' });
-    }
-
+        document.getElementById('commentTextarea').focus();
+}
+    
+    // 取消回复
     function cancelReply() {
-        document.getElementById('replyToId').value = '';
-        document.getElementById('replyToAuthor').value = '';
+        document.getElementById('replyPid').value = '';
+        document.getElementById('replyRid').value = '';
+        document.getElementById('replyAt').value = '';
         document.getElementById('replyNotice').classList.add('hidden');
     }
+    
+    // 暴露cancelReply到全局
     window.cancelReply = cancelReply;
-
+    
+    // 处理表单提交
     async function handleSubmit(e) {
         e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        const msg = document.getElementById('formMessage');
-        const pid = document.getElementById('replyToId').value;
-        const rid = document.getElementById('replyToAuthor').value;
-
-        // 🌟 修复：发送数据时，确保 pid/rid 也是数字类型（如果原数据是数字）
-        // 大多数数据库如果是数字ID，传字符串过去会匹配失败
-        const safePid = pid ? (isNaN(pid) ? pid : Number(pid)) : undefined;
-        const safeRid = rid ? (isNaN(rid) ? rid : Number(rid)) : undefined;
-
-        const data = {
-            nick: document.getElementById('nameInput').value,
-            mail: document.getElementById('emailInput').value,
-            link: document.getElementById('websiteInput').value,
-            comment: document.getElementById('commentTextarea').value,
-            path: PAGE_PATH, // 严格使用绝对路径
-            url: window.location.href,
-            ua: navigator.userAgent,
-            pid: safePid, 
-            rid: safeRid
-        };
-
-        if (!data.nick || !data.mail || !data.comment) return alert('Please fill required fields');
         
-        localStorage.setItem('podevus_comment_name', data.nick);
-        localStorage.setItem('podevus_comment_email', data.mail);
-        localStorage.setItem('podevus_comment_website', data.link);
-
-        btn.disabled = true; btn.textContent = 'Sending...';
-
+        const name = document.getElementById('nameInput').value.trim();
+        const email = document.getElementById('emailInput').value.trim();
+        const website = document.getElementById('websiteInput').value.trim();
+        const content = document.getElementById('commentTextarea').value.trim();
+        const pid = document.getElementById('replyPid').value || null;
+        const rid = document.getElementById('replyRid').value || null;
+        const at = document.getElementById('replyAt').value || null;
+        const messageDiv = document.getElementById('formMessage');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        // 验证
+        if (!name || !email || !content) {
+            showMessage(messageDiv, 'Please fill in all required fields', 'error');
+            return;
+        }
+        
+        if (!isValidEmail(email)) {
+            showMessage(messageDiv, 'Please enter a valid email address', 'error');
+            return;
+        }
+        
+        if (website && !isValidUrl(website)) {
+            showMessage(messageDiv, 'Please enter a valid website URL', 'error');
+            return;
+        }
+        
+        if (content.length > 1000) {
+            showMessage(messageDiv, 'Comment must be less than 1000 characters', 'error');
+            return;
+        }
+        
+        // 保存用户信息到localStorage
+        localStorage.setItem('podevus_comment_name', name);
+        localStorage.setItem('podevus_comment_email', email);
+        if (website) {
+            localStorage.setItem('podevus_comment_website', website);
+        }
+        
+        // 禁用提交按钮
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Posting...';
+        
         try {
-            const res = await fetch(`${WALINE_SERVER_URL}/comment`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            const json = await res.json();
+            // [关键修复] 确保 pid/rid 类型正确 (如果是数字ID)
+            const safePid = replyToId ? (isNaN(replyToId) ? replyToId : Number(replyToId)) : undefined;
+            const safeRid = rootId ? (isNaN(rootId) ? rootId : Number(rootId)) : undefined;
+
+            // 构建评论数据
+            const commentData = {
+                comment: content,
+                nick: name,
+                mail: email,
+                link: website || '',
+                path: PAGE_PATH, // 确保发送评论时使用绝对路径
+                url: window.location.href,
+                ua: navigator.userAgent
+            };
             
-            if (json.errno === 0 || json.data) {
-                document.getElementById('commentTextarea').value = '';
-                cancelReply();
-                msg.textContent = 'Success!'; msg.className = 'message success'; msg.classList.remove('hidden');
-                setTimeout(() => msg.classList.add('hidden'), 3000);
-                await loadComments();
-            } else {
-                throw new Error(json.errmsg || 'Unknown error');
+            // 如果是回复
+            if (pid) {
+                commentData.pid = pid;
+                commentData.rid = rid || pid;
+                commentData.at = at;  // 🔑 关键：发送被回复人昵称
             }
-        } catch (err) {
-            msg.textContent = err.message; msg.className = 'message error'; msg.classList.remove('hidden');
+            
+            // 发送到 Waline 服务器
+            const response = await fetch(`${WALINE_SERVER_URL}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(commentData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.errno === 0 || result.data) {
+                // 清空表单内容（保留用户信息）
+                document.getElementById('commentTextarea').value = '';
+                
+                // 重置回复状态
+                cancelReply();
+                
+                // 显示成功消息
+                showMessage(messageDiv, 'Comment posted successfully!', 'success');
+                setTimeout(() => hideMessage(messageDiv), 3000);
+                
+                // 重新加载评论列表
+                await loadComments();
+                
+                // 滚动到新评论
+                // ... (原有逻辑)
+            } else {
+                showMessage(messageDiv, result.errmsg || 'Failed to post comment', 'error');
+            }
+        } catch (error) {
+            console.error('Failed to post comment:', error);
+            showMessage(messageDiv, 'Failed to post comment. Please try again.', 'error');
         } finally {
-            btn.disabled = false; btn.textContent = 'Post Comment';
+            // 恢复提交按钮
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Post Comment';
         }
     }
-})();
-
-// ============ 5. 网站保护代码 (按你要求恢复) ============
-(function() {
-    // 禁用右键
-    document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
-
-    // 禁用选择 (除了输入框和评论内容)
-    document.addEventListener('selectstart', e => {
+    
+    // 格式化时间
+    function formatTime(date) {
+        if (isNaN(date.getTime())) return 'Unknown Date';
+        
+        const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const month = months[date.getMonth()];
+        const day = date.getDate();
+        const year = date.getFullYear();
+        let hour = date.getHours();
+        const minute = date.getMinutes().toString().padStart(2, '0');
+        
+        const ampm = hour >= 12 ? 'pm' : 'am';
+        hour = hour % 12 || 12; // 转换为12小时制
+        
+        return `${month} ${day}, ${year} at ${hour}:${minute} ${ampm}`;
+    }
+    
+    // 验证邮箱格式
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    // 验证URL格式
+    function isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+    
+    // HTML转义
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // 显示消息
+    function showMessage(element, message, type) {
+        element.textContent = message;
+        element.className = 'message ' + type;
+        element.classList.remove('hidden');
+    }
+    
+    // 隐藏消息
+    function hideMessage(element) {
+        element.classList.add('hidden');
+    }
+    
+    // [网站保护功能 - 已恢复]
+    
+    // 禁用右键菜单
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    // 禁用文本选择（评论区域除外）
+    document.addEventListener('selectstart', function(e) {
         if (!e.target.closest('input') && !e.target.closest('textarea') && !e.target.closest('.comment-content')) {
-            e.preventDefault(); return false;
+            e.preventDefault();
+            return false;
         }
     });
-
-    // 禁用复制 (除了评论内容)
-    document.addEventListener('copy', e => {
+    
+    // 禁用复制（评论区域除外）
+    document.addEventListener('copy', function(e) {
         if (!e.target.closest('.comment-content')) {
-            e.preventDefault(); return false;
+            e.preventDefault();
+            return false;
         }
     });
-
-    // 禁用 F12 和开发工具快捷键
-    document.addEventListener('keydown', e => {
-        if (e.key === 'F12' || 
-            (e.ctrlKey && 'uUsS'.includes(e.key)) || 
-            (e.ctrlKey && e.shiftKey && 'iIjJcCm'.includes(e.key))) {
-            e.preventDefault(); return false;
+    
+    // 禁用常见快捷键
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey && (e.key === 'c' || e.key === 'C' || 
+                           e.key === 'u' || e.key === 'U' || 
+                           e.key === 's' || e.key === 'S')) || 
+            e.key === 'F12') {
+            e.preventDefault();
+            return false;
         }
     });
 })();
 
-// ============ 6. 页面加载动画 ============
+// ============ 平滑滚动 ============
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+
+// ============ 页面加载动画 ============
 window.addEventListener('load', () => {
     document.body.style.opacity = '0';
     setTimeout(() => {
@@ -1753,4 +2205,8 @@ window.addEventListener('load', () => {
         document.body.style.opacity = '1';
     }, 100);
 });
+
 </script>
+    <script src="../assets/music-player.js"></script>
+</body>
+</html>
