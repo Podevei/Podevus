@@ -1399,7 +1399,8 @@ html {
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
 const PAGE_PATH = 'https://podevei.github.io/Podevus/posts/Blog_posts_prima-doll-enhanced.html';
 
-console.log('Target Page Path set to:', PAGE_PATH);
+console.log('[Init] Waline Config Loaded.');
+console.log('[Init] Target Path:', PAGE_PATH);
 
 // ============ 三角形光标效果 ============
 (function() {
@@ -1627,9 +1628,10 @@ console.log('Target Page Path set to:', PAGE_PATH);
     setInterval(() => createParticle(particlesForeground, true), 3000);
 })();
 
-// ============ Waline 评论系统（[修复] 父子回复显示问题） ============
+// ============ Waline 评论系统 [核心修复：正确处理 Waline 返回的嵌套数据] ============
 (function() {
-    let allComments = [];
+    // 存储所有评论的扁平化列表（用于查找父评论昵称）
+    let allCommentsFlat = [];
     
     document.addEventListener('DOMContentLoaded', function() {
         loadComments();
@@ -1657,79 +1659,76 @@ console.log('Target Page Path set to:', PAGE_PATH);
         return new Date();
     }
 
+    // [新增] 将嵌套评论扁平化，用于查找父评论昵称
+    function flattenComments(comments, result = []) {
+        if (!Array.isArray(comments)) return result;
+        comments.forEach(comment => {
+            result.push(comment);
+            if (comment.children && comment.children.length > 0) {
+                flattenComments(comment.children, result);
+            }
+        });
+        return result;
+    }
+
     async function loadComments() {
         const commentsList = document.getElementById('commentsList');
         const commentsCount = document.getElementById('commentsCount');
+        
+        console.log('[API] Fetching comments...');
         
         try {
             const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
             const data = await response.json();
             
+            console.log('[API] Response:', data);
+            
             if (data.errno === 0 || (data.data && Array.isArray(data.data.data)) || Array.isArray(data.data)) {
-                let rawData = [];
+                let rootComments = [];
                 let totalCount = 0;
                 
                 if (data.data && Array.isArray(data.data.data)) {
-                    rawData = data.data.data;
+                    rootComments = data.data.data;
                     totalCount = data.data.count;
                 } else if (Array.isArray(data.data)) {
-                    rawData = data.data;
-                    totalCount = data.count || rawData.length;
+                    rootComments = data.data;
+                    totalCount = data.count || rootComments.length;
                 } else if (Array.isArray(data)) {
-                     rawData = data;
-                     totalCount = rawData.length;
+                     rootComments = data;
+                     totalCount = rootComments.length;
                 }
                 
-                allComments = rawData;
+                console.log('[API] Root comments:', rootComments.length, 'Total count:', totalCount);
+                
+                // [核心修复] 检查 Waline 是否已经返回了嵌套的 children
+                // 如果 API 已经返回嵌套结构，直接使用，不要重建树！
+                const hasNestedChildren = rootComments.some(c => c.children && c.children.length > 0);
+                console.log('[Tree] Has nested children from API:', hasNestedChildren);
+                
+                // 扁平化所有评论（包括嵌套的children）用于查找父评论昵称
+                allCommentsFlat = flattenComments(rootComments);
+                console.log('[Tree] Flattened comments count:', allCommentsFlat.length);
+                
                 commentsCount.textContent = `${totalCount} Replies`;
                 
-                if (allComments.length === 0) {
+                if (rootComments.length === 0) {
                     commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
                     return;
                 }
                 
-                const commentTree = buildCommentTree(allComments);
-                commentsList.innerHTML = commentTree.map(comment => renderComment(comment)).join('');
+                // 按时间倒序排列根评论（最新的在上面）
+                rootComments.sort((a, b) => parseDate(b) - parseDate(a));
+                
+                // [核心修复] 直接使用 Waline 返回的嵌套结构渲染，不再重建树
+                commentsList.innerHTML = rootComments.map(comment => renderComment(comment)).join('');
                 bindReplyButtons();
             } else {
                 commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
             }
         } catch (error) {
-            console.error('Failed to load comments:', error);
+            console.error('[API] Failed to load comments:', error);
             commentsList.innerHTML = '<div class="no-comments">Failed to load comments. Please refresh the page.</div>';
         }
-    }
-    
-    // [核心修复] 构建评论树
-    function buildCommentTree(comments) {
-        const commentMap = {};
-        const rootComments = [];
-        
-        // 1. 先把所有评论放进 Map，【强制 ID 为 String】避免类型不匹配
-        comments.forEach(comment => {
-            comment.children = [];
-            // 使用 String() 确保 ID 类型一致
-            commentMap[String(comment.objectId)] = comment;
-        });
-        
-        // 2. 再次遍历，建立父子关系
-        comments.forEach(comment => {
-            const id = String(comment.objectId);
-            const pid = comment.pid ? String(comment.pid) : null;
-            
-            // 如果有 pid 且父评论存在，则加入父评论的 children
-            if (pid && commentMap[pid]) {
-                commentMap[pid].children.push(comment);
-            } else {
-                // 否则视为根评论
-                rootComments.push(comment);
-            }
-        });
-        
-        // 3. 根评论按时间倒序（最新的在最上面）
-        rootComments.sort((a, b) => parseDate(b) - parseDate(a));
-        
-        return rootComments;
     }
     
     function getCommentNick(comment) {
@@ -1750,20 +1749,21 @@ console.log('Target Page Path set to:', PAGE_PATH);
         
         // 渲染回复提示（Reply to @xxx）
         let replyIndicator = '';
-        if (comment.pid && comment.pid != comment.rid) {
-            const parentComment = allComments.find(c => String(c.objectId) === String(comment.pid));
+        if (comment.pid) {
+            // 从扁平化列表中查找父评论
+            const parentComment = allCommentsFlat.find(c => String(c.objectId) === String(comment.pid));
             if (parentComment) {
                 const pName = getCommentNick(parentComment);
                 replyIndicator = `<div class="reply-to-indicator">Reply to <span>@${escapeHtml(pName)}</span></div>`;
             }
         }
         
-        // 渲染子评论（嵌套）
+        // [核心修复] 直接使用 Waline 返回的 children 数组渲染子评论
         let repliesHtml = '';
         if (comment.children && comment.children.length > 0) {
             // 子评论按时间正序排列（旧的在前）
-            const repliesContent = comment.children
-                .sort((a, b) => parseDate(a) - parseDate(b))
+            const sortedChildren = [...comment.children].sort((a, b) => parseDate(a) - parseDate(b));
+            const repliesContent = sortedChildren
                 .map(reply => renderComment(reply, Math.min(depth + 1, maxDepth)))
                 .join('');
             repliesHtml = `<div class="comment-replies">${repliesContent}</div>`;
@@ -1836,6 +1836,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
         
         const pid = document.getElementById('replyPid').value || null;
         const rid = document.getElementById('replyRid').value || null;
+        const atName = document.getElementById('replyAt').value || null;
         
         const messageDiv = document.getElementById('formMessage');
         const submitBtn = document.getElementById('submitBtn');
@@ -1866,9 +1867,16 @@ console.log('Target Page Path set to:', PAGE_PATH);
             if (pid) {
                 commentData.pid = pid;
                 commentData.rid = rid || pid;
-                const parentComment = allComments.find(c => String(c.objectId) === String(pid));
-                commentData.at = parentComment ? getCommentNick(parentComment) : (document.getElementById('replyAt').value || 'Anonymous');
+                // 使用存储的 @name 或从扁平列表中查找
+                if (atName && atName.trim()) {
+                    commentData.at = atName;
+                } else {
+                    const parentComment = allCommentsFlat.find(c => String(c.objectId) === String(pid));
+                    commentData.at = parentComment ? getCommentNick(parentComment) : 'Anonymous';
+                }
             }
+            
+            console.log('[Submit] Comment data:', commentData);
             
             const response = await fetch(`${WALINE_SERVER_URL}/comment`, {
                 method: 'POST',
@@ -1877,6 +1885,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
             });
             
             const result = await response.json();
+            console.log('[Submit] Response:', result);
             
             if (result.errno === 0 || result.data) {
                 document.getElementById('commentTextarea').value = '';
@@ -1888,7 +1897,7 @@ console.log('Target Page Path set to:', PAGE_PATH);
                 showMessage(messageDiv, result.errmsg || 'Failed to post comment', 'error');
             }
         } catch (error) {
-            console.error('Failed to post comment:', error);
+            console.error('[Submit] Failed:', error);
             showMessage(messageDiv, 'Failed to post comment. Please try again.', 'error');
         } finally {
             submitBtn.disabled = false;
