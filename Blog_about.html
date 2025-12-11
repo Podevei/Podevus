@@ -961,13 +961,20 @@ footer {
         document.getElementById('particlesFg').innerHTML='';
     }
 
-    // ============ Waline 评论系统 (完全使用 source2 的逻辑) ============
+    // ============ Waline 评论系统 (修复版) ============
     const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
-    const PAGE_PATH = window.location.pathname;
+    
+    // [FIX] 路径修正逻辑
+    // 您的后台截图显示数据存储在 /Podevus/Blog_about.html
+    // 但您本地运行（或其他环境）请求的是 /Blog/Blog_about.html
+    // 下面的代码将强制使用文件名 + /Podevus/ 前缀，确保任何环境下都能读取到同一份数据
+    let rawPath = window.location.pathname;
+    let fileName = rawPath.split('/').pop() || 'index.html'; // 获取文件名
+    const PAGE_PATH = '/Podevus/' + fileName; 
+
     let allCommentsFlat = [];
 
     document.addEventListener('DOMContentLoaded', function() {
-        // 由于评论区在里世界，初始不加载，等切换时才加载
         document.getElementById('commentForm').addEventListener('submit', handleSubmit);
         document.getElementById('cancelReplyBtn').addEventListener('click', cancelReply);
         
@@ -1007,51 +1014,40 @@ footer {
         const commentsList = document.getElementById('commentsList');
         const commentsCount = document.getElementById('commentsCount');
         
-        console.log('[API] Fetching comments...');
+        console.log('[API] Fetching comments for path:', PAGE_PATH);
         
         try {
             const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
             const data = await response.json();
             
-            console.log('[API] Response:', data);
+            console.log('[API] Full Response:', data);
             
-            if (data.errno === 0 || (data.data && Array.isArray(data.data.data)) || Array.isArray(data.data)) {
-                let rootComments = [];
-                let totalCount = 0;
-                
-                if (data.data && Array.isArray(data.data.data)) {
-                    rootComments = data.data.data;
-                    totalCount = data.data.count;
-                } else if (Array.isArray(data.data)) {
-                    rootComments = data.data;
-                    totalCount = data.count || rootComments.length;
-                } else if (Array.isArray(data)) {
-                     rootComments = data;
-                     totalCount = rootComments.length;
-                }
-                
-                console.log('[API] Root comments:', rootComments.length, 'Total count:', totalCount);
-                
-                const hasNestedChildren = rootComments.some(c => c.children && c.children.length > 0);
-                console.log('[Tree] Has nested children from API:', hasNestedChildren);
-                
-                allCommentsFlat = flattenComments(rootComments);
-                console.log('[Tree] Flattened comments count:', allCommentsFlat.length);
-                
-                commentsCount.textContent = `${totalCount} Replies`;
-                
-                if (rootComments.length === 0) {
-                    commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
-                    return;
-                }
-                
-                rootComments.sort((a, b) => parseDate(b) - parseDate(a));
-                
-                commentsList.innerHTML = rootComments.map(comment => renderComment(comment)).join('');
-                bindReplyButtons();
-            } else {
-                commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
+            let rootComments = [];
+            let totalCount = 0;
+            
+            if (data && Array.isArray(data.data)) {
+                rootComments = data.data;
+                totalCount = data.count || rootComments.length;
+            } else if (Array.isArray(data)) {
+                rootComments = data;
+                totalCount = rootComments.length;
             }
+            
+            console.log('[API] Root comments:', rootComments.length, 'Total count:', totalCount);
+            
+            allCommentsFlat = flattenComments(rootComments);
+            
+            commentsCount.textContent = `${totalCount} Replies`;
+            
+            if (rootComments.length === 0) {
+                commentsList.innerHTML = '<div class="no-comments">You could be the first one</div>';
+                return;
+            }
+            
+            rootComments.sort((a, b) => parseDate(b) - parseDate(a));
+            
+            commentsList.innerHTML = rootComments.map(comment => renderComment(comment)).join('');
+            bindReplyButtons();
         } catch (error) {
             console.error('[API] Failed to load comments:', error);
             commentsList.innerHTML = '<div class="no-comments">Failed to load comments. Please refresh the page.</div>';
@@ -1198,8 +1194,6 @@ footer {
                 }
             }
             
-            console.log('[Submit] Comment data:', commentData);
-            
             const response = await fetch(`${WALINE_SERVER_URL}/comment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1207,7 +1201,6 @@ footer {
             });
             
             const result = await response.json();
-            console.log('[Submit] Response:', result);
             
             if (result.errno === 0 || result.data) {
                 document.getElementById('commentTextarea').value = '';
