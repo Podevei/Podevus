@@ -15,6 +15,7 @@
     --text-primary: #2d2520;
     --text-secondary: #5a504a;
     --accent-color: #c89b6d;
+    --accent-hover: #b08558;
     --border-dark: #d4c4b0;
     --card-bg: #ffffff;
     --shadow-color: rgba(45, 37, 32, 0.08);
@@ -82,7 +83,7 @@ body::before {
 }
 
 /* =========================================
-   2. Header & 齿轮 (您喜欢的转动效果)
+   2. Header & 齿轮
    ========================================= */
 header {
     border-bottom: 2px solid var(--border-dark); padding-bottom: 30px; margin-bottom: 30px; position: relative;
@@ -156,12 +157,10 @@ nav a.active::before {
 }
 .gear-btn svg { width: 100%; height: 100%; fill: currentColor; }
 
-/* 状态1: 上发条动画 (Winding) - 剧烈回弹 */
 .gear-btn.winding {
     animation: windUp 1s cubic-bezier(0.5, -0.5, 0.5, 1.5) forwards;
     color: var(--steam-gold);
 }
-/* 状态2: 锁定状态 (Locked) */
 .gear-btn.locked {
     transform: rotate(360deg);
     color: var(--steam-gold);
@@ -170,9 +169,9 @@ nav a.active::before {
 
 @keyframes windUp {
     0% { transform: rotate(0deg); }
-    70% { transform: rotate(400deg); } /* 过充 */
-    85% { transform: rotate(340deg); } /* 回弹 */
-    100% { transform: rotate(360deg); } /* 锁定 */
+    70% { transform: rotate(400deg); }
+    85% { transform: rotate(340deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .gear-hint {
@@ -182,11 +181,10 @@ nav a.active::before {
 body.world-inner .gear-hint { color: var(--steam-gold); text-shadow: 0 0 5px var(--steam-gold); }
 
 /* =========================================
-   3. 世界切换逻辑 (您想要的平滑过渡)
+   3. 世界切换逻辑
    ========================================= */
 .world-container { position: relative; min-height: 60vh; }
 
-/* 表世界 (About) */
 .content-surface {
     opacity: 1; 
     transform: translateY(0) scale(1);
@@ -194,7 +192,6 @@ body.world-inner .gear-hint { color: var(--steam-gold); text-shadow: 0 0 5px var
     transform-origin: top center;
 }
 
-/* 里世界 (Comments) */
 .content-inner {
     position: absolute; top: 0; left: 0; width: 100%;
     opacity: 0; pointer-events: none;
@@ -202,7 +199,6 @@ body.world-inner .gear-hint { color: var(--steam-gold); text-shadow: 0 0 5px var
     transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* 激活状态 */
 body.world-inner .content-surface {
     opacity: 0; 
     transform: translateY(-50px) scale(0.95); 
@@ -214,18 +210,35 @@ body.world-inner .content-inner {
 }
 
 /* =========================================
-   4. 表世界样式 (原样保留)
+   4. 表世界样式 (新增边框样式)
    ========================================= */
 .about-content {
     background: var(--card-bg);
-    padding: 40px; border-radius: 8px; border: 1px solid var(--border-light);
-    box-shadow: 0 2px 8px var(--shadow-color); margin-bottom: 40px;
-    transition: background 0.3s ease;
+    padding: 40px; 
+    border-radius: 6px;
+    
+    /* [修改] 增加显著的“框”效果 (双线边框) */
+    border: 3px double var(--border-dark);
+    box-shadow: 0 5px 15px var(--shadow-color);
+    
+    margin-bottom: 40px;
+    transition: all 0.3s ease;
+    position: relative;
 }
+
+/* 鼠标悬停时边框变色，增强交互感 */
+.about-content:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 8px 20px rgba(200, 155, 109, 0.15);
+}
+
 .about-content h2 {
     font-family: var(--font-serif); font-size: 1.8em; font-weight: 500; margin-bottom: 20px;
-    border-bottom: 2px solid var(--border-light); padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light); 
+    padding-bottom: 10px;
+    color: var(--accent-color); /* 标题使用主题色 */
 }
+
 .music-player-entry {
     background: linear-gradient(135deg, #1a1614 0%, #2d2520 100%);
     border: none; padding: 18px 45px; color: var(--accent-color);
@@ -238,7 +251,7 @@ body.world-inner .content-inner {
 .music-player-entry svg { width: 24px; height: 24px; fill: currentColor; }
 
 /* =========================================
-   5. 里世界评论区 (完全使用 source2 的样式)
+   5. 里世界评论区
    ========================================= */
 /* 粒子层 */
 .particles-bg, .particles-fg {
@@ -265,7 +278,6 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
     margin-bottom: 40px; text-align: center; text-shadow: 0 0 10px rgba(200,155,109,0.3);
 }
 
-/* 历史评论区块 */
 .comments-history-section {
     margin-bottom: 40px;
 }
@@ -278,7 +290,6 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
     margin-bottom: 25px;
 }
 
-/* 加载状态 */
 .comments-loading {
     text-align: center;
     color: var(--comment-text);
@@ -344,7 +355,6 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
     box-shadow: -5px 0 15px rgba(200, 155, 109, 0.2);
 }
 
-/* 嵌套回复样式 */
 .comment-replies {
     margin-left: 40px;
     margin-top: 15px;
@@ -363,7 +373,6 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
     margin-left: 30px;
 }
 
-/* 评论头像 */
 .comment-avatar {
     width: 45px;
     height: 45px;
@@ -453,7 +462,6 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
     word-break: break-word;
 }
 
-/* 回复提示 */
 .reply-to-indicator {
     color: var(--comment-accent);
     font-size: 0.9em;
@@ -465,7 +473,6 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
     font-weight: 600;
 }
 
-/* 回复按钮 */
 .comment-footer {
     display: flex;
     justify-content: flex-end;
@@ -495,7 +502,6 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
     transform: translateY(-1px);
 }
 
-/* 发表评论区块 */
 .comment-form-section {
     background: rgba(44, 24, 16, 0.3);
     padding: 35px;
@@ -545,7 +551,6 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
     position: relative;
 }
 
-/* 回复提示栏 */
 .reply-notice {
     background: rgba(200, 155, 109, 0.15);
     border: 1px solid var(--comment-border);
@@ -652,7 +657,6 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
     background: rgba(26, 15, 10, 0.8);
 }
 
-/* 通知选项 */
 .notify-options {
     margin-bottom: 20px;
     display: flex;
@@ -961,16 +965,19 @@ footer {
         document.getElementById('particlesFg').innerHTML='';
     }
 
-    // ============ Waline 评论系统 (修复版) ============
+    // ============ Waline 评论系统 (双路径智能检测版) ============
     const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
     
-    // [FIX] 路径修正逻辑
-    // 您的后台截图显示数据存储在 /Podevus/Blog_about.html
-    // 但您本地运行（或其他环境）请求的是 /Blog/Blog_about.html
-    // 下面的代码将强制使用文件名 + /Podevus/ 前缀，确保任何环境下都能读取到同一份数据
+    // [FIX] 路径修正逻辑：定义两个可能的路径
+    // 1. livePath: 对应 GitHub Pages 的结构 /Podevus/Blog_about.html
+    // 2. rootPath: 对应根目录结构 /Blog_about.html (作为备用)
     let rawPath = window.location.pathname;
-    let fileName = rawPath.split('/').pop() || 'index.html'; // 获取文件名
-    const PAGE_PATH = '/Podevus/' + fileName; 
+    let fileName = rawPath.split('/').pop() || 'index.html'; 
+    const PATH_VARIANTS = [
+        '/Podevus/' + fileName,  // 优先尝试这个
+        '/' + fileName           // 备选
+    ];
+    let ACTIVE_PATH = PATH_VARIANTS[0]; // 默认使用第一个，如果获取不到数据会切换
 
     let allCommentsFlat = [];
 
@@ -1010,21 +1017,26 @@ footer {
         return result;
     }
 
+    // 封装 Fetch 逻辑以便重用
+    async function fetchCommentsForPath(path) {
+        console.log('[API] Trying path:', path);
+        const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(path)}&pageSize=100`);
+        const data = await response.json();
+        return data;
+    }
+
     async function loadComments() {
         const commentsList = document.getElementById('commentsList');
         const commentsCount = document.getElementById('commentsCount');
         
-        console.log('[API] Fetching comments for path:', PAGE_PATH);
-        
         try {
-            const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
-            const data = await response.json();
-            
-            console.log('[API] Full Response:', data);
-            
+            // [FIX] 智能双重检测逻辑
+            // 第一次尝试：尝试 /Podevus/ 前缀路径
+            let data = await fetchCommentsForPath(PATH_VARIANTS[0]);
             let rootComments = [];
             let totalCount = 0;
-            
+
+            // 解析数据
             if (data && Array.isArray(data.data)) {
                 rootComments = data.data;
                 totalCount = data.count || rootComments.length;
@@ -1032,11 +1044,35 @@ footer {
                 rootComments = data;
                 totalCount = rootComments.length;
             }
+
+            // [FIX] 如果第一个路径没数据，且我们还在本地测试，尝试第二个路径
+            if (totalCount === 0) {
+                console.log('[API] Path 1 returned 0, trying fallback path:', PATH_VARIANTS[1]);
+                const dataFallback = await fetchCommentsForPath(PATH_VARIANTS[1]);
+                let rootCommentsFallback = [];
+                let totalCountFallback = 0;
+
+                if (dataFallback && Array.isArray(dataFallback.data)) {
+                    rootCommentsFallback = dataFallback.data;
+                    totalCountFallback = dataFallback.count || rootCommentsFallback.length;
+                } else if (Array.isArray(dataFallback)) {
+                    rootCommentsFallback = dataFallback;
+                    totalCountFallback = rootCommentsFallback.length;
+                }
+
+                // 如果备用路径有数据，就使用备用路径的数据
+                if (totalCountFallback > 0) {
+                    console.log('[API] Fallback path has data! Switching active path.');
+                    rootComments = rootCommentsFallback;
+                    totalCount = totalCountFallback;
+                    ACTIVE_PATH = PATH_VARIANTS[1]; // 更新当前激活路径，供提交评论使用
+                }
+            }
             
-            console.log('[API] Root comments:', rootComments.length, 'Total count:', totalCount);
+            console.log('[API] Final Active Path:', ACTIVE_PATH);
+            console.log('[API] Final Count:', totalCount);
             
             allCommentsFlat = flattenComments(rootComments);
-            
             commentsCount.textContent = `${totalCount} Replies`;
             
             if (rootComments.length === 0) {
@@ -1045,9 +1081,9 @@ footer {
             }
             
             rootComments.sort((a, b) => parseDate(b) - parseDate(a));
-            
             commentsList.innerHTML = rootComments.map(comment => renderComment(comment)).join('');
             bindReplyButtons();
+
         } catch (error) {
             console.error('[API] Failed to load comments:', error);
             commentsList.innerHTML = '<div class="no-comments">Failed to load comments. Please refresh the page.</div>';
@@ -1178,7 +1214,8 @@ footer {
                 nick: name,
                 mail: email,
                 link: website || '',
-                path: PAGE_PATH,
+                // [FIX] 使用检测到的有效路径提交新评论
+                path: ACTIVE_PATH,
                 url: window.location.href,
                 ua: navigator.userAgent
             };
