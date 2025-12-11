@@ -18,7 +18,7 @@
                 artist: 'VISUAL ARTS/Key',
                 expanded: false,
                 songs: [
-                    { title: '惑い空', artist: '鴉羽(CV_楠木ともり)', file: 'VISUAL ARTS _ Key _ 鴉羽(CV_楠木ともり) - 惑い空.flac' },
+                    { title: '惑い空', artist: '鴉羽(CV_楠木ともり)', file: 'VISUAL ARTS _ Key _ 鴉羽(CV_楠木ともり) - 惑い空.ogg' },
                 ]
             },
             {
@@ -91,7 +91,7 @@
                 expanded: false,
                 songs: [
                     { title: 'ニリンソウ', artist: 'VISUAL ARTS, Key Sounds Label', file: 'VISUAL ARTS _ Key Sounds Label - ニリンソウ (鹅掌草).ogg' },
-                    { title: 'Theme of SSSロック风アレンジ', artist: '麻枝准', file: '麻枝准 (まえだ じゅん) - ロック风アレンジ.flac' },
+                    { title: 'Theme of SSSロック风アレンジ', artist: '麻枝准', file: '麻枝准 (まえだ じゅん) - ロック风アレンジ.ogg' },
                     { title: '散花', artist: 'VISUAL ARTS, Key Sounds Label (キー・サウンズ・レーベル)', file: 'VISUAL ARTS_Key Sounds Label (キー・サウンズ・レーベル) - 散花.ogg' },
                     { title: 'Vitae', artist: 'VISUAL ARTS/Key', file: 'Various Artists _ VISUAL ARTS _ Key - Vitae.ogg' },
                     { title: 'Reminiscence', artist: 'VISUAL ARTS/Key', file: 'Various Artists _ VISUAL ARTS _ Key - Reminiscence.ogg' },
