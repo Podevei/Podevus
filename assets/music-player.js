@@ -91,10 +91,18 @@
                 expanded: false,
                 songs: [
                     { title: 'ニリンソウ', artist: 'VISUAL ARTS, Key Sounds Label', file: 'VISUAL ARTS _ Key Sounds Label - ニリンソウ (鹅掌草).ogg' },
-                    { title: 'Theme of SSSロック风アレンジ', artist: '麻枝准', file: '麻枝准 (まえだ じゅん) - ロック风アレンジ.ogg' },
+                    { title: 'Theme of SSSロック风アレンジ', artist: '麻枝准', file: '麻枝准 - ロック风アレンジ.ogg' },
                     { title: '散花', artist: 'VISUAL ARTS, Key Sounds Label (キー・サウンズ・レーベル)', file: 'VISUAL ARTS_Key Sounds Label (キー・サウンズ・レーベル) - 散花.ogg' },
                     { title: 'Vitae', artist: 'VISUAL ARTS/Key', file: 'Various Artists _ VISUAL ARTS _ Key - Vitae.ogg' },
                     { title: 'Reminiscence', artist: 'VISUAL ARTS/Key', file: 'Various Artists _ VISUAL ARTS _ Key - Reminiscence.ogg' },
+                ]
+            },
+            {
+                name: '杂合集',
+                artist: '-',
+                expanded: false,
+                songs: [
+                    { title: '星が瞬くこんな夜に', artist: 'supercell', file: 'supercell - 星が瞬くこんな夜に (ゲームVer_).ogg' },
                 ]
             },
         ]
