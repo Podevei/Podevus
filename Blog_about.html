@@ -217,7 +217,7 @@ body.world-inner .content-inner {
     padding: 40px; 
     border-radius: 6px;
     
-    /* [修改] 增加显著的“框”效果 (双线边框) */
+    /* [修改] 增加显著的"框"效果 (双线边框) */
     border: 3px double var(--border-dark);
     box-shadow: 0 5px 15px var(--shadow-color);
     
@@ -239,16 +239,43 @@ body.world-inner .content-inner {
     color: var(--accent-color); /* 标题使用主题色 */
 }
 
+/* 关于页面的启动入口 */
 .music-player-entry {
-    background: linear-gradient(135deg, #1a1614 0%, #2d2520 100%);
-    border: none; padding: 18px 45px; color: var(--accent-color);
-    font-family: var(--font-sans); letter-spacing: 0.2em; text-transform: uppercase;
-    font-weight: 600; display: inline-flex; align-items: center; gap: 15px;
-    clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
-    box-shadow: 0 0 0 2px var(--accent-color); transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #F5F0EB, #E8D2C3);
+    color: #3A2E2A;
+    border: 1.5px solid #C88A59;
+    border-radius: 30px;
+    font-family: "Noto Serif JP", "Source Han Serif CN", Georgia, serif;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(200, 138, 89, 0.3);
 }
-.music-player-entry:hover { transform: translateY(-3px); box-shadow: 0 0 0 2px var(--accent-hover); }
-.music-player-entry svg { width: 24px; height: 24px; fill: currentColor; }
+
+@media (prefers-color-scheme: dark) {
+    .music-player-entry {
+        background: linear-gradient(135deg, #3a3633, #2a2826);
+        border-color: #d4a574;
+        color: #E8D2C3;
+    }
+}
+
+.music-player-entry:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #E8D2C3, #D4A8B1);
+    border-color: #D4A8B1;
+    box-shadow: 0 6px 24px rgba(212, 168, 177, 0.4);
+}
+
+.music-player-entry svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
 
 /* =========================================
    5. 里世界评论区
@@ -811,7 +838,7 @@ footer {
                 <p><strong>Podevus V2.1</strong></p>
                 <p>欢迎来到 Podevus，这是一个记录思考、分享观点的个人空间。</p>
                 <p>在这里，我会分享关于技术、阅读、动画作品以及日常思考的文章。希望这些文字能够引发一些共鸣，或者至少给你带来片刻的思考。</p>
-                <p>本站采用极简设计理念，融合大正浪漫时代的优雅美学，旨在让内容本身成为焦点。</p>
+                <p>本站采用极简设计理念,融合大正浪漫时代的优雅美学，旨在让内容本身成为焦点。</p>
             </div>
             <div class="about-content">
                 <h2>关于作者</h2>
@@ -965,19 +992,14 @@ footer {
         document.getElementById('particlesFg').innerHTML='';
     }
 
-    // ============ Waline 评论系统 (双路径智能检测版) ============
+    // ============ Waline 评论系统 [修复版：使用完整URL作为path] ============
     const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
     
-    // [FIX] 路径修正逻辑：定义两个可能的路径
-    // 1. livePath: 对应 GitHub Pages 的结构 /Podevus/Blog_about.html
-    // 2. rootPath: 对应根目录结构 /Blog_about.html (作为备用)
-    let rawPath = window.location.pathname;
-    let fileName = rawPath.split('/').pop() || 'index.html'; 
-    const PATH_VARIANTS = [
-        '/Podevus/' + fileName,  // 优先尝试这个
-        '/' + fileName           // 备选
-    ];
-    let ACTIVE_PATH = PATH_VARIANTS[0]; // 默认使用第一个，如果获取不到数据会切换
+    // [FIX] 使用完整URL作为path，与Waline后台显示的路径一致
+    const ACTIVE_PATH = 'https://podevei.github.io/Podevus/Blog_about.html';
+    
+    console.log('[Init] Waline Config Loaded.');
+    console.log('[Init] Active Path:', ACTIVE_PATH);
 
     let allCommentsFlat = [];
 
@@ -1017,26 +1039,21 @@ footer {
         return result;
     }
 
-    // 封装 Fetch 逻辑以便重用
-    async function fetchCommentsForPath(path) {
-        console.log('[API] Trying path:', path);
-        const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(path)}&pageSize=100`);
-        const data = await response.json();
-        return data;
-    }
-
     async function loadComments() {
         const commentsList = document.getElementById('commentsList');
         const commentsCount = document.getElementById('commentsCount');
         
+        console.log('[API] Fetching comments for path:', ACTIVE_PATH);
+        
         try {
-            // [FIX] 智能双重检测逻辑
-            // 第一次尝试：尝试 /Podevus/ 前缀路径
-            let data = await fetchCommentsForPath(PATH_VARIANTS[0]);
+            const response = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(ACTIVE_PATH)}&pageSize=100`);
+            const data = await response.json();
+            
+            console.log('[API] Response:', data);
+            
             let rootComments = [];
             let totalCount = 0;
 
-            // 解析数据
             if (data && Array.isArray(data.data)) {
                 rootComments = data.data;
                 totalCount = data.count || rootComments.length;
@@ -1044,33 +1061,8 @@ footer {
                 rootComments = data;
                 totalCount = rootComments.length;
             }
-
-            // [FIX] 如果第一个路径没数据，且我们还在本地测试，尝试第二个路径
-            if (totalCount === 0) {
-                console.log('[API] Path 1 returned 0, trying fallback path:', PATH_VARIANTS[1]);
-                const dataFallback = await fetchCommentsForPath(PATH_VARIANTS[1]);
-                let rootCommentsFallback = [];
-                let totalCountFallback = 0;
-
-                if (dataFallback && Array.isArray(dataFallback.data)) {
-                    rootCommentsFallback = dataFallback.data;
-                    totalCountFallback = dataFallback.count || rootCommentsFallback.length;
-                } else if (Array.isArray(dataFallback)) {
-                    rootCommentsFallback = dataFallback;
-                    totalCountFallback = rootCommentsFallback.length;
-                }
-
-                // 如果备用路径有数据，就使用备用路径的数据
-                if (totalCountFallback > 0) {
-                    console.log('[API] Fallback path has data! Switching active path.');
-                    rootComments = rootCommentsFallback;
-                    totalCount = totalCountFallback;
-                    ACTIVE_PATH = PATH_VARIANTS[1]; // 更新当前激活路径，供提交评论使用
-                }
-            }
             
-            console.log('[API] Final Active Path:', ACTIVE_PATH);
-            console.log('[API] Final Count:', totalCount);
+            console.log('[API] Root comments:', rootComments.length, 'Total count:', totalCount);
             
             allCommentsFlat = flattenComments(rootComments);
             commentsCount.textContent = `${totalCount} Replies`;
@@ -1214,7 +1206,6 @@ footer {
                 nick: name,
                 mail: email,
                 link: website || '',
-                // [FIX] 使用检测到的有效路径提交新评论
                 path: ACTIVE_PATH,
                 url: window.location.href,
                 ua: navigator.userAgent
@@ -1231,6 +1222,8 @@ footer {
                 }
             }
             
+            console.log('[Submit] Comment data:', commentData);
+            
             const response = await fetch(`${WALINE_SERVER_URL}/comment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1238,6 +1231,7 @@ footer {
             });
             
             const result = await response.json();
+            console.log('[Submit] Response:', result);
             
             if (result.errno === 0 || result.data) {
                 document.getElementById('commentTextarea').value = '';
