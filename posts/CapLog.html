@@ -673,8 +673,12 @@ html { scroll-behavior: smooth; }
     </footer>
 
     <script>
+// [FIX] 使用完整URL作为path，与Waline后台一致
 const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
-const PAGE_PATH = window.location.pathname || '/article/capstone';
+const PAGE_PATH = 'https://podevei.github.io/Podevus/posts/CapLog.html';
+
+console.log('[Init] Waline Config Loaded.');
+console.log('[Init] Active Path:', PAGE_PATH);
 
 // 滚动触发背景变色和评论显示
 (function() {
@@ -757,9 +761,10 @@ const PAGE_PATH = window.location.pathname || '/article/capstone';
     setInterval(() => createParticle(fg, true), 3000);
 })();
 
-// Waline评论系统
+// Waline评论系统 [修复版]
 (function() {
-    let allComments = [];
+    let allCommentsFlat = [];
+
     document.addEventListener('DOMContentLoaded', function() {
         loadComments();
         document.getElementById('commentForm').addEventListener('submit', handleSubmit);
@@ -772,52 +777,108 @@ const PAGE_PATH = window.location.pathname || '/article/capstone';
         if (savedWebsite) document.getElementById('websiteInput').value = savedWebsite;
     });
 
+    function parseDate(item) {
+        const raw = item.insertedAt || item.createdAt || item.updatedAt || item.time || item.created;
+        if (!raw) return new Date();
+        if (typeof raw === 'number') return new Date(raw);
+        if (typeof raw === 'string') {
+            let safe = raw.replace(' ', 'T').replace(/-/g, '/');
+            const d = new Date(safe);
+            return isNaN(d.getTime()) ? new Date() : d;
+        }
+        return new Date();
+    }
+
+    function flattenComments(comments, result = []) {
+        if (!Array.isArray(comments)) return result;
+        comments.forEach(comment => {
+            result.push(comment);
+            if (comment.children && comment.children.length > 0) {
+                flattenComments(comment.children, result);
+            }
+        });
+        return result;
+    }
+
     async function loadComments() {
         const list = document.getElementById('commentsList');
         const count = document.getElementById('commentsCount');
+        
+        console.log('[API] Fetching comments for path:', PAGE_PATH);
+        
         try {
             const res = await fetch(`${WALINE_SERVER_URL}/comment?path=${encodeURIComponent(PAGE_PATH)}&pageSize=100`);
             const data = await res.json();
-            if (data.errno === 0 && data.data) {
-                allComments = data.data.data || [];
-                count.textContent = `${data.data.totalCount || 0} Replies`;
-                if (allComments.length === 0) { list.innerHTML = '<div class="no-comments">You could be the first one</div>'; return; }
-                list.innerHTML = buildCommentTree(allComments).map(c => renderComment(c)).join('');
-                bindReplyButtons();
-            } else { list.innerHTML = '<div class="no-comments">You could be the first one</div>'; }
-        } catch (e) { console.error(e); list.innerHTML = '<div class="no-comments">Failed to load comments.</div>'; }
+            
+            console.log('[API] Response:', data);
+            
+            let rootComments = [];
+            let totalCount = 0;
+
+            if (data && Array.isArray(data.data)) {
+                rootComments = data.data;
+                totalCount = data.count || rootComments.length;
+            } else if (Array.isArray(data)) {
+                rootComments = data;
+                totalCount = rootComments.length;
+            }
+            
+            console.log('[API] Root comments:', rootComments.length, 'Total count:', totalCount);
+            
+            allCommentsFlat = flattenComments(rootComments);
+            count.textContent = `${totalCount} Replies`;
+            
+            if (rootComments.length === 0) {
+                list.innerHTML = '<div class="no-comments">You could be the first one</div>';
+                return;
+            }
+            
+            rootComments.sort((a, b) => parseDate(b) - parseDate(a));
+            list.innerHTML = rootComments.map(c => renderComment(c)).join('');
+            bindReplyButtons();
+        } catch (e) {
+            console.error('[API] Failed:', e);
+            list.innerHTML = '<div class="no-comments">Failed to load comments.</div>';
+        }
     }
 
-    function buildCommentTree(comments) {
-        const map = {}, roots = [];
-        comments.forEach(c => { c.children = []; map[c.objectId] = c; });
-        comments.forEach(c => {
-            if (c.pid && map[c.pid]) map[c.pid].children.push(c);
-            else if (c.rid && map[c.rid]) map[c.rid].children.push(c);
-            else roots.push(c);
-        });
-        roots.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-        return roots;
+    function getCommentNick(comment) {
+        if (!comment) return 'Anonymous';
+        if (comment.nick && String(comment.nick).trim()) return comment.nick;
+        if (comment.user && comment.user.nick && String(comment.user.nick).trim()) return comment.user.nick;
+        return 'Anonymous';
     }
 
     function renderComment(c, depth = 0) {
         const avatar = c.avatar || `https://www.gravatar.com/avatar/${c.mail_md5 || ''}?s=45&d=mm&r=g`;
-        let author = c.link ? `<a href="${escapeHtml(c.link)}" target="_blank" rel="nofollow noopener">${escapeHtml(c.nick)}</a>` : escapeHtml(c.nick);
+        const nickName = getCommentNick(c);
+        let author = c.link ? `<a href="${escapeHtml(c.link)}" target="_blank" rel="nofollow noopener">${escapeHtml(nickName)}</a>` : escapeHtml(nickName);
+        
         let replyInd = '';
-        if (c.pid && c.pid !== c.rid) {
-            const parent = allComments.find(x => x.objectId === c.pid);
-            if (parent) replyInd = `<div class="reply-to-indicator">Reply to <span>@${escapeHtml(parent.nick)}</span></div>`;
+        if (c.pid) {
+            const parent = allCommentsFlat.find(x => String(x.objectId) === String(c.pid));
+            if (parent) {
+                const pName = getCommentNick(parent);
+                replyInd = `<div class="reply-to-indicator">Reply to <span>@${escapeHtml(pName)}</span></div>`;
+            }
         }
+        
         let replies = '';
         if (c.children && c.children.length > 0) {
-            replies = `<div class="comment-replies">${c.children.sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt)).map(r => renderComment(r, Math.min(depth+1, 3))).join('')}</div>`;
+            const sortedChildren = [...c.children].sort((a,b) => parseDate(a) - parseDate(b));
+            replies = `<div class="comment-replies">${sortedChildren.map(r => renderComment(r, Math.min(depth+1, 3))).join('')}</div>`;
         }
-        return `<div class="comment-card" id="comment-${c.objectId}"><div class="comment-header"><div class="comment-header-left"><div class="comment-avatar"><img src="${avatar}" alt="${escapeHtml(c.nick)}" loading="lazy"></div><div class="comment-author-info"><span class="comment-author">${author}</span><span class="comment-time"><a href="#comment-${c.objectId}">${formatTime(c.createdAt)}</a></span></div></div></div>${replyInd}<div class="comment-content">${c.comment}</div><div class="comment-footer"><button class="reply-btn" data-comment-id="${c.objectId}" data-root-id="${c.rid || c.objectId}" data-author="${escapeHtml(c.nick)}">Reply</button></div></div>${replies}`;
+        
+        const timeStr = formatTime(parseDate(c));
+        
+        return `<div class="comment-card" id="comment-${c.objectId}"><div class="comment-header"><div class="comment-header-left"><div class="comment-avatar"><img src="${avatar}" alt="${escapeHtml(nickName)}" loading="lazy"></div><div class="comment-author-info"><span class="comment-author">${author}</span><span class="comment-time"><a href="#comment-${c.objectId}">${timeStr}</a></span></div></div></div>${replyInd}<div class="comment-content">${c.comment}</div><div class="comment-footer"><button class="reply-btn" data-comment-id="${c.objectId}" data-root-id="${c.rid || c.objectId}" data-author="${escapeHtml(nickName)}">Reply</button></div></div>${replies}`;
     }
 
     function bindReplyButtons() {
         document.querySelectorAll('.reply-btn').forEach(btn => {
-            btn.addEventListener('click', function() { setReplyTo(this.dataset.commentId, this.dataset.rootId, this.dataset.author); });
+            btn.addEventListener('click', function() {
+                setReplyTo(this.dataset.commentId, this.dataset.rootId, this.dataset.author);
+            });
         });
     }
 
@@ -847,39 +908,77 @@ const PAGE_PATH = window.location.pathname || '/article/capstone';
         const rootId = document.getElementById('replyToAuthor').value;
         const msg = document.getElementById('formMessage');
         const btn = document.getElementById('submitBtn');
+        
         if (!name || !email || !content) { showMessage(msg, 'Please fill in all required fields', 'error'); return; }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMessage(msg, 'Please enter a valid email', 'error'); return; }
         if (website && !isValidUrl(website)) { showMessage(msg, 'Please enter a valid URL', 'error'); return; }
         if (content.length > 1000) { showMessage(msg, 'Comment too long', 'error'); return; }
+        
         localStorage.setItem('podevus_comment_name', name);
         localStorage.setItem('podevus_comment_email', email);
         if (website) localStorage.setItem('podevus_comment_website', website);
-        btn.disabled = true; btn.textContent = 'Posting...';
+        
+        btn.disabled = true;
+        btn.textContent = 'Posting...';
+        
         try {
-            const data = { comment: content, nick: name, mail: email, link: website || '', url: PAGE_PATH, ua: navigator.userAgent };
-            if (replyToId) { data.pid = replyToId; data.rid = rootId || replyToId; }
-            const res = await fetch(`${WALINE_SERVER_URL}/comment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const data = {
+                comment: content,
+                nick: name,
+                mail: email,
+                link: website || '',
+                path: PAGE_PATH,
+                url: window.location.href,
+                ua: navigator.userAgent
+            };
+            
+            if (replyToId) {
+                data.pid = replyToId;
+                data.rid = rootId || replyToId;
+                const parent = allCommentsFlat.find(c => String(c.objectId) === String(replyToId));
+                data.at = parent ? getCommentNick(parent) : 'Anonymous';
+            }
+            
+            console.log('[Submit] Comment data:', data);
+            
+            const res = await fetch(`${WALINE_SERVER_URL}/comment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
             const result = await res.json();
-            if (result.errno === 0) {
+            console.log('[Submit] Response:', result);
+            
+            if (result.errno === 0 || result.data) {
                 document.getElementById('commentTextarea').value = '';
                 cancelReply();
                 showMessage(msg, 'Comment posted!', 'success');
                 setTimeout(() => msg.classList.add('hidden'), 3000);
                 await loadComments();
-                if (result.data?.objectId) setTimeout(() => document.getElementById('comment-' + result.data.objectId)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-            } else { showMessage(msg, result.errmsg || 'Failed', 'error'); }
-        } catch (err) { console.error(err); showMessage(msg, 'Failed to post', 'error'); }
-        finally { btn.disabled = false; btn.textContent = 'Post Comment'; }
+            } else {
+                showMessage(msg, result.errmsg || 'Failed', 'error');
+            }
+        } catch (err) {
+            console.error('[Submit] Failed:', err);
+            showMessage(msg, 'Failed to post', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Post Comment';
+        }
     }
 
     function formatTime(ts) {
-        const d = new Date(ts);
+        if (isNaN(ts.getTime())) return 'Unknown Date';
         const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        let h = d.getHours(); const ampm = h >= 12 ? 'pm' : 'am'; h = h % 12 || 12;
-        return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} at ${h}:${d.getMinutes().toString().padStart(2,'0')} ${ampm}`;
+        let h = ts.getHours();
+        const ampm = h >= 12 ? 'pm' : 'am';
+        h = h % 12 || 12;
+        return `${months[ts.getMonth()]} ${ts.getDate()}, ${ts.getFullYear()} at ${h}:${ts.getMinutes().toString().padStart(2,'0')} ${ampm}`;
     }
+    
     function isValidUrl(u) { try { new URL(u); return true; } catch { return false; } }
-    function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    function escapeHtml(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
     function showMessage(el, m, type) { el.textContent = m; el.className = 'message ' + type; el.classList.remove('hidden'); }
 })();
 
