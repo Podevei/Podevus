@@ -210,23 +210,19 @@ body.world-inner .content-inner {
 }
 
 /* =========================================
-   4. 表世界样式 (新增边框样式)
+   4. 表世界样式
    ========================================= */
 .about-content {
     background: var(--card-bg);
     padding: 40px; 
     border-radius: 6px;
-    
-    /* [修改] 增加显著的"框"效果 (双线边框) */
     border: 3px double var(--border-dark);
     box-shadow: 0 5px 15px var(--shadow-color);
-    
     margin-bottom: 40px;
     transition: all 0.3s ease;
     position: relative;
 }
 
-/* 鼠标悬停时边框变色，增强交互感 */
 .about-content:hover {
     border-color: var(--accent-color);
     box-shadow: 0 8px 20px rgba(200, 155, 109, 0.15);
@@ -236,10 +232,9 @@ body.world-inner .content-inner {
     font-family: var(--font-serif); font-size: 1.8em; font-weight: 500; margin-bottom: 20px;
     border-bottom: 1px solid var(--border-light); 
     padding-bottom: 10px;
-    color: var(--accent-color); /* 标题使用主题色 */
+    color: var(--accent-color);
 }
 
-/* 关于页面的启动入口 */
 .music-player-entry {
     display: inline-flex;
     align-items: center;
@@ -294,6 +289,68 @@ body.world-inner .particles-bg, body.world-inner .particles-fg { opacity: 1; }
 @keyframes floatUp {
     0% { transform: translateY(0) scale(0.5); opacity: 0; }
     100% { transform: translateY(-100vh) scale(1.2); opacity: 0; }
+}
+
+/* 角落齿轮装饰 - 固定在屏幕角落 */
+.corner-gear {
+    position: fixed;
+    pointer-events: none;
+    z-index: 15;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+body.world-inner .corner-gear {
+    opacity: 0.6;
+}
+
+.corner-gear-left {
+    top: -50px;  /* 部分在屏幕外 */
+    left: -50px;
+    width: 100px;
+    height: 100px;
+    animation: rotateClockwise 20s linear infinite;
+}
+
+.corner-gear-right {
+    top: -25px;  /* 部分在屏幕外 */
+    right: -25px;
+    width: 80px;
+    height: 80px;
+    animation: rotateCounterClockwise 15s linear infinite;
+}
+
+.corner-gear-right-sub1 {
+    top: 39px;  /* 部分在屏幕外 */
+    right: 0px;
+    width: 20px;
+    height: 20px;
+    animation: rotateCounterClockwise 1s linear infinite;
+}
+
+.corner-gear-right-sub2 {
+    top: 27px;  /* 部分在屏幕外 */
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    animation: rotateCounterClockwise 1s linear infinite reverse;
+}
+
+.corner-gear svg {
+    width: 100%;
+    height: 100%;
+    fill: var(--steam-gold);
+    filter: drop-shadow(0 0 8px rgba(200, 155, 109, 0.4));
+}
+
+@keyframes rotateClockwise {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes rotateCounterClockwise {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
 }
 
 .steampunk-comments {
@@ -806,6 +863,9 @@ footer {
         gap: 10px;
         text-align: center;
     }
+    .corner-gear {
+        display: none;
+    }
 }
     </style>
 </head>
@@ -924,6 +984,31 @@ footer {
     <div class="particles-bg" id="particlesBg"></div>
     <div class="particles-fg" id="particlesFg"></div>
 
+    <!-- 角落齿轮装饰 - 固定在屏幕角落 -->
+    <div class="corner-gear corner-gear-left">
+        <svg viewBox="0 0 24 24">
+            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+        </svg>
+    </div>
+    
+    <div class="corner-gear corner-gear-right">
+        <svg viewBox="0 0 24 24">
+            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+        </svg>
+    </div>
+
+    <div class="corner-gear corner-gear-right-sub1">
+        <svg viewBox="0 0 24 24">
+            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+        </svg>
+    </div>
+
+    <div class="corner-gear corner-gear-right-sub2">
+        <svg viewBox="0 0 24 24">
+            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+        </svg>
+    </div>
+
     <script>
     (function(){const isMobile=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);if(isMobile)return;const c=document.createElement('div');c.className='custom-cursor';document.body.appendChild(c);document.addEventListener('mousemove',e=>{c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';});document.addEventListener('mousedown',e=>{const r=document.createElement('div');r.className='cursor-ripple';r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';r.style.transform='translate(-50%,-50%)';document.body.appendChild(r);setTimeout(()=>r.remove(),600);});document.querySelectorAll('a,button,input,textarea').forEach(el=>{el.addEventListener('mouseenter',()=>c.style.transform='scale(1.2)');el.addEventListener('mouseleave',()=>c.style.transform='scale(1)');});})();
     </script>
@@ -992,10 +1077,8 @@ footer {
         document.getElementById('particlesFg').innerHTML='';
     }
 
-    // ============ Waline 评论系统 [修复版：使用完整URL作为path] ============
+    // ============ Waline 评论系统 [修复版] ============
     const WALINE_SERVER_URL = 'https://podevuscomments.vercel.app';
-    
-    // [FIX] 使用完整URL作为path，与Waline后台显示的路径一致
     const ACTIVE_PATH = 'https://podevei.github.io/Podevus/Blog_about.html';
     
     console.log('[Init] Waline Config Loaded.');
