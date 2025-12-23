@@ -66,8 +66,8 @@
                 artist: '加山雄三',
                 expanded: false,
                 songs: [
-                    { title: '知床旅情', artist: '加山雄三', file: '加山雄三 - 知床旅情.ogg' },
-                    { title: '海　その愛', artist: '加山雄三', file: '加山雄三 - 海　その愛.ogg' },
+                    { title: '知床旅情', artist: '加山雄三', file: '加山雄三 - 知床旅情.mp3' },
+                    { title: '海　その愛', artist: '加山雄三', file: '1.ogg' },
                 ]
             },
             {
