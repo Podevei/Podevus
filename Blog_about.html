@@ -234,42 +234,110 @@ body.world-inner .content-inner {
     padding-bottom: 10px;
     color: var(--accent-color);
 }
-
-.music-player-entry {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 28px;
-    background: linear-gradient(135deg, #F5F0EB, #E8D2C3);
-    color: #3A2E2A;
-    border: 1.5px solid #C88A59;
-    border-radius: 30px;
-    font-family: "Noto Serif JP", "Source Han Serif CN", Georgia, serif;
-    font-size: 1em;
+.sakura-btn-wrapper {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(200, 138, 89, 0.3);
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 初始轻微旋转，更有韵味 */
+    transform: rotate(15deg); 
+    transition: transform 0.3s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-    .music-player-entry {
-        background: linear-gradient(135deg, #3a3633, #2a2826);
-        border-color: #d4a574;
-        color: #E8D2C3;
+/* SVG 容器 */
+.sakura-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    /* 默认柔和阴影 */
+    filter: drop-shadow(0 4px 6px rgba(200, 138, 89, 0.3));
+    transition: filter 0.3s ease;
+}
+
+/* 红色层：默认隐藏 */
+.active-layer {
+    transition: opacity 0.3s ease;
+}
+
+/* 内容样式 */
+.sakura-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #5D4037;
+    font-family: "Noto Serif SC", serif;
+    pointer-events: none;
+}
+.sakura-content svg { width: 28px; height: 28px; opacity: 0.8; }
+.sakura-content span { font-size: 14px; font-weight: bold; letter-spacing: 2px; }
+
+/* --- 悬浮效果 (Hover) --- */
+.sakura-btn-wrapper:hover {
+    transform: rotate(15deg) scale(1.05);
+}
+.sakura-btn-wrapper:hover .sakura-bg {
+    filter: drop-shadow(0 0 10px rgba(232, 210, 195, 0.8));
+}
+
+/* --- 点击后的涟漪动画状态 (Active State) --- */
+
+/* 1. 红色层瞬间显现，然后渐隐 */
+.sakura-btn-wrapper.is-rippling .active-layer {
+    animation: fade-red 0.5s ease-out forwards;
+}
+
+/* 2. 整个背景产生红色光晕涟漪 */
+.sakura-btn-wrapper.is-rippling .sakura-bg {
+    animation: ripple-shadow 0.5s ease-out forwards;
+}
+
+/* 3. 内容轻微下沉模拟按压感 */
+.sakura-btn-wrapper.is-rippling .sakura-content {
+    transform: scale(0.95);
+    transition: transform 0.2s;
+}
+
+/* --- 动画关键帧 --- */
+
+/* 变红动画：快速变红，然后慢慢变回透明 */
+@keyframes fade-red {
+    0% { opacity: 0; }
+    20% { opacity: 1; } /* 瞬间变红 */
+    100% { opacity: 0; } /* 0.5s 结束时回到原样 */
+}
+
+/* 涟漪动画：阴影变红并向外扩散，最后消失 */
+@keyframes ripple-shadow {
+    0% {
+        filter: drop-shadow(0 0 0 rgba(255, 110, 127, 0));
+        transform: scale(1);
+    }
+    30% {
+        /* 涟漪最强的时候：红色光晕扩散 */
+        filter: drop-shadow(0 0 20px rgba(255, 110, 127, 0.8)); 
+        transform: scale(1.02);
+    }
+    100% {
+        /* 恢复平静 */
+        filter: drop-shadow(0 4px 6px rgba(200, 138, 89, 0.3));
+        transform: scale(1);
     }
 }
 
-.music-player-entry:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, #E8D2C3, #D4A8B1);
-    border-color: #D4A8B1;
-    box-shadow: 0 6px 24px rgba(212, 168, 177, 0.4);
-}
-
-.music-player-entry svg {
-    width: 20px;
-    height: 20px;
-    fill: currentColor;
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+    .sakura-content { color: #E8D2C3; }
+    .sakura-bg path.base-layer { stroke: #d4a574; }
 }
 
 /* =========================================
@@ -897,28 +965,73 @@ footer {
                 <h2>关于本站</h2>
                 <p><strong>Podevus V2.4</strong></p>
                 <p>欢迎来到 Podevus，这是一个记录思考、分享观点的个人空间。</p>
-                <p>分享关于技术、阅读、动画作品以及一些想法的文章。希望这些文字能够引发一些共鸣，或者至少给人们带来片刻的思考。</p>
-                <p>本站采用极简设计理念,融合大正浪漫时代的优雅美学，旨在让内容本身成为焦点。</p>
+                <p>分享关于技术、阅读、作品以及一些想法的文章。希望这些文字能够给人们带来一些想法。</p>
+                <p>本站采用极简设计理念，融合大正时代的优雅配色，旨在让内容本身成为焦点。</p>
             </div>
             <div class="about-content">
                 <h2>关于作者</h2>
                 <p>一个思考、记录的普通人。</p>
-                <p>事物值得被记录和分享。</p>
+                <p>为什么事物会如此</p>
             </div>
             <div class="about-content">
                 <h2>设计理念</h2>
-                <p><strong>存质</strong> —— 本站的设计。</p>
-                <p>正如 Prima Doll 中那个理想化的世界，保留那个时代所有迷人的视觉元素，巧妙地剥离了真实历史中的压迫、创伤和社会背面。</p>
+                <p><strong>存质</strong> —— 本站与本人的的设计。</p>
+                <p>理想化的世界，保留时代下所有迷人的视觉元素，剥离真实历史中的压迫、创伤和社会背面。</p>
             </div>
-            <div class="about-content music-entry-section">
-                <h2>音乐空间</h2>
-                <div style="text-align: center; margin-top: 25px;">
-                    <button class="music-player-entry" onclick="openMusicPlayer()">
-                        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                        <span>打开音乐播放器</span>
-                    </button>
-                </div>
+            <div>
+    <h2></h2>
+    <div style="text-align: center; margin-top: 25px;">
+        
+        <div class="sakura-btn-wrapper" onclick="triggerSakuraRipple(this)">
+            
+            <svg class="sakura-bg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="sakuraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FDFBF9; stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E8D2C3; stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="activeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff9a9e; stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#fecfef; stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+
+                <path class="base-layer" d="M50 50 Q65 20 52 5 A3 3 0 0 0 48 5 Q35 20 50 50 Q80 35 95 48 A3 3 0 0 1 92 52 Q65 60 50 50 Q75 80 65 95 A3 3 0 0 1 60 92 Q55 70 50 50 Q25 80 35 95 A3 3 0 0 0 40 92 Q45 70 50 50 Q20 35 5 48 A3 3 0 0 0 8 52 Q35 60 50 50Z"
+                    fill="url(#sakuraGradient)" stroke="#C88A59" stroke-width="0.5"/>
+
+                <path class="active-layer" d="M50 50 Q65 20 52 5 A3 3 0 0 0 48 5 Q35 20 50 50 Q80 35 95 48 A3 3 0 0 1 92 52 Q65 60 50 50 Q75 80 65 95 A3 3 0 0 1 60 92 Q55 70 50 50 Q25 80 35 95 A3 3 0 0 0 40 92 Q45 70 50 50 Q20 35 5 48 A3 3 0 0 0 8 52 Q35 60 50 50Z"
+                    fill="url(#activeGradient)" style="opacity: 0; pointer-events: none;"/>
+            </svg>
+
+            <div class="sakura-content">
+                <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg>
+                <span></span>
             </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function triggerSakuraRipple(btn) {
+    // 你的打开播放器逻辑
+    if(typeof openMusicPlayer === 'function') openMusicPlayer();
+
+    // 移除之前的动画类（如果用户点得很快）
+    btn.classList.remove('is-rippling');
+    
+    // 强制浏览器重排 (Reflow)，确保动画能重新触发
+    void btn.offsetWidth;
+    
+    // 添加动画类
+    btn.classList.add('is-rippling');
+    
+    // 0.5秒后自动移除（配合CSS动画时长）
+    setTimeout(() => {
+        btn.classList.remove('is-rippling');
+    }, 500);
+}
+</script>
         </div>
 
         <div class="content-inner" id="innerWorld">
