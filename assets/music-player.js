@@ -103,6 +103,7 @@
                 expanded: false,
                 songs: [
                     { title: '星が瞬くこんな夜に', artist: 'supercell', file: 'supercell - 星が瞬くこんな夜に (ゲームVer_).ogg' },
+                    { title: 'goldenfield', artist: 'VISUAL ARTS/Key', file: 'fhána _ VISUAL ARTS _ Key - goldenfield.ogg' },
                 ]
             },
         ]
