@@ -1229,9 +1229,144 @@ html {
     color: #fff;
 }
 
+    
+/* ===== 装饰线条 ===== */
+.decorative-lines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 9990;
+}
+
+.deco-line {
+    position: absolute;
+    background: var(--accent-color);
+    opacity: 0.5;
+}
+
+/* 水平线条 */
+.deco-line-h1 { top: 20px; left: 0; width: 180px; height: 1px; }
+.deco-line-h2 { top: 50px; right: 0; width: 120px; height: 1px; }
+.deco-line-h3 { bottom: 50px; left: 0; width: 140px; height: 1px; }
+.deco-line-h4 { bottom: 20px; right: 0; width: 100px; height: 1px; }
+
+/* 垂直线条 */
+.deco-line-v1 { top: 0; left: 20px; width: 1px; height: 150px; }
+.deco-line-v2 { top: 0; right: 20px; width: 1px; height: 120px; }
+.deco-line-v3 { bottom: 0; left: 50px; width: 1px; height: 100px; }
+.deco-line-v4 { bottom: 0; right: 50px; width: 1px; height: 180px; }
+
+/* ===== 角落装饰 ===== */
+.corner-ornament {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 9991;
+}
+
+.corner-ornament svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--accent-color);
+    stroke-width: 1.5;
+}
+
+.corner-ornament svg circle {
+    fill: var(--accent-color);
+}
+
+.corner-tl { top: 10px; left: 10px; }
+.corner-tr { top: 10px; right: 10px; transform: scaleX(-1); }
+.corner-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+.corner-br { bottom: 10px; right: 10px; transform: scale(-1); }
+
+/* 深色模式 - 保持鲜明 */
+@media (prefers-color-scheme: dark) {
+    .deco-line { opacity: 0.4; }
+    .corner-ornament { opacity: 0.5; }
+}
+
+/* 移动端隐藏 */
+@media (max-width: 768px) {
+    .decorative-lines,
+    .corner-ornament { display: none !important; }
+}
+
+/* 中等屏幕 */
+@media (max-width: 1100px) and (min-width: 769px) {
+    .corner-ornament { width: 80px; height: 80px; opacity: 0.45; }
+    .deco-line { opacity: 0.35; }
+    .deco-line-h1 { width: 120px; }
+    .deco-line-h2 { width: 80px; }
+    .deco-line-h3 { width: 100px; }
+    .deco-line-h4 { width: 60px; }
+    .deco-line-v1 { height: 100px; }
+    .deco-line-v2 { height: 80px; }
+    .deco-line-v3 { height: 60px; }
+    .deco-line-v4 { height: 120px; }
+}
+
     </style>
 </head>
 <body>
+
+    <!-- 装饰线条 -->
+    <div class="decorative-lines">
+        <div class="deco-line deco-line-h1"></div>
+        <div class="deco-line deco-line-h2"></div>
+        <div class="deco-line deco-line-h3"></div>
+        <div class="deco-line deco-line-h4"></div>
+        <div class="deco-line deco-line-v1"></div>
+        <div class="deco-line deco-line-v2"></div>
+        <div class="deco-line deco-line-v3"></div>
+        <div class="deco-line deco-line-v4"></div>
+    </div>
+
+    <!-- 角落装饰 -->
+    <div class="corner-ornament corner-tl">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 95 L5 5 L95 5"/>
+            <path d="M15 85 L15 15 L85 15"/>
+            <circle cx="15" cy="15" r="3"/>
+            <circle cx="5" cy="5" r="2"/>
+            <path d="M25 5 L25 25 L5 25"/>
+        </svg>
+    </div>
+    <div class="corner-ornament corner-tr">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 95 L5 5 L95 5"/>
+            <path d="M15 85 L15 15 L85 15"/>
+            <circle cx="15" cy="15" r="3"/>
+            <circle cx="5" cy="5" r="2"/>
+            <path d="M25 5 L25 25 L5 25"/>
+        </svg>
+    </div>
+    <div class="corner-ornament corner-bl">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 95 L5 5 L95 5"/>
+            <path d="M15 85 L15 15 L85 15"/>
+            <circle cx="15" cy="15" r="3"/>
+            <circle cx="5" cy="5" r="2"/>
+            <path d="M25 5 L25 25 L5 25"/>
+        </svg>
+    </div>
+    <div class="corner-ornament corner-br">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 95 L5 5 L95 5"/>
+            <path d="M15 85 L15 15 L85 15"/>
+            <circle cx="15" cy="15" r="3"/>
+            <circle cx="5" cy="5" r="2"/>
+            <path d="M25 5 L25 25 L5 25"/>
+        </svg>
+    </div>
+
     <header>
         <h1><a href="../index.html">Podevus</a></h1>
         <p class="subtitle">記 · 思 · 道</p>
@@ -1648,15 +1783,57 @@ console.log('[Init] Target Path:', PAGE_PATH);
     });
 
     function parseDate(item) {
-        const raw = item.insertedAt || item.createdAt || item.updatedAt || item.time || item.created;
-        if (!raw) return new Date();
-        if (typeof raw === 'number') return new Date(raw);
-        if (typeof raw === 'string') {
-            let safe = raw.replace(' ', 'T').replace(/-/g, '/');
-            const d = new Date(safe);
-            return isNaN(d.getTime()) ? new Date() : d;
+        // 尝试多种可能的时间字段名
+        const raw = item.insertedAt || item.createdAt || item.created_at || item.updatedAt || item.time || item.created || item.timestamp;
+        
+        if (!raw) {
+            console.warn('[parseDate] No date field found in:', item);
+            return null; // 返回null而不是当前时间
         }
-        return new Date();
+        
+        let date = null;
+        
+        // 处理数字时间戳
+        if (typeof raw === 'number') {
+            // 如果是秒级时间戳，转换为毫秒
+            date = new Date(raw < 10000000000 ? raw * 1000 : raw);
+        }
+        // 处理字符串时间
+        else if (typeof raw === 'string') {
+            // 首先尝试直接解析ISO 8601格式
+            date = new Date(raw);
+            
+            // 如果解析失败，尝试其他格式
+            if (isNaN(date.getTime())) {
+                // 尝试替换空格为T
+                date = new Date(raw.replace(' ', 'T'));
+            }
+            
+            // 如果还是失败，尝试更多格式
+            if (isNaN(date.getTime())) {
+                // 处理 "2025-12-31 22:00:00" 格式
+                const parts = raw.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?/);
+                if (parts) {
+                    date = new Date(parts[1], parts[2] - 1, parts[3], parts[4], parts[5], parts[6] || 0);
+                }
+            }
+        }
+        // 处理对象（可能有__type字段的Waline格式）
+        else if (typeof raw === 'object' && raw !== null) {
+            if (raw.iso) {
+                date = new Date(raw.iso);
+            } else if (raw.__type === 'Date' && raw.iso) {
+                date = new Date(raw.iso);
+            }
+        }
+        
+        // 验证日期有效性
+        if (date && !isNaN(date.getTime())) {
+            return date;
+        }
+        
+        console.warn('[parseDate] Failed to parse date:', raw);
+        return null;
     }
 
     // [新增] 将嵌套评论扁平化，用于查找父评论昵称
@@ -1906,7 +2083,8 @@ console.log('[Init] Target Path:', PAGE_PATH);
     }
     
     function formatTime(date) {
-        if (isNaN(date.getTime())) return 'Unknown Date';
+        // 处理null或无效日期
+        if (!date || isNaN(date.getTime())) return 'Unknown Date';
         const months = ['January', 'February', 'March', 'April', 'May', 'June','July', 'August', 'September', 'October', 'November', 'December'];
         let hour = date.getHours();
         const ampm = hour >= 12 ? 'pm' : 'am';

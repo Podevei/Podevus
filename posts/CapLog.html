@@ -538,9 +538,310 @@ footer::before {
 }
 html { scroll-behavior: smooth; }
 ::selection { background: var(--accent-color); color: #fff; }
+    
+/* ===== 装饰线条 ===== */
+.decorative-lines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 9990;
+}
+
+.deco-line {
+    position: absolute;
+    background: var(--accent-color);
+    opacity: 0.5;
+}
+
+/* 水平线条 */
+.deco-line-h1 { top: 20px; left: 0; width: 180px; height: 1px; }
+.deco-line-h2 { top: 50px; right: 0; width: 120px; height: 1px; }
+.deco-line-h3 { bottom: 50px; left: 0; width: 140px; height: 1px; }
+.deco-line-h4 { bottom: 20px; right: 0; width: 100px; height: 1px; }
+
+/* 垂直线条 */
+.deco-line-v1 { top: 0; left: 20px; width: 1px; height: 150px; }
+.deco-line-v2 { top: 0; right: 20px; width: 1px; height: 120px; }
+.deco-line-v3 { bottom: 0; left: 50px; width: 1px; height: 100px; }
+.deco-line-v4 { bottom: 0; right: 50px; width: 1px; height: 180px; }
+
+/* ===== 角落装饰 ===== */
+.corner-ornament {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 9991;
+}
+
+.corner-ornament svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--accent-color);
+    stroke-width: 1.5;
+}
+
+.corner-ornament svg circle {
+    fill: var(--accent-color);
+}
+
+.corner-tl { top: 10px; left: 10px; }
+.corner-tr { top: 10px; right: 10px; transform: scaleX(-1); }
+.corner-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+.corner-br { bottom: 10px; right: 10px; transform: scale(-1); }
+
+/* 深色模式 - 保持鲜明 */
+@media (prefers-color-scheme: dark) {
+    .deco-line { opacity: 0.4; }
+    .corner-ornament { opacity: 0.5; }
+}
+
+/* 移动端隐藏 */
+@media (max-width: 768px) {
+    .decorative-lines,
+    .corner-ornament { display: none !important; }
+}
+
+/* 中等屏幕 */
+@media (max-width: 1100px) and (min-width: 769px) {
+    .corner-ornament { width: 80px; height: 80px; opacity: 0.45; }
+    .deco-line { opacity: 0.35; }
+    .deco-line-h1 { width: 120px; }
+    .deco-line-h2 { width: 80px; }
+    .deco-line-h3 { width: 100px; }
+    .deco-line-h4 { width: 60px; }
+    .deco-line-v1 { height: 100px; }
+    .deco-line-v2 { height: 80px; }
+    .deco-line-v3 { height: 60px; }
+    .deco-line-v4 { height: 120px; }
+}
+
+<style>
+@keyframes plate-glow {
+    0%, 100% {
+        box-shadow: 
+            0 0 0 4px #1a1410,
+            0 0 0 8px #8b4513,
+            0 4px 8px rgba(0, 0, 0, 0.8);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 4px #1a1410,
+            0 0 0 8px #d2691e,
+            0 4px 15px rgba(0, 0, 0, 0.9),
+            0 0 25px rgba(255, 204, 0, 0.3);
+    }
+}
+
+.date-card-plate {
+    position: relative;
+    padding: 25px 35px;
+    background: 
+        linear-gradient(135deg, #2a2410 0%, #3a3420 50%, #2a2410 100%);
+    border: 2px solid #000;
+    animation: plate-glow 2.5s ease-in-out infinite;
+}
+
+.plate-screw {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle, #8b4513 0%, #654321 100%);
+    border: 1px solid #000;
+    border-radius: 0;
+}
+
+.screw-tl { top: 8px; left: 8px; }
+.screw-tr { top: 8px; right: 8px; }
+.screw-bl { bottom: 8px; left: 8px; }
+.screw-br { bottom: 8px; right: 8px; }
+
+.plate-screw::before {
+    content: '×';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.date-card-plate h3 {
+    color: #ffcc00;
+    font-size: 26px;
+    margin-bottom: 8px;
+    letter-spacing: 4px;
+    font-weight: 700;
+    text-shadow: 
+        1px 1px 0 #000,
+        2px 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.date-card-plate p {
+    color: #cd853f;
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+@keyframes firework-glow {
+    0%, 100% {
+        box-shadow: 
+            0 0 0 4px #1a1410,
+            0 0 0 8px #d4af37,
+            0 0 20px rgba(212, 175, 55, 0.4),
+            0 0 40px rgba(255, 215, 0, 0.2);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 4px #1a1410,
+            0 0 0 8px #ffd700,
+            0 0 35px rgba(255, 215, 0, 0.7),
+            0 0 60px rgba(255, 215, 0, 0.4);
+    }
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+.date-card-newyear {
+    position: relative;
+    padding: 25px 35px;
+    background: 
+        linear-gradient(135deg, #1a0a0a 0%, #2a1a1a 50%, #1a0a0a 100%);
+    border: 2px solid #000;
+    animation: firework-glow 2s ease-in-out infinite;
+    overflow: hidden;
+}
+
+.newyear-screw {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle, #d4af37 0%, #b8860b 100%);
+    border: 1px solid #000;
+    border-radius: 0;
+}
+
+.screw-tl { top: 8px; left: 8px; }
+.screw-tr { top: 8px; right: 8px; }
+.screw-bl { bottom: 8px; left: 8px; }
+.screw-br { bottom: 8px; right: 8px; }
+
+.newyear-screw::before {
+    content: '×';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.sparkle-element {
+    position: absolute;
+    color: #ffd700;
+    font-size: 14px;
+    animation: sparkle 1.5s ease-in-out infinite;
+}
+
+.sparkle-1 { top: 10px; left: 30%; animation-delay: 0s; }
+.sparkle-2 { top: 15px; right: 25%; animation-delay: 0.3s; }
+.sparkle-3 { bottom: 15px; left: 20%; animation-delay: 0.6s; }
+.sparkle-4 { bottom: 10px; right: 30%; animation-delay: 0.9s; }
+.sparkle-5 { top: 50%; left: 15%; animation-delay: 1.2s; }
+.sparkle-6 { top: 50%; right: 15%; animation-delay: 0.15s; }
+
+.date-card-newyear h3 {
+    color: #ffd700;
+    font-size: 26px;
+    margin-bottom: 8px;
+    letter-spacing: 4px;
+    font-weight: 700;
+    text-shadow: 
+        1px 1px 0 #000,
+        2px 2px 3px rgba(0, 0, 0, 0.5),
+        0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.date-card-newyear p {
+    color: #d4af37;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-shadow: 
+        1px 1px 0 #000,
+        0 0 10px rgba(212, 175, 55, 0.3);
+}
+
     </style>
 </head>
 <body>
+
+    <!-- 装饰线条 -->
+    <div class="decorative-lines">
+        <div class="deco-line deco-line-h1"></div>
+        <div class="deco-line deco-line-h2"></div>
+        <div class="deco-line deco-line-h3"></div>
+        <div class="deco-line deco-line-h4"></div>
+        <div class="deco-line deco-line-v1"></div>
+        <div class="deco-line deco-line-v2"></div>
+        <div class="deco-line deco-line-v3"></div>
+        <div class="deco-line deco-line-v4"></div>
+    </div>
+
+    <!-- 角落装饰 -->
+    <div class="corner-ornament corner-tl">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 95 L5 5 L95 5"/>
+            <path d="M15 85 L15 15 L85 15"/>
+            <circle cx="15" cy="15" r="3"/>
+            <circle cx="5" cy="5" r="2"/>
+            <path d="M25 5 L25 25 L5 25"/>
+        </svg>
+    </div>
+    <div class="corner-ornament corner-tr">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 95 L5 5 L95 5"/>
+            <path d="M15 85 L15 15 L85 15"/>
+            <circle cx="15" cy="15" r="3"/>
+            <circle cx="5" cy="5" r="2"/>
+            <path d="M25 5 L25 25 L5 25"/>
+        </svg>
+    </div>
+    <div class="corner-ornament corner-bl">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 95 L5 5 L95 5"/>
+            <path d="M15 85 L15 15 L85 15"/>
+            <circle cx="15" cy="15" r="3"/>
+            <circle cx="5" cy="5" r="2"/>
+            <path d="M25 5 L25 25 L5 25"/>
+        </svg>
+    </div>
+    <div class="corner-ornament corner-br">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 95 L5 5 L95 5"/>
+            <path d="M15 85 L15 15 L85 15"/>
+            <circle cx="15" cy="15" r="3"/>
+            <circle cx="5" cy="5" r="2"/>
+            <path d="M25 5 L25 25 L5 25"/>
+        </svg>
+    </div>
+
     <header>
         <h1><a href="../index.html">Podevus</a></h1>
         <p class="subtitle">記 · 思 · 道</p>
@@ -610,7 +911,42 @@ html { scroll-behavior: smooth; }
 
             <h3>2025/12/07</h3>
             <p>增加了Podevus网站光标悬停在可交互内容上时浮现的阴影，为Capstone Log页面增加了独特光标效果</p>
-            <p>    未定    </p>
+
+            <div class="date-card-plate">
+                <div class="plate-screw screw-tl"></div>
+                <div class="plate-screw screw-tr"></div>
+                <div class="plate-screw screw-bl"></div>
+                <div class="plate-screw screw-br"></div>
+                <h3>2025/12/14</h3>
+                <p>计划变更，因为Key社发布新游戏虹彩都市，故更改汉化目标</p>
+            </div>
+
+            <h3>2025/12/21</h3>
+            <p>对新游戏的用户界面文本和序章剧情内容进行了翻译和精修工作，包括粗翻、语境校订以及中文语境下文学性的润色</p>
+
+            <h3>2025/12/28</h3>
+            <p>完成了本地化Google Gemini API的部署，付费API部署有效期一个月，以辅助粗翻</p>
+
+            <h3>2025/12/29</h3>
+            <p>完成了所有解包文档的初步翻译，后续将进行细化与修订</p>
+
+            <div class="date-card-newyear">
+                <div class="newyear-screw screw-tl"></div>
+                <div class="newyear-screw screw-tr"></div>
+                <div class="newyear-screw screw-bl"></div>
+                <div class="newyear-screw screw-br"></div>
+                <span class="sparkle-element sparkle-1">✦</span>
+                <span class="sparkle-element sparkle-2">✧</span>
+                <span class="sparkle-element sparkle-3">✦</span>
+                <span class="sparkle-element sparkle-4">✧</span>
+                <span class="sparkle-element sparkle-5">✦</span>
+                <span class="sparkle-element sparkle-6">✧</span>
+                <h3>2026/01/01</h3>
+                <p>Happy New Year</p>
+            </div>
+
+            <h3>2026/01/11</h3>
+            <p>深入学习CSS进阶内容，掌握动画、渐变、变换等高级特性。基于所学知识独立设计了三套独特视觉效果，并通过纯CSS实现，避免对小变成语种依赖导致部署上的问题，成功应用于新增的Podevus映像页面。同步改良并加强了Podevus网站的整体UI效果，提升视觉层次与用户交互体验。修复了评论系统中存在的时间戳显示漏洞，原bug导致所有评论均显示为当前访问时间而非实际发布时间，现已修正为正确的发布时间戳记录与显示机制。</p>
         </div>
 
         <div class="back-link">
@@ -778,15 +1114,57 @@ console.log('[Init] Active Path:', PAGE_PATH);
     });
 
     function parseDate(item) {
-        const raw = item.insertedAt || item.createdAt || item.updatedAt || item.time || item.created;
-        if (!raw) return new Date();
-        if (typeof raw === 'number') return new Date(raw);
-        if (typeof raw === 'string') {
-            let safe = raw.replace(' ', 'T').replace(/-/g, '/');
-            const d = new Date(safe);
-            return isNaN(d.getTime()) ? new Date() : d;
+        // 尝试多种可能的时间字段名
+        const raw = item.insertedAt || item.createdAt || item.created_at || item.updatedAt || item.time || item.created || item.timestamp;
+        
+        if (!raw) {
+            console.warn('[parseDate] No date field found in:', item);
+            return null; // 返回null而不是当前时间
         }
-        return new Date();
+        
+        let date = null;
+        
+        // 处理数字时间戳
+        if (typeof raw === 'number') {
+            // 如果是秒级时间戳，转换为毫秒
+            date = new Date(raw < 10000000000 ? raw * 1000 : raw);
+        }
+        // 处理字符串时间
+        else if (typeof raw === 'string') {
+            // 首先尝试直接解析ISO 8601格式
+            date = new Date(raw);
+            
+            // 如果解析失败，尝试其他格式
+            if (isNaN(date.getTime())) {
+                // 尝试替换空格为T
+                date = new Date(raw.replace(' ', 'T'));
+            }
+            
+            // 如果还是失败，尝试更多格式
+            if (isNaN(date.getTime())) {
+                // 处理 "2025-12-31 22:00:00" 格式
+                const parts = raw.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?/);
+                if (parts) {
+                    date = new Date(parts[1], parts[2] - 1, parts[3], parts[4], parts[5], parts[6] || 0);
+                }
+            }
+        }
+        // 处理对象（可能有__type字段的Waline格式）
+        else if (typeof raw === 'object' && raw !== null) {
+            if (raw.iso) {
+                date = new Date(raw.iso);
+            } else if (raw.__type === 'Date' && raw.iso) {
+                date = new Date(raw.iso);
+            }
+        }
+        
+        // 验证日期有效性
+        if (date && !isNaN(date.getTime())) {
+            return date;
+        }
+        
+        console.warn('[parseDate] Failed to parse date:', raw);
+        return null;
     }
 
     function flattenComments(comments, result = []) {
