@@ -788,6 +788,104 @@ html { scroll-behavior: smooth; }
         0 0 10px rgba(212, 175, 55, 0.3);
 }
 
+.timeline-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.timeline-entry {
+    position: relative;
+    margin-bottom: 50px;
+    padding-left: 180px;
+}
+
+.timeline-date {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 28px;
+    font-weight: 600;
+    color: #B8860B;
+    letter-spacing: 2px;
+    min-width: 150px;
+}
+
+.timeline-content {
+    background: rgba(245, 241, 232, 0.3);
+    border-left: 3px solid #B8860B;
+    padding: 20px 25px;
+    line-height: 1.8;
+}
+
+.timeline-content p {
+    margin: 0 0 12px 0;
+    color: #3E2723;
+    font-size: 15px;
+}
+
+.timeline-content p:last-child {
+    margin-bottom: 0;
+}
+
+.problem-tag {
+    display: inline-block;
+    background: #D84315;
+    color: #FFF;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    margin-right: 8px;
+    font-weight: 500;
+}
+
+.solution-tag {
+    display: inline-block;
+    background: #2E7D32;
+    color: #FFF;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    margin-right: 8px;
+    font-weight: 500;
+}
+
+.highlight-box {
+    background: rgba(184, 134, 11, 0.1);
+    border-left: 3px solid #B8860B;
+    padding: 12px 15px;
+    margin: 15px 0;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.tech-detail {
+    color: #5D4037;
+    font-size: 14px;
+    margin-left: 20px;
+    line-height: 1.7;
+}
+
+.special-card {
+    background: linear-gradient(135deg, rgba(184, 134, 11, 0.15), rgba(245, 241, 232, 0.3));
+    border: 2px solid #B8860B;
+    border-radius: 8px;
+    padding: 25px 30px;
+    position: relative;
+}
+
+.special-card::before {
+    content: "✦";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    color: #B8860B;
+    background: #F5F1E8;
+    padding: 0 15px;
+}
+
     </style>
 </head>
 <body>
@@ -870,83 +968,178 @@ html { scroll-behavior: smooth; }
             <p>这是一篇Capstone Project相关的<strong>开发日志</strong><br>
                 在这里记录关于日语环境编码、工作进程、开发工具使用等方面的内容。</p>
 
-            <h3>2025/09/26</h3>
-            <p>确定项目</p>
+            <div class="timeline-container">
+                
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/09/26</div>
+                    <div class="timeline-content">
+                        <p>确定项目</p>
+                    </div>
+                </div>
 
-            <h3>2025/09/27</h3>
-            <p>深入学习日语编码环境的技术细节，包括Shift-JIS和UTF-8编码系统的转换机制，同时系统性研究AVE Engine的底层运作原理、文件结构和脚本解析逻辑</p>
-            <p>开始初步搭建Podevus个人博客网站，经过多次设计迭代后确定了整体的视觉风格和技术架构，完成了主页的HTML结构搭建和CSS样式设计，实现了基础的响应式布局</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/09/27</div>
+                    <div class="timeline-content">
+                        <p>深入学习日语编码环境（Shift-JIS与UTF-8转换机制），系统研究AVG Engine的底层架构、文件结构和脚本解析逻辑。</p>
+                        <p>启动Podevus个人博客项目，确定大正浪漫风格的视觉方向，完成主页HTML结构和CSS响应式布局。</p>
+                    </div>
+                </div>
 
-            <h3>2025/10/05</h3>
-            <p>经过深入的技术调研和可行性分析，决定将项目主体引擎更换，主要原因是AVE Engine的文档资料相对匮乏且社区支持有限，最终放弃AVE转而采用更成熟、文档更完善的Siglus Engine作为新的技术方向</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/10/05</div>
+                    <div class="timeline-content">
+                        <p>项目技术方案重大调整：因AVG Engine文档匮乏、社区支持有限、工具链不成熟，决定转向Siglus Engine技术路线。Siglus拥有完善文档、成熟工具生态和活跃开发者社区。</p>
+                    </div>
+                </div>
 
-            <h3>2025/10/18</h3>
-            <p>系统学习Siglus Extract工具的使用方法和命令行参数，深入研究其衍生解包器的工作原理，包括文件格式识别、资源提取流程以及各类封包格式的解析技术</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/10/18</div>
+                    <div class="timeline-content">
+                        <p>系统学习SiglusExtract工具的使用方法和命令行参数，深入研究其衍生解包器的工作原理，包括文件格式识别、资源提取流程以及.pck、.dat封包格式的解析技术。</p>
+                    </div>
+                </div>
 
-            <h3>2025/10/25</h3>
-            <p>进行了第一次完整的游戏资源解包操作，成功提取了游戏的脚本文件、图像资源和音频素材</p>
-            <p class="error">问题1：第一次执行解码操作时，解包工具被Windows Defender误判为恶意软件，程序被自动隔离</p>
-            <p>通过将解包工具添加到Windows Defender的排除列表中，并验证了文件的数字签名，成功解决了杀毒软件的误报问题，确保了后续工作的顺利进行</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/10/25</div>
+                    <div class="timeline-content">
+                        <p>首次完整游戏资源解包操作，成功提取脚本文件（.ss）、图像资源（.g00）和音频素材（.ogg/.nwa）。</p>
+                        <div class="highlight-box">
+                            <span class="problem-tag">问题1</span>
+                            解包工具被Windows Defender误判为恶意软件并自动隔离。
+                        </div>
+                        <p class="tech-detail"><span class="solution-tag">解决</span>将SiglusExtract添加到Windows Defender排除列表，并验证文件哈希值确认为官方可信版本。</p>
+                    </div>
+                </div>
 
-            <h3>2025/10/26</h3>
-            <p>完成游戏图片资源的批量解包工作，并进行了细致的分类整理，通过人工筛选和图像识别技术相结合，准确区分出所有包含日文文字、需要进行本地化翻译和重新制作的UI图片素材</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/10/26</div>
+                    <div class="timeline-content">
+                        <p>完成游戏图片资源批量解包，使用vaconv工具将.g00转换为PNG格式。通过人工审核结合OCR识别技术，筛选出所有包含日文UI文字、需要本地化处理的界面素材。</p>
+                    </div>
+                </div>
 
-            <h3>2025/11/01</h3>
-            <p>对游戏的用户界面文本和第一章完整剧情内容进行了初步翻译工作，包括粗翻、语境校订以及文学性的精修润色，确保译文既准确传达原意又符合中文的表达习惯和阅读体验</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/11/01</div>
+                    <div class="timeline-content">
+                        <p>对游戏UI文本和第一章剧情进行系统翻译工作，流程包括：直译确保准确性 → 语境校订 → 文学性润色。</p>
+                    </div>
+                </div>
 
-            <h3>2025/11/15</h3>
-            <p>将第一章翻译完成的文本内容和修订重制好的本地化图片资源进行了完整的封装测试，测试结果显示所有内容均能正常加载和显示</p>
-            <p>使用Siglus Engine的打包工具将修改后的资源重新加密压缩为.pck格式的封包文件,并在游戏环境中进行了多轮实际运行测试，验证了文本显示、图片渲染和交互功能均无异常，未出现乱码、错位或其他显示问题</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/11/15</div>
+                    <div class="timeline-content">
+                        <p>第一章翻译内容和本地化图片完成封装测试。使用ScriptRepacker重打包.ss文件，用SiglusExtract的Repack功能生成.pck封包。</p>
+                        <p>多轮运行测试验证：文本显示、图片加载、对话推进、存档功能均正常，未出现乱码或错位问题。</p>
+                    </div>
+                </div>
 
-            <h3>2025/11/16</h3>
-            <p>启动了Podevus个人博客网站的全面完善和功能扩展工作，开始设计和开发更多的内容模块和交互特性</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/11/16</div>
+                    <div class="timeline-content">
+                        <p>启动Podevus网站的全面完善阶段，系统性开发更多内容模块和交互特性。</p>
+                    </div>
+                </div>
 
-            <h3>2025/11/23</h3>
-            <p>本周集中完善了网站的6个核心内容承载页面，包括页面布局优化、内容展示逻辑改进和视觉效果提升，同时还开发制作了两个功能性测试页面用于验证新特性和交互设计的可行性</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/11/23</div>
+                    <div class="timeline-content">
+                        <p>完成网站6个核心页面的优化：页面布局调整、内容展示逻辑改进、视觉效果统一提升。同时开发两个功能性测试页面用于验证新特性。</p>
+                    </div>
+                </div>
 
-            <h3>2025/11/30</h3>
-            <p>本周设计并绘画/JS程序制作了Podevus的光标显示效果，分别为全局通用和プリマドール相关内容专用的两种。<br>
-            全局通用光标秉承了整个网站的设计风格-简洁的大正浪漫风配色，米白+古铜金+深棕+暖灰的基本色调；<br>
-            プリマドール相关内容专用光标的配色选取了鴉羽衣服的两种主要颜色，并加入了随移动速度加快的自旋效果</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/11/30</div>
+                    <div class="timeline-content">
+                        <p>完成Podevus网站自定义光标系统设计：</p>
+                        <p class="tech-detail">• 全局通用光标：秉承大正浪漫风格，采用米白+古铜金+深棕+暖灰配色</p>
+                        <p class="tech-detail">• プリマドール专用光标：提取鴉羽服饰配色，通过JavaScript实现速度响应式自旋效果</p>
+                    </div>
+                </div>
 
-            <h3>2025/12/07</h3>
-            <p>增加了Podevus网站光标悬停在可交互内容上时浮现的阴影，为Capstone Log页面增加了独特光标效果</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/12/07</div>
+                    <div class="timeline-content">
+                        <p>实现光标悬停交互反馈系统，可交互元素上方浮现柔和阴影效果。为Capstone Log页面定制独特主题光标。</p>
+                    </div>
+                </div>
 
-            <div class="date-card-plate">
-                <div class="plate-screw screw-tl"></div>
-                <div class="plate-screw screw-tr"></div>
-                <div class="plate-screw screw-bl"></div>
-                <div class="plate-screw screw-br"></div>
-                <h3>2025/12/14</h3>
-                <p>计划变更，因为Key社发布新游戏虹彩都市，故更改汉化目标</p>
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/12/14</div>
+                    <div class="timeline-content special-card">
+                        <p><strong>项目目标重大调整</strong></p>
+                        <p>因Key社发布新作《虹彩都市》，决定将汉化目标更改为该作品，以为中文玩家提供更及时的本地化支持。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/12/21</div>
+                    <div class="timeline-content">
+                        <p>对《虹彩都市》UI文本和序章剧情进行系统翻译，严格遵循三阶段流程：粗翻 → 语境校订 → 文学润色。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/12/28</div>
+                    <div class="timeline-content">
+                        <p>完成本地化Google Gemini API部署，获得为期一个月的付费调用权限，用于辅助游戏文本的初步翻译工作。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-entry">
+                    <div class="timeline-date">2025/12/29</div>
+                    <div class="timeline-content">
+                        <p>完成从游戏封包提取的全部文档文件的初步翻译，建立完整文本资料库。后续将进入细化修订阶段。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-entry">
+                    <div class="timeline-date">2026/01/01</div>
+                    <div class="timeline-content special-card">
+                        <p style="text-align: center; font-size: 20px; color: #B8860B; margin: 0;">Happy New Year</p>
+                    </div>
+                </div>
+
+                <div class="timeline-entry">
+                    <div class="timeline-date">2026/01/11</div>
+                    <div class="timeline-content">
+                        <p>深入学习CSS进阶内容（动画、渐变、变换），独立设计三套纯CSS视觉效果并应用于Podevus映像页面。</p>
+                        <p>改良网站整体UI系统，优化视觉层次与交互体验。修复评论系统时间戳显示漏洞，现已正确显示评论创建时间。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-entry">
+                    <div class="timeline-date">2026/01/18</div>
+                    <div class="timeline-content">
+                        <div class="highlight-box">
+                            <span class="problem-tag">问题2</span>
+                            第五次封包测试出现严重渲染异常：中文文本显示为"我 · 了下眼"的形式，部分汉字被替换为间隔符。
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>解决流程：</strong></p>
+                        
+                        <p class="tech-detail">1. 启用SiglusUniversalPatch补丁系统，生成补丁文件解锁中文支持</p>
+                        
+                        <p class="tech-detail">2. 发现字符间距过大问题，判定为UniversalPatch间距修正算法过度补偿</p>
+                        
+                        <p class="tech-detail">3. 字体系统调整：</p>
+                        <p class="tech-detail" style="margin-left: 40px;">• 解包Gameexe.dat，发现默认字体为日文"Kosugi Maru"</p>
+                        <p class="tech-detail" style="margin-left: 40px;">• 选用思源黑体（Source Han Sans SC）替代，圆润风格与原字体相似</p>
+                        <p class="tech-detail" style="margin-left: 40px;">• 安装SourceHanSansSC-Regular.otf到Windows系统</p>
+                        
+                        <p class="tech-detail">4. 修改Gameexe.txt核心配置：</p>
+                        <p class="tech-detail" style="margin-left: 40px;">• 字体名称：<code>CONFIG.FONT.NAME = "Source Han Sans SC"</code></p>
+                        <p class="tech-detail" style="margin-left: 40px;">• 字符间距：<code>MOJI_SPACE = 0, 0</code>（原值0, 18）</p>
+                        <p class="tech-detail" style="margin-left: 40px;">• 渲染优化：<code>FONT.TYPE = 0</code>, <code>FONT.SHADOW = 0</code></p>
+                        <p class="tech-detail" style="margin-left: 40px;">• 禁用描边：<code>SHADOW_COLOR = -1</code>, <code>FUCHI_COLOR = -1</code></p>
+                        
+                        <p class="tech-detail">5. 重新封包、删除savedata缓存、测试验证</p>
+                        
+                        <div class="highlight-box" style="margin-top: 15px; background: rgba(46, 125, 50, 0.1); border-left-color: #2E7D32;">
+                            <strong>最终结果：</strong>字符间距恢复正常，字体渲染清晰均匀，思源黑体圆润风格与原作视觉氛围保持一致。
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <h3>2025/12/21</h3>
-            <p>对新游戏的用户界面文本和序章剧情内容进行了翻译和精修工作，包括粗翻、语境校订以及中文语境下文学性的润色</p>
-
-            <h3>2025/12/28</h3>
-            <p>完成了本地化Google Gemini API的部署，付费API部署有效期一个月，以辅助粗翻</p>
-
-            <h3>2025/12/29</h3>
-            <p>完成了所有解包文档的初步翻译，后续将进行细化与修订</p>
-
-            <div class="date-card-newyear">
-                <div class="newyear-screw screw-tl"></div>
-                <div class="newyear-screw screw-tr"></div>
-                <div class="newyear-screw screw-bl"></div>
-                <div class="newyear-screw screw-br"></div>
-                <span class="sparkle-element sparkle-1">✦</span>
-                <span class="sparkle-element sparkle-2">✧</span>
-                <span class="sparkle-element sparkle-3">✦</span>
-                <span class="sparkle-element sparkle-4">✧</span>
-                <span class="sparkle-element sparkle-5">✦</span>
-                <span class="sparkle-element sparkle-6">✧</span>
-                <h3>2026/01/01</h3>
-                <p>Happy New Year</p>
-            </div>
-
-            <h3>2026/01/11</h3>
-            <p>深入学习CSS进阶内容，掌握动画、渐变、变换等高级特性。基于所学知识独立设计了三套独特视觉效果，并通过纯CSS实现，避免对小变成语种依赖导致部署上的问题，成功应用于新增的Podevus映像页面。同步改良并加强了Podevus网站的整体UI效果，提升视觉层次与用户交互体验。修复了评论系统中存在的时间戳显示漏洞，原bug导致所有评论均显示为当前访问时间而非实际发布时间，现已修正为正确的发布时间戳记录与显示机制。</p>
         </div>
 
         <div class="back-link">
