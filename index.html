@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Podevus</title>
     <link rel="icon" type="image/x-icon" href="logo.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
 
 :root {
@@ -362,11 +365,82 @@ html { scroll-behavior: smooth; }
     .deco-line-v4 { height: 120px; }
 }
 
+/* ==================================================== */
+/* ===== 页面衔接入场遮罩 (Seamless Transition Mask) ===== */
+/* ==================================================== */
+#page-entrance-mask {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--primary-bg); /* 与背景色完全一致，无缝融为一体 */
+    z-index: 100005;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.entrance-content {
+    text-align: center;
+    z-index: 100006;
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.entrance-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--accent-color);
+    margin-bottom: 15px;
+    letter-spacing: 0.05em;
+}
+
+.entrance-subtitle {
+    font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.3em;
+}
+
+.entrance-corner {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    z-index: 100006;
+}
+
+.entrance-corner svg { width: 100%; height: 100%; fill: none; stroke: var(--accent-color); stroke-width: 1.5; }
+.entrance-corner svg circle { fill: var(--accent-color); }
+
+.ec-tl { top: 10px; left: 10px; }
+.ec-tr { top: 10px; right: 10px; transform: scaleX(-1); }
+.ec-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+.ec-br { bottom: 10px; right: 10px; transform: scale(-1); }
+
+/* 主体内容的错层上浮动画 */
+.fade-enter {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+}
     </style>
 </head>
 <body>
 
-    <!-- 装饰线条 -->
+    <div id="page-entrance-mask">
+        <div class="entrance-corner ec-tl"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M5 95 L5 5 L95 5"/><path d="M15 85 L15 15 L85 15"/><circle cx="15" cy="15" r="3"/><circle cx="5" cy="5" r="2"/><path d="M25 5 L25 25 L5 25"/></svg></div>
+        <div class="entrance-corner ec-tr"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M5 95 L5 5 L95 5"/><path d="M15 85 L15 15 L85 15"/><circle cx="15" cy="15" r="3"/><circle cx="5" cy="5" r="2"/><path d="M25 5 L25 25 L5 25"/></svg></div>
+        <div class="entrance-corner ec-bl"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M5 95 L5 5 L95 5"/><path d="M15 85 L15 15 L85 15"/><circle cx="15" cy="15" r="3"/><circle cx="5" cy="5" r="2"/><path d="M25 5 L25 25 L5 25"/></svg></div>
+        <div class="entrance-corner ec-br"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M5 95 L5 5 L95 5"/><path d="M15 85 L15 15 L85 15"/><circle cx="15" cy="15" r="3"/><circle cx="5" cy="5" r="2"/><path d="M25 5 L25 25 L5 25"/></svg></div>
+        
+        <div class="entrance-content" id="entrance-content">
+            <div class="entrance-title">Podevus</div>
+            <div class="entrance-subtitle">記 · 思 · 道</div>
+        </div>
+    </div>
+
     <div class="decorative-lines">
         <div class="deco-line deco-line-h1"></div>
         <div class="deco-line deco-line-h2"></div>
@@ -378,7 +452,6 @@ html { scroll-behavior: smooth; }
         <div class="deco-line deco-line-v4"></div>
     </div>
 
-    <!-- 角落装饰 -->
     <div class="corner-ornament corner-tl">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 95 L5 5 L95 5"/>
@@ -478,46 +551,97 @@ html { scroll-behavior: smooth; }
         <p>© 2025 Podevus</p>
         <p>存质</p>
     </footer>
+
     <script>
-(function() {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile) { document.body.style.cursor = 'auto'; return; }
+    (function() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) { document.body.style.cursor = 'auto'; } 
+        else {
+            const customCursor = document.createElement('div');
+            customCursor.className = 'custom-cursor';
+            document.body.appendChild(customCursor);
 
-    const customCursor = document.createElement('div');
-    customCursor.className = 'custom-cursor';
-    document.body.appendChild(customCursor);
+            let mouseX = 0, mouseY = 0;
 
-    let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX; mouseY = e.clientY;
+                customCursor.style.left = mouseX + 'px';
+                customCursor.style.top = mouseY + 'px';
+            });
 
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX; mouseY = e.clientY;
-        customCursor.style.left = mouseX + 'px';
-        customCursor.style.top = mouseY + 'px';
-    });
+            document.querySelectorAll('a, button, .post, .post-category').forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
 
-    document.querySelectorAll('a, button, .post, .post-category').forEach(el => {
-        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-    });
+            document.addEventListener('mousedown', () => {
+                document.body.classList.add('cursor-active');
+                const ripple = document.createElement('div');
+                ripple.className = 'cursor-ripple';
+                ripple.style.left = mouseX + 'px';
+                ripple.style.top = mouseY + 'px';
+                ripple.style.transform = 'translate(-50%, -50%)';
+                document.body.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
 
-    document.addEventListener('mousedown', () => {
-        document.body.classList.add('cursor-active');
-        const ripple = document.createElement('div');
-        ripple.className = 'cursor-ripple';
-        ripple.style.left = mouseX + 'px';
-        ripple.style.top = mouseY + 'px';
-        ripple.style.transform = 'translate(-50%, -50%)';
-        document.body.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 600);
-    });
+            document.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
+            document.addEventListener('mouseleave', () => customCursor.style.opacity = '0');
+            document.addEventListener('mouseenter', () => customCursor.style.opacity = '1');
+        }
 
-    document.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
-    document.addEventListener('mouseleave', () => customCursor.style.opacity = '0');
-    document.addEventListener('mouseenter', () => customCursor.style.opacity = '1');
-})();
+        // ===== 页面无缝衔接入场动画引擎 =====
+        document.addEventListener("DOMContentLoaded", () => {
+            const mask = document.getElementById('page-entrance-mask');
+            if (mask) {
+                // 动画期间临时禁止页面滚动
+                document.body.style.overflow = 'hidden'; 
+                
+                const content = document.getElementById('entrance-content');
+                // 获取需要依次滑出入场的元素
+                const elementsToAnimate = [
+                    document.querySelector('header'),
+                    ...document.querySelectorAll('.post'),
+                    document.querySelector('footer')
+                ];
+                
+                // 给这些元素打上准备入场的 tag
+                elementsToAnimate.forEach(el => {
+                    if(el) el.classList.add('fade-enter');
+                });
+
+                // --- 完美衔接时间轴 ---
+                // 1. 先停滞 500ms，保持和上一页离开时的画面完全一模一样，形成视觉欺骗
+                setTimeout(() => {
+                    // 2. 中心的标识文字开始消散，并微微上浮
+                    content.style.opacity = '0';
+                    content.style.transform = 'translateY(-20px)';
+                    
+                    // 3. 文字散去后，纯色遮罩褪去，原生地暴露出博客底部的边角、线条装饰和背景
+                    setTimeout(() => {
+                        mask.style.opacity = '0';
+                        mask.style.visibility = 'hidden';
+                        
+                        // 4. 博客的各个区块（头部、文章、页脚）像水波一样依次上浮进入视野
+                        elementsToAnimate.forEach((el, index) => {
+                            setTimeout(() => {
+                                el.classList.add('fade-enter-active');
+                            }, index * 120); // 间隔 120ms，产生阶梯感
+                        });
+
+                        // 5. 动画彻底结束后，恢复页面的正常滚动能力
+                        setTimeout(() => {
+                            document.body.style.overflow = '';
+                        }, elementsToAnimate.length * 120 + 800);
+
+                    }, 600); // 留给中心文字淡出的时间
+                    
+                }, 500); // 视错觉驻留时间
+            }
+        });
+    })();
     </script>
 
-    <!-- 全局音乐播放器 -->
     <script src="assets/music-player.js"></script>
 </body>
 </html>
